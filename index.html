@@ -1,16 +1,30 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#D97706" />
-    <meta name="description" content="CERCLE PRIVÉ - L'excellence immobilière en toute discrétion" />
-    <link rel="manifest" href="/manifest.json" />
-    <title>CERCLE PRIVÉ - Immobilier de Prestige</title>
     
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#D97706" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="OFF MARKET" />
+    <meta name="description" content="L'excellence immobilière en toute discrétion - Biens de prestige en off-market" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <title>CERCLE PRIVÉ - Site Immobilier de Luxe</title>
+  </head>
+  <body>
     <style>
-      /* Loader initial ultra-simple */
+      /* Écran de chargement initial optimisé */
       #initial-loader {
         position: fixed;
         top: 0;
@@ -23,7 +37,6 @@
         align-items: center;
         justify-content: center;
         z-index: 9999;
-        font-family: system-ui, sans-serif;
       }
       
       .loader-title {
@@ -32,30 +45,27 @@
         font-weight: 300;
         letter-spacing: 0.1em;
         margin-bottom: 1rem;
+        font-family: system-ui, -apple-system, sans-serif;
       }
       
       .loader-spinner {
-        width: 2rem;
-        height: 2rem;
-        border: 3px solid #374151;
-        border-top: 3px solid #D97706;
+        width: 3rem;
+        height: 3rem;
+        border: 4px solid #374151;
+        border-top: 4px solid #D97706;
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
       
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      
-      /* Masquer le loader quand React est chargé */
+      /* Transition optimisée */
       .react-loaded #initial-loader {
-        display: none;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-out;
       }
     </style>
-  </head>
-  <body>
-    <!-- Loader initial minimal -->
+    
+    <!-- Écran de chargement initial optimisé -->
     <div id="initial-loader">
       <h1 class="loader-title">CERCLE PRIVÉ</h1>
       <div class="loader-spinner"></div>
@@ -65,28 +75,122 @@
     <script type="module" src="/src/main.tsx"></script>
     
     <script>
-      // Masquer le loader après 2 secondes maximum
-      setTimeout(() => {
-        const loader = document.getElementById('initial-loader');
-        if (loader) {
-          loader.style.display = 'none';
-        }
-      }, 2000);
+      // Optimisation du chargement initial
+      window.addEventListener('DOMContentLoaded', function() {
+        // Gestion d'erreur pour éviter les pages blanches
+        window.addEventListener('error', function(e) {
+          console.error('Erreur de chargement:', e);
+        
+        // Afficher un message d'erreur au lieu d'une page blanche
+        const rootElement = document.getElementById('root');
+        if (rootElement && (rootElement.innerHTML === '' || rootElement.innerHTML.trim() === '')) {
+            document.getElementById('root').innerHTML = `
+            <div style="min-height: 100vh; background: #111827; display: flex; align-items: center; justify-content: center; color: white; text-align: center; font-family: system-ui; padding: 1rem;">
+              <div style="max-width: 500px; width: 100%;">
+                <h1 style="color: #D97706; font-size: 1.75rem; margin-bottom: 1rem; font-weight: 300; letter-spacing: 0.1em;">CERCLE PRIVÉ</h1>
+                <div style="margin-bottom: 2rem;">
+                  <div style="width: 4rem; height: 4rem; border: 4px solid #374151; border-top: 4px solid #D97706; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                  <p style="color: #9CA3AF; margin-bottom: 0.5rem;">Problème de chargement détecté</p>
+                  <p style="color: #6B7280; font-size: 0.875rem;">Tentative de récupération...</p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 300px; margin: 0 auto;">
+                  <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#B45309'" onmouseout="this.style.backgroundColor='#D97706'">
+                    Recharger la page
+                  </button>
+                  <button onclick="localStorage.clear(); window.location.reload();" style="padding: 0.5rem 1rem; background: transparent; color: #6B7280; border: 1px solid #374151; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem; transition: all 0.2s;" onmouseover="this.style.borderColor='#4B5563'; this.style.color='#9CA3AF'" onmouseout="this.style.borderColor='#374151'; this.style.color='#6B7280'">
+                    Réinitialiser et recharger
+                  </button>
+                </div>
+                <p style="color: #4B5563; font-size: 0.75rem; margin-top: 1.5rem; line-height: 1.4;">
+                  Si le problème persiste, contactez-nous à<br>
+                  <a href="mailto:nicolas.c@lacremerie.fr" style="color: #D97706; text-decoration: none;">nicolas.c@lacremerie.fr</a>
+                </div>
+              </div>
+            `;
+          }
+        
+        // Essayer de recharger automatiquement après 5 secondes
+        setTimeout(function() {
+          if (document.getElementById('root').innerHTML.includes('Problème de chargement')) {
+            window.location.reload();
+          }
+        }, 5000);
+        });
+      });
       
-      // Gestion d'erreur simple
-      window.addEventListener('error', (e) => {
-        console.error('Erreur:', e);
+      // Détecter si le JavaScript ne se charge pas du tout
+      setTimeout(function() {
+        const rootElement = document.getElementById('root');
         const loader = document.getElementById('initial-loader');
-        if (loader) {
-          loader.innerHTML = `
-            <h1 class="loader-title">CERCLE PRIVÉ</h1>
-            <p style="color: #9CA3AF; margin-bottom: 1rem;">Erreur de chargement</p>
-            <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer;">
-              Recharger
-            </button>
+        
+        // Si après 3 secondes le loader est toujours visible ET que React n'a pas démarré
+        if (rootElement && rootElement.innerHTML.trim() === '' && loader && loader.style.opacity !== '0') {
+          // Masquer le loader
+          loader.style.display = 'none';
+          
+          rootElement.innerHTML = `
+            <div style="min-height: 100vh; background: #111827; display: flex; align-items: center; justify-content: center; color: white; text-align: center; font-family: system-ui; padding: 1rem;">
+              <div style="max-width: 400px;">
+                <h1 style="color: #D97706; font-size: 1.5rem; margin-bottom: 1rem; font-weight: 300; letter-spacing: 0.1em;">CERCLE PRIVÉ</h1>
+                <p style="color: #9CA3AF; margin-bottom: 1.5rem;">Le site semble bloqué sur le chargement</p>
+                <p style="color: #6B7280; font-size: 0.875rem; margin-bottom: 1.5rem;">Cela peut être dû à une connexion lente ou à un problème temporaire</p>
+                <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500;">
+                  Recharger
+                </button>
+                <div style="margin-top: 1rem;">
+                  <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.reload();" style="padding: 0.5rem 1rem; background: transparent; color: #6B7280; border: 1px solid #374151; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+                    Vider le cache et recharger
+                  </button>
+                  <div style="margin-top: 0.5rem;">
+                    <a href="mailto:nicolas.c@lacremerie.fr" style="color: #D97706; text-decoration: none; font-size: 0.875rem;">
+                      Contacter le support
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           `;
         }
-      });
+      }, 3000); // 3 secondes
+      
+      // Vérification finale après 8 secondes
+      setTimeout(function() {
+        const loader = document.getElementById('initial-loader');
+        const root = document.getElementById('root');
+        
+        // Si le loader initial est toujours visible après 8 secondes
+        if (loader && loader.style.display !== 'none' && loader.style.opacity !== '0') {
+          console.error('Chargement définitivement bloqué, affichage du fallback...');
+          
+          // Masquer le loader et afficher un message d'erreur
+          loader.style.display = 'none';
+          
+          if (root) {
+            root.innerHTML = `
+              <div style="min-height: 100vh; background: #111827; display: flex; align-items: center; justify-content: center; color: white; text-align: center; font-family: system-ui; padding: 1rem;">
+                <div style="max-width: 500px;">
+                  <h1 style="color: #D97706; font-size: 1.75rem; margin-bottom: 1rem; font-weight: 300; letter-spacing: 0.1em;">CERCLE PRIVÉ</h1>
+                  <div style="margin-bottom: 2rem;">
+                    <p style="color: #9CA3AF; margin-bottom: 1rem;">Le site ne répond pas</p>
+                    <p style="color: #6B7280; font-size: 0.875rem;">Problème de chargement détecté après 8 secondes</p>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 300px; margin: 0 auto;">
+                    <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500; transition: background-color 0.2s;">
+                      Recharger la page
+                    </button>
+                    <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.reload();" style="padding: 0.5rem 1rem; background: transparent; color: #6B7280; border: 1px solid #374151; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+                      Vider le cache et recharger
+                    </button>
+                    <a href="mailto:nicolas.c@lacremerie.fr" style="padding: 0.5rem 1rem; background: transparent; color: #D97706; border: 1px solid #D97706; border-radius: 0.375rem; text-decoration: none; font-size: 0.875rem; display: inline-block;">
+                      Contacter le support
+                    </a>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+        }
+      }, 8000); // 8 secondes
     </script>
   </body>
 </html>
