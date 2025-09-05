@@ -88,16 +88,15 @@ self.addEventListener('fetch', (event) => {
             throw error;
           });
       })
-          }
-          // Pour les pages, retourner la page d'accueil en cache
-          if (event.request.mode === 'navigate') {
-            return caches.match('/');
-          }
-          // Retourner une réponse offline simple
-          return new Response('Application hors ligne', {
-            status: 200,
-            headers: { 'Content-Type': 'text/plain' }
-          });
+      .catch(() => {
+        // Pour les pages, retourner la page d'accueil en cache
+        if (event.request.mode === 'navigate') {
+          return caches.match('/');
+        }
+        // Retourner une réponse offline simple
+        return new Response('Application hors ligne', {
+          status: 200,
+          headers: { 'Content-Type': 'text/plain' }
         });
       })
   );
