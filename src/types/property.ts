@@ -12,4 +12,5 @@ export interface Property {
   type: 'villa' | 'appartement' | 'penthouse';
   status: 'disponible' | 'vendu' | 'reserve';
   yield?: number; // Rendement annuel en euros
+  isVisible?: boolean; // Visibilité du bien sur le site
 }

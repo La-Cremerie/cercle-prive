@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Save, X, Home, MapPin, Bed, Bath, Square, Upload, Link, Image, Copy } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Home, MapPin, Bed, Bath, Square, Upload, Link, Image, Copy, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -44,7 +44,8 @@ const PropertyManagement: React.FC = () => {
         features: ['Piscine à débordement', 'Vue mer panoramique', 'Garage 3 voitures', 'Jardin paysager'],
         type: 'villa' as const,
         status: 'disponible' as const,
-        yield: 180000
+        yield: 180000,
+        isVisible: true
       },
       {
         id: '2',
@@ -62,7 +63,8 @@ const PropertyManagement: React.FC = () => {
         features: ['Domaine privé', 'Spa privé', 'Court de tennis', 'Héliport'],
         type: 'villa' as const,
         status: 'disponible' as const,
-        yield: 248000
+        yield: 248000,
+        isVisible: true
       },
       {
         id: '3',
@@ -80,7 +82,8 @@ const PropertyManagement: React.FC = () => {
         features: ['Terrasse 200m²', 'Vue mer et ville', 'Concierge 24h/24', 'Parking privé'],
         type: 'penthouse' as const,
         status: 'reserve' as const,
-        yield: 512000
+        yield: 512000,
+        isVisible: true
       }
     ];
     
@@ -102,7 +105,8 @@ const PropertyManagement: React.FC = () => {
     features: [],
     type: 'villa',
     status: 'disponible',
-    yield: 0
+    yield: 0,
+    isVisible: true
   });
   const [newFeature, setNewFeature] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -134,7 +138,8 @@ const PropertyManagement: React.FC = () => {
       description: '',
       features: [],
       type: 'villa',
-      status: 'disponible'
+      status: 'disponible',
+      isVisible: true
     });
     setNewFeature('');
     setNewImageUrl('');
@@ -250,7 +255,9 @@ const PropertyManagement: React.FC = () => {
       description: formData.description || '',
       features: formData.features || [],
       type: formData.type || 'villa',
-      status: formData.status || 'disponible'
+      status: formData.status || 'disponible',
+      yield: formData.yield || 0,
+      isVisible: formData.isVisible !== false
     };
 
     if (editingProperty) {
@@ -372,6 +379,15 @@ const PropertyManagement: React.FC = () => {
                 {property.status === 'disponible' ? 'Disponible' : 
                  property.status === 'reserve' ? 'Réservé' : 'Vendu'}
               </div>
+              
+              {/* Visibility Badge */}
+              <div className={`absolute top-3 left-20 px-2 py-1 rounded-full text-xs font-medium ${
+                property.isVisible 
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              }`}>
+                {property.isVisible ? 'Visible' : 'Masqué'}
+              </div>
 
               {/* Actions */}
               <div className="absolute top-3 right-3 flex space-x-2">
@@ -393,6 +409,35 @@ const PropertyManagement: React.FC = () => {
                   className="p-2 bg-white/90 text-red-600 rounded-full hover:bg-white transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+              
+              {/* Toggle visibility button */}
+              <div className="absolute bottom-3 right-3">
+                <button
+                  onClick={() => {
+                    const updatedProperties = properties.map(p => 
+                      p.id === property.id 
+                        ? { ...p, isVisible: !p.isVisible }
+                        : p
+                    );
+                    setProperties(updatedProperties);
+                    localStorage.setItem('properties', JSON.stringify(updatedProperties));
+                    window.dispatchEvent(new Event('storage'));
+                    toast.success(`Bien ${property.isVisible ? 'masqué' : 'rendu visible'}`);
+                  }}
+                  className={`p-2 rounded-full backdrop-blur-sm transition-colors ${
+                    property.isVisible
+                      ? 'bg-green-500/80 text-white hover:bg-green-600'
+                      : 'bg-red-500/80 text-white hover:bg-red-600'
+                  }`}
+                  title={property.isVisible ? 'Masquer ce bien' : 'Rendre visible ce bien'}
+                >
+                  {property.isVisible ? (
+                    <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -611,6 +656,38 @@ const PropertyManagement: React.FC = () => {
                     <option value="reserve">Réservé</option>
                     <option value="vendu">Vendu</option>
                   </select>
+                </div>
+                
+                {/* Visibilité */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Visibilité sur le site
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="visibility"
+                        checked={formData.isVisible === true}
+                        onChange={() => setFormData(prev => ({ ...prev, isVisible: true }))}
+                        className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Visible</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="visibility"
+                        checked={formData.isVisible === false}
+                        onChange={() => setFormData(prev => ({ ...prev, isVisible: false }))}
+                        className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Masqué</span>
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Les biens masqués n'apparaîtront pas sur le site public
+                  </p>
                 </div>
 
                 {/* Description */}

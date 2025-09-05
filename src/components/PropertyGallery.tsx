@@ -94,8 +94,8 @@ const PropertyGallery: React.FC = () => {
   }, []);
 
   const filteredProperties = filter === 'all' 
-    ? properties 
-    : properties.filter(p => p.type === filter);
+    ? properties.filter(p => p.isVisible !== false)
+    : properties.filter(p => p.type === filter && p.isVisible !== false);
 
   const toggleFavorite = (propertyId: string) => {
     setFavorites(prev => {
