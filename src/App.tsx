@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 // Import direct du LoginForm pour éviter le lazy loading
 const LoginForm = React.lazy(() => import('./components/LoginForm'));
@@ -18,6 +18,10 @@ function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+
+  // États pour la gestion d'erreur avancée
+  const [retryCount, setRetryCount] = useState(0);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   // Composants du site principal (chargés après login)
   const [MainSiteComponents, setMainSiteComponents] = useState<{
@@ -61,6 +65,7 @@ function App() {
     
     try {
       setLoadingError(null);
+      setLastError(null);
       // Chargement en parallèle avec Promise.allSettled pour éviter qu'une erreur bloque tout
       const mainImports = await Promise.allSettled([
         import('./components/Navigation'),
@@ -126,10 +131,42 @@ function App() {
 
       setMainSiteComponents(components);
       setMainSiteLoaded(true);
+      setRetryCount(0); // Reset retry count on success
     } catch (error) {
       console.error('Erreur lors du chargement du site:', error);
-      setLoadingError('Erreur critique lors du chargement');
+      const errorMessage = error instanceof Error ? error.message : 'Erreur critique lors du chargement';
+      setLoadingError(errorMessage);
+      setLastError(errorMessage);
     }
+  };
+
+  // Fonction de retry avec backoff
+  const retryLoadMainSite = async () => {
+    if (retryCount >= 3) {
+      setLoadingError('Impossible de charger le site après plusieurs tentatives');
+      return;
+    }
+    
+    setRetryCount(prev => prev + 1);
+    setLoadingError(null);
+    setMainSiteLoaded(false);
+    setMainSiteComponents(null);
+    
+    // Délai progressif : 1s, 2s, 3s
+    await new Promise(resolve => setTimeout(resolve, retryCount * 1000 + 1000));
+    
+    await loadMainSite();
+  };
+
+  // Fonction pour revenir au login
+  const backToLogin = () => {
+    localStorage.removeItem('userLoggedIn');
+    localStorage.removeItem('userData');
+    setIsLoggedIn(false);
+    setMainSiteLoaded(false);
+    setMainSiteComponents(null);
+    setLoadingError(null);
+    setRetryCount(0);
   };
 
   const handleLoginSuccess = async () => {
@@ -210,17 +247,47 @@ function App() {
           <div className="text-center max-w-md">
             <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-light text-white mb-4 tracking-wider">
-              Erreur de chargement
+              Problème de chargement
             </h2>
             <p className="text-gray-400 font-light mb-6">
               {loadingError}
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
-            >
-              Recharger la page
-            </button>
+            <div className="space-y-3">
+              {retryCount < 3 && (
+                <button
+                  onClick={retryLoadMainSite}
+                  disabled={retryCount >= 3}
+                  className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                  <span>Réessayer ({retryCount}/3)</span>
+                </button>
+              )}
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                <RefreshCw className="w-5 h-5" />
+                <span>Recharger la page</span>
+              </button>
+              <button
+                onClick={backToLogin}
+                className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+              >
+                <Home className="w-5 h-5" />
+                <span>Retour à l'accueil</span>
+              </button>
+            </div>
+            {lastError && (
+              <details className="mt-4 text-left">
+                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-400">
+                  Détails techniques
+                </summary>
+                <pre className="mt-2 text-xs text-gray-600 bg-gray-800 p-3 rounded overflow-auto">
+                  {lastError}
+                </pre>
+              </details>
+            )}
           </div>
         </div>
       );
@@ -233,7 +300,13 @@ function App() {
           <h2 className="text-xl font-light text-white mb-2 tracking-wider">
             CERCLE PRIVÉ
           </h2>
-          <p className="text-gray-400 font-light">Chargement de votre espace privé...</p>
+          <p className="text-gray-400 font-light">
+            Chargement de votre espace privé...
+            {retryCount > 0 && ` (Tentative ${retryCount + 1})`}
+          </p>
+          <div className="mt-4 w-64 bg-gray-800 rounded-full h-1 mx-auto">
+            <div className="bg-yellow-600 h-1 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+          </div>
         </div>
       </div>
     );
