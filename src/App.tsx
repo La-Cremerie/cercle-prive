@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import AdminLogin from './components/AdminLogin';
+import AdminPanel from './components/AdminPanel';
 import { Toaster } from 'react-hot-toast';
 
 // Composant de connexion simplifié
@@ -119,11 +121,15 @@ const LoginForm: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess })
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   useEffect(() => {
     // Vérifier si l'utilisateur est déjà connecté
     const userLoggedIn = localStorage.getItem('userLoggedIn');
+    const adminLoggedIn = localStorage.getItem('adminLoggedIn');
     setIsLoggedIn(userLoggedIn === 'true');
+    setIsAdminLoggedIn(adminLoggedIn === 'true');
     setIsLoading(false);
   }, []);
 
@@ -137,6 +143,16 @@ function App() {
     setIsLoggedIn(false);
   };
 
+  const handleAdminLoginSuccess = () => {
+    setIsAdminLoggedIn(true);
+    setShowAdminLogin(false);
+  };
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem('adminLoggedIn');
+    setIsAdminLoggedIn(false);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -145,6 +161,21 @@ function App() {
           <p className="font-light">Chargement...</p>
         </div>
       </div>
+    );
+  }
+
+  // Si admin connecté, afficher le panel admin
+  if (isAdminLoggedIn) {
+    return <AdminPanel onLogout={handleAdminLogout} />;
+  }
+
+  // Si demande de connexion admin, afficher le formulaire admin
+  if (showAdminLogin) {
+    return (
+      <AdminLogin 
+        onLoginSuccess={handleAdminLoginSuccess}
+        onBack={() => setShowAdminLogin(false)}
+      />
     );
   }
 
@@ -177,6 +208,12 @@ function App() {
                   className="text-sm font-light text-red-400 hover:text-red-300 transition-colors"
                 >
                   DÉCONNEXION
+                </button>
+                <button
+                  onClick={() => setShowAdminLogin(true)}
+                  className="text-sm font-light text-gray-400 hover:text-yellow-500 transition-colors"
+                >
+                  ADMIN
                 </button>
               </div>
             </div>
