@@ -137,9 +137,6 @@ const LoginForm = ({ onLoginSuccess }: { onLoginSuccess: () => void }) => {
               onChange={(e) => setFormData(prev => ({ ...prev, prenom: e.target.value }))}
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               required
-            />
-          </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email *
@@ -152,7 +149,7 @@ const LoginForm = ({ onLoginSuccess }: { onLoginSuccess: () => void }) => {
               required
             />
           </div>
-
+            />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Téléphone *
@@ -165,7 +162,7 @@ const LoginForm = ({ onLoginSuccess }: { onLoginSuccess: () => void }) => {
               required
             />
           </div>
-
+          </div>
           <button
             type="submit"
             disabled={isSubmitting}
