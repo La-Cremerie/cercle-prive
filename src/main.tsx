@@ -58,3 +58,4 @@ if (document.readyState === 'loading') {
 
   // Service worker registration (après le rendu)
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
+}
