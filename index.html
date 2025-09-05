@@ -23,7 +23,67 @@
     <title>CERCLE PRIVÉ - Site Immobilier de Luxe</title>
   </head>
   <body>
+    <style>
+      /* Écran de chargement initial pour éviter la page blanche */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #111827;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      
+      #initial-loader h1 {
+        color: #D97706;
+        font-size: 1.5rem;
+        font-weight: 300;
+        letter-spacing: 0.1em;
+        margin-bottom: 1rem;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      
+      .spinner {
+        width: 3rem;
+        height: 3rem;
+        border: 4px solid #374151;
+        border-top: 4px solid #D97706;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Masquer le loader une fois React chargé */
+      .react-loaded #initial-loader {
+        display: none;
+      }
+    </style>
+    
+    <!-- Écran de chargement initial -->
+    <div id="initial-loader">
+      <h1>CERCLE PRIVÉ</h1>
+      <div class="spinner"></div>
+    </div>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+      // Masquer le loader initial une fois que React est prêt
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          document.body.classList.add('react-loaded');
+        }, 100);
+      });
+    </script>
   </body>
 </html>

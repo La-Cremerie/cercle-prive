@@ -34,9 +34,6 @@ function App() {
 
   useEffect(() => {
     const initializeApp = async () => {
-      // Petit délai pour éviter la page blanche
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
       // Vérifier si l'utilisateur est déjà connecté
       const userLoggedIn = localStorage.getItem('userLoggedIn');
       if (userLoggedIn === 'true') {

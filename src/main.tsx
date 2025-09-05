@@ -22,3 +22,8 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 );
+
+// Masquer le loader initial une fois React monté
+setTimeout(() => {
+  document.body.classList.add('react-loaded');
+}, 50);
