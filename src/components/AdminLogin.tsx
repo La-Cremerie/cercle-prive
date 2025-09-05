@@ -12,15 +12,26 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Mots de passe admin simples (en production, utilisez une vraie authentification)
+  const ADMIN_PASSWORDS = {
+    'nicolas.c@lacremerie.fr': 'lacremerie2025',
+    'quentin@lacremerie.fr': '123'
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    // Mot de passe admin simple
+    // Récupérer l'email admin depuis localStorage ou utiliser nicolas par défaut
+    const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+    const expectedPassword = ADMIN_PASSWORDS[adminEmail as keyof typeof ADMIN_PASSWORDS] || ADMIN_PASSWORDS['nicolas.c@lacremerie.fr'];
+
+    // Simulation d'une vérification
     setTimeout(() => {
-      if (password === 'lacremerie2025') {
+      if (password === expectedPassword) {
         localStorage.setItem('adminLoggedIn', 'true');
+        localStorage.setItem('currentAdminEmail', adminEmail);
         onLoginSuccess();
       } else {
         setError('Mot de passe incorrect');
@@ -37,6 +48,9 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
           <h2 className="text-2xl font-light text-gray-900 mb-2">
             Accès Administrateur
           </h2>
+          <p className="text-gray-600 font-light mb-4">
+            Compte: {localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr'}
+          </p>
           <p className="text-gray-600 font-light">
             Veuillez entrer votre mot de passe
           </p>

@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Settings, Bell } from 'lucide-react';
+import { useNotifications } from '../hooks/useNotifications';
 import ThemeToggle from './ThemeToggle';
 
-const Navigation: React.FC = () => {
+interface NavigationProps {
+  onAdminClick?: () => void;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { unreadCount, markAsRead } = useNotifications();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleAdminClick = () => {
+    markAsRead();
+    onAdminClick?.();
+  };
 
   return (
     <nav className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 shadow-sm">
@@ -40,6 +50,20 @@ const Navigation: React.FC = () => {
             </a>
             
             <ThemeToggle />
+            
+            {onAdminClick && (
+              <button
+                onClick={handleAdminClick}
+                className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
+              >
+                <Settings className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -92,6 +116,22 @@ const Navigation: React.FC = () => {
               >
                 VENDRE
               </a>
+              {onAdminClick && (
+                <button
+                  onClick={() => {
+                    handleAdminClick();
+                    toggleMenu();
+                  }}
+                  className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
+                >
+                  <Settings className="w-4 h-4" />
+                  {unreadCount > 0 && (
+                    <span className="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center ml-2">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         )}

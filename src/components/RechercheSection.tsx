@@ -49,7 +49,7 @@ const RechercheSection: React.FC = () => {
   ];
 
   const autresCriteresOptions = [
-    'Aucune mitoyenneté', 'Sans travaux', 'Orienté sud', 'Piscine', 'Ascenseur', 'Aire d\'envol', 'Vue mer', 'Pleine vue mer'
+    'Aucune mitoyenneté', 'Sans travaux', 'Orienté sud', 'Piscine', 'Ascenseur', 'Aire d\'envol'
   ];
 
   const [autreLibre, setAutreLibre] = useState('');
@@ -99,21 +99,21 @@ const RechercheSection: React.FC = () => {
 
   if (isSuccess) {
     return (
-      <section id="recherche" className="py-20 lg:py-32 bg-gray-50">
+      <section id="recherche" className="py-20 lg:py-32 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg shadow-xl p-12"
+            className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-12"
           >
             <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
-            <h3 className="text-3xl font-light text-gray-900 mb-4">
+            <h3 className="text-3xl font-light text-gray-900 dark:text-white mb-4">
               Recherche enregistrée !
             </h3>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
               Nous analysons votre demande et vous contacterons dès qu'un bien correspondant à vos critères sera disponible.
             </p>
-            <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
+            <div className="flex items-center justify-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
                 <span>Contact sous 48h</span>
@@ -130,36 +130,36 @@ const RechercheSection: React.FC = () => {
   }
 
   return (
-    <section id="recherche" className="py-20 lg:py-32 bg-gray-50">
+    <section id="recherche" className="py-20 lg:py-32 bg-gray-50 dark:bg-gray-800">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-light text-yellow-600 tracking-wide mb-8">
-            RECHERCHE PERSONNALISÉE
+            Trouvez votre bien d'exception
           </h2>
           <div className="w-24 h-px bg-yellow-600 mx-auto mb-8"></div>
-          <p className="text-lg text-gray-700 font-light leading-relaxed max-w-3xl mx-auto">
-            Trouvez votre bien d'exception grâce à notre recherche sur-mesure
+          <p className="text-lg text-gray-700 dark:text-gray-300 font-light leading-relaxed max-w-3xl mx-auto">
+            Recherche personnalisée parmi nos propriétés de prestige
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Que recherchez-vous ? */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Que recherchez-vous ?
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
                 {typesBien.map((type) => (
-                  <label key={type} className="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 transition-colors">
+                  <label key={type} className="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.typeBien.includes(type)}
                       onChange={() => handleCheckboxChange('typeBien', type)}
                       className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                     />
-                    <span className="text-xs text-gray-700">{type}</span>
+                    <span className="text-xs text-gray-700 dark:text-gray-300">{type}</span>
                   </label>
                 ))}
               </div>
@@ -167,12 +167,12 @@ const RechercheSection: React.FC = () => {
 
             {/* Surfaces */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Surfaces et caractéristiques
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                Surfaces
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Surface min. (en m²)
                   </label>
                   <input
@@ -180,12 +180,12 @@ const RechercheSection: React.FC = () => {
                     name="surfaceMin"
                     value={formData.surfaceMin}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     placeholder="150"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Nombre de chambres min.
                   </label>
                   <input
@@ -193,12 +193,12 @@ const RechercheSection: React.FC = () => {
                     name="nombreChambresMin"
                     value={formData.nombreChambresMin}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     placeholder="3"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Nombre de sdb min.
                   </label>
                   <input
@@ -206,60 +206,213 @@ const RechercheSection: React.FC = () => {
                     name="nombreSdbMin"
                     value={formData.nombreSdbMin}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     placeholder="2"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Autres critères */}
+            {/* Extérieur */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Critères spécifiques
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                Extérieur
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Type d'extérieur
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="exterieur"
+                        value="oui"
+                        checked={formData.exterieur === 'oui'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Oui</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="exterieur"
+                        value="pas-important"
+                        checked={formData.exterieur === 'pas-important'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Pas important</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Surface ext. (en m²)
+                  </label>
+                  <input
+                    type="number"
+                    name="surfaceExtMin"
+                    value={formData.surfaceExtMin}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    placeholder="100"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Stationnement
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="stationnement"
+                        value="oui"
+                        checked={formData.stationnement === 'oui'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Oui</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        name="stationnement"
+                        value="ferme"
+                        checked={formData.stationnement === 'ferme'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Fermé</span>
+                    </label>
+                    <label className="flex items-center space-x-2 md:col-span-2">
+                      <input
+                        type="radio"
+                        name="stationnement"
+                        value="pas-important"
+                        checked={formData.stationnement === 'pas-important'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Pas important</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Autres critères indispensables */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                Autres critères indispensables
+              </h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {autresCriteresOptions.map((critere) => (
-                  <label key={critere} className="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 transition-colors">
+                  <label key={critere} className="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.autresCriteres.includes(critere)}
                       onChange={() => handleCheckboxChange('autresCriteres', critere)}
                       className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                     />
-                    <span className="text-xs text-gray-700">{critere}</span>
+                    <span className="text-xs text-gray-700 dark:text-gray-300">{critere}</span>
                   </label>
                 ))}
+                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.autresCriteres.includes('Vue mer')}
+                      onChange={() => handleCheckboxChange('autresCriteres', 'Vue mer')}
+                      className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
+                    />
+                    <span className="text-xs text-gray-700 dark:text-gray-300">Vue mer</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={formData.autresCriteres.includes('Pleine vue mer')}
+                      onChange={() => handleCheckboxChange('autresCriteres', 'Pleine vue mer')}
+                      className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
+                    />
+                    <span className="text-xs text-gray-700 dark:text-gray-300">Pleine vue mer</span>
+                  </label>
+                </div>
+                
+                {/* Autre critère libre */}
+                <div>
+                  <label className="flex items-center space-x-2 cursor-pointer mb-3">
+                    <input
+                      type="checkbox"
+                      checked={formData.autresCriteres.includes('Autre: ' + autreLibre) && autreLibre.trim() !== ''}
+                      onChange={(e) => {
+                        if (e.target.checked && autreLibre.trim()) {
+                          handleCheckboxChange('autresCriteres', 'Autre: ' + autreLibre);
+                        } else if (!e.target.checked) {
+                          setFormData(prev => ({
+                            ...prev,
+                            autresCriteres: prev.autresCriteres.filter(item => !item.startsWith('Autre:'))
+                          }));
+                        }
+                      }}
+                      className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
+                    />
+                    <span className="text-xs text-gray-700 dark:text-gray-300">Autre :</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={autreLibre}
+                    onChange={(e) => {
+                      setAutreLibre(e.target.value);
+                      // Mettre à jour automatiquement la liste si la case est cochée
+                      if (formData.autresCriteres.some(item => item.startsWith('Autre:'))) {
+                        setFormData(prev => ({
+                          ...prev,
+                          autresCriteres: [
+                            ...prev.autresCriteres.filter(item => !item.startsWith('Autre:')),
+                            ...(e.target.value.trim() ? ['Autre: ' + e.target.value] : [])
+                          ]
+                        }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    placeholder="Spécifiez votre critère personnalisé..."
+                  />
+                </div>
               </div>
             </div>
 
             {/* Emplacement et Budget */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   Emplacement
                 </h3>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Villes ou codes postaux de recherche
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Villes ou codes postaux de recherche (plusieurs villes possibles)
                   </label>
                   <textarea
                     name="villesRecherche"
                     value={formData.villesRecherche}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     placeholder="Cannes, Saint-Tropez, Monaco, 06400, 83990..."
                   />
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   Budget
                 </h3>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Budget maximum (hors frais de notaire)
                   </label>
                   <input
@@ -267,21 +420,91 @@ const RechercheSection: React.FC = () => {
                     name="budgetMin"
                     value={formData.budgetMin}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     placeholder="2 500 000 €"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Votre financement */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                Votre financement
+              </h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Est-ce que vous allez faire un prêt pour cet achat ?
+                    </label>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="pret"
+                          value="oui"
+                          checked={formData.pret === 'oui'}
+                          onChange={handleInputChange}
+                          className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Oui</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="pret"
+                          value="non"
+                          checked={formData.pret === 'non'}
+                          onChange={handleInputChange}
+                          className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Non</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Avez-vous validé votre financement par un banquier ou un courtier ?
+                    </label>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="bancaire"
+                          value="oui"
+                          checked={formData.bancaire === 'oui'}
+                          onChange={handleInputChange}
+                          className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Oui</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="bancaire"
+                          value="non"
+                          checked={formData.bancaire === 'non'}
+                          onChange={handleInputChange}
+                          className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Non</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Vos coordonnées */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Vos coordonnées
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Prénom *
                   </label>
                   <div className="relative">
@@ -291,13 +514,13 @@ const RechercheSection: React.FC = () => {
                       name="prenom"
                       value={formData.prenom}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Nom *
                   </label>
                   <div className="relative">
@@ -307,13 +530,13 @@ const RechercheSection: React.FC = () => {
                       name="nom"
                       value={formData.nom}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email *
                   </label>
                   <div className="relative">
@@ -323,13 +546,13 @@ const RechercheSection: React.FC = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Téléphone *
                   </label>
                   <div className="relative">
@@ -339,7 +562,7 @@ const RechercheSection: React.FC = () => {
                       name="telephone"
                       value={formData.telephone}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
@@ -357,7 +580,7 @@ const RechercheSection: React.FC = () => {
             </button>
           </form>
 
-          <p className="text-xs text-gray-500 text-center mt-6">
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-6">
             Recherche gratuite et confidentielle. Nous vous contacterons uniquement si nous avons des biens correspondant à vos critères.
           </p>
         </div>
