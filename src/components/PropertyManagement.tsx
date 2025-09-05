@@ -225,6 +225,7 @@ const PropertyManagement: React.FC = () => {
       }
     }
   };
+
   const handleDelete = (propertyId: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce bien ?')) {
       const updatedProperties = properties.filter(p => p.id !== propertyId);
@@ -462,16 +463,6 @@ const PropertyManagement: React.FC = () => {
                   </span>
                 </div>
               )}
-              
-              {/* Rendement */}
-              {property.yield && property.yield > 0 && (
-                <div className="mb-3">
-                  <span className="text-sm text-green-600 font-medium">
-                    {property.yield.toLocaleString('fr-FR')} € / an
-                  </span>
-                </div>
-              )}
-              
               <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center">

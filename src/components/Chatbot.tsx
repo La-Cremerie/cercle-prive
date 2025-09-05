@@ -228,6 +228,7 @@ const Chatbot: React.FC = () => {
                   disabled={!inputValue.trim() || isTyping}
                   className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
+                  <Send className="w-4 h-4" />
                 </button>
               </div>
             </div>
