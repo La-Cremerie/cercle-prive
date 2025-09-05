@@ -112,7 +112,7 @@ export class UserService {
         .from('user_registrations')
         .select('*')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         throw new Error(`Erreur lors de la recherche: ${error.message}`);
