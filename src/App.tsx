@@ -631,6 +631,12 @@ function App() {
         </div>
       </section>
 
+      {/* Section Recherche */}
+      <RechercheSection />
+
+      {/* Section Vendre */}
+      <VendreSection />
+
       <Toaster position="top-right" />
       <Chatbot />
     </div>

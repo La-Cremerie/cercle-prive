@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Euro, Clock, Shield, CheckCircle, Phone, Mail, Send } from 'lucide-react';
+import { Home, Euro, Clock, Shield, CheckCircle, Phone, Mail, Send, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -87,21 +87,21 @@ const VendreSection: React.FC = () => {
 
   if (isSuccess) {
     return (
-      <section id="vendre" className="py-20 lg:py-32 bg-gray-50 dark:bg-gray-800">
+      <section id="vendre" className="py-20 lg:py-32 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-12"
+            className="bg-white rounded-lg shadow-xl p-12"
           >
             <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
-            <h3 className="text-3xl font-light text-gray-900 dark:text-white mb-4">
+            <h3 className="text-3xl font-light text-gray-900 mb-4">
               Demande envoyée avec succès !
             </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+            <p className="text-lg text-gray-600 mb-8">
               Nous vous contacterons sous 24h pour évaluer votre bien et vous proposer notre accompagnement personnalisé.
             </p>
-            <div className="flex items-center justify-center space-x-6 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
               <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
                 <span>Appel sous 24h</span>
@@ -118,7 +118,7 @@ const VendreSection: React.FC = () => {
   }
 
   return (
-    <section id="vendre" className="py-20 lg:py-32 bg-gray-50 dark:bg-gray-800">
+    <section id="vendre" className="py-20 lg:py-32 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
@@ -126,7 +126,7 @@ const VendreSection: React.FC = () => {
             VENDRE VOTRE BIEN
           </h2>
           <div className="w-24 h-px bg-yellow-600 mx-auto mb-8"></div>
-          <p className="text-lg text-gray-700 dark:text-gray-300 font-light leading-relaxed max-w-4xl mx-auto">
+          <p className="text-lg text-gray-700 font-light leading-relaxed max-w-4xl mx-auto">
             Confiez-nous la vente de votre bien immobilier de prestige. Notre approche off-market garantit discrétion, 
             valorisation optimale et accompagnement personnalisé pour une transaction réussie.
           </p>
@@ -135,7 +135,7 @@ const VendreSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           {/* Avantages */}
           <div className="space-y-8">
-            <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-8">
+            <h3 className="text-2xl font-light text-gray-900 mb-8">
               Pourquoi nous choisir ?
             </h3>
             
@@ -146,16 +146,16 @@ const VendreSection: React.FC = () => {
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="flex items-start space-x-4 p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm"
+                  className="flex items-start space-x-4 p-6 bg-white rounded-lg shadow-sm"
                 >
                   <div className="flex-shrink-0">
                     {avantage.icon}
                   </div>
                   <div>
-                    <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">
                       {avantage.title}
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-400 font-light leading-relaxed">
+                    <p className="text-gray-600 font-light leading-relaxed">
                       {avantage.description}
                     </p>
                   </div>
@@ -164,20 +164,20 @@ const VendreSection: React.FC = () => {
             </div>
 
             {/* Contact direct */}
-            <div className="bg-white dark:bg-gray-900 border-2 border-amber-400 rounded-lg p-8 shadow-sm">
-              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+            <div className="bg-white border-2 border-yellow-400 rounded-lg p-8 shadow-sm">
+              <h4 className="text-lg font-medium text-gray-900 mb-4">
                 Besoin d'un conseil immédiat ?
               </h4>
               <div className="flex items-center justify-center space-x-8">
                 <a
                   href="tel:+33652913556"
-                  className="flex items-center justify-center w-12 h-12 border-2 border-amber-400 rounded-full text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300 hover:scale-110"
+                  className="flex items-center justify-center w-12 h-12 border-2 border-yellow-400 rounded-full text-yellow-600 hover:bg-yellow-50 transition-all duration-300 hover:scale-110"
                 >
                   <Phone className="w-5 h-5" />
                 </a>
                 <a
                   href="mailto:nicolas.c@lacremerie.fr"
-                  className="flex items-center justify-center w-12 h-12 border-2 border-amber-400 rounded-full text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300 hover:scale-110"
+                  className="flex items-center justify-center w-12 h-12 border-2 border-yellow-400 rounded-full text-yellow-600 hover:bg-yellow-50 transition-all duration-300 hover:scale-110"
                 >
                   <Mail className="w-5 h-5" />
                 </a>
@@ -186,13 +186,13 @@ const VendreSection: React.FC = () => {
           </div>
 
           {/* Formulaire de contact */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8">
+          <div className="bg-white rounded-lg shadow-xl p-8">
             <div className="text-center mb-8">
               <Home className="w-12 h-12 text-yellow-600 mx-auto mb-4" />
-              <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-2">
+              <h3 className="text-2xl font-light text-gray-900 mb-2">
                 Estimation gratuite
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600">
                 Obtenez une évaluation professionnelle de votre bien
               </p>
             </div>
@@ -201,7 +201,7 @@ const VendreSection: React.FC = () => {
               {/* Informations personnelles */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nom *
                   </label>
                   <input
@@ -209,12 +209,12 @@ const VendreSection: React.FC = () => {
                     name="nom"
                     value={formData.nom}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Prénom *
                   </label>
                   <input
@@ -222,7 +222,7 @@ const VendreSection: React.FC = () => {
                     name="prenom"
                     value={formData.prenom}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -230,7 +230,7 @@ const VendreSection: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Email *
                   </label>
                   <input
@@ -238,12 +238,12 @@ const VendreSection: React.FC = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Téléphone *
                   </label>
                   <input
@@ -251,7 +251,7 @@ const VendreSection: React.FC = () => {
                     name="telephone"
                     value={formData.telephone}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -260,14 +260,14 @@ const VendreSection: React.FC = () => {
               {/* Informations sur le bien */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Type de bien *
                   </label>
                   <select
                     name="typeVente"
                     value={formData.typeVente}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     required
                   >
                     <option value="villa">Villa</option>
@@ -279,7 +279,7 @@ const VendreSection: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Localisation *
                   </label>
                   <input
@@ -288,7 +288,7 @@ const VendreSection: React.FC = () => {
                     value={formData.localisation}
                     onChange={handleInputChange}
                     placeholder="Cannes, Saint-Tropez, Monaco..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     required
                   />
                 </div>
@@ -296,7 +296,7 @@ const VendreSection: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Prix estimé
                   </label>
                   <input
@@ -305,18 +305,18 @@ const VendreSection: React.FC = () => {
                     value={formData.prixEstime}
                     onChange={handleInputChange}
                     placeholder="2 500 000 €"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Urgence de vente
                   </label>
                   <select
                     name="urgence"
                     value={formData.urgence}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                   >
                     <option value="normale">Normale (6-12 mois)</option>
                     <option value="rapide">Rapide (3-6 mois)</option>
@@ -327,7 +327,7 @@ const VendreSection: React.FC = () => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description de votre bien
                 </label>
                 <textarea
@@ -336,7 +336,7 @@ const VendreSection: React.FC = () => {
                   onChange={handleInputChange}
                   rows={4}
                   placeholder="Décrivez votre bien : nombre de pièces, caractéristiques particulières, vue, équipements..."
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                 />
               </div>
 
@@ -350,7 +350,7 @@ const VendreSection: React.FC = () => {
               </button>
             </form>
 
-            <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-6">
+            <p className="text-xs text-gray-500 text-center mt-6">
               Estimation gratuite et sans engagement. Réponse sous 24h.
             </p>
           </div>
@@ -359,7 +359,7 @@ const VendreSection: React.FC = () => {
         {/* Processus de vente */}
         <div className="max-w-6xl mx-auto mt-20">
           <div className="text-center mb-12">
-            <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-4">
+            <h3 className="text-2xl font-light text-gray-900 mb-4">
               Notre processus de vente off-market
             </h3>
             <div className="w-16 h-px bg-yellow-600 mx-auto"></div>
@@ -398,10 +398,10 @@ const VendreSection: React.FC = () => {
                 <div className="w-16 h-16 bg-yellow-600 text-white rounded-full flex items-center justify-center text-xl font-light mx-auto mb-4">
                   {etape.step}
                 </div>
-                <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                <h4 className="text-lg font-medium text-gray-900 mb-2">
                   {etape.title}
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400 font-light leading-relaxed">
+                <p className="text-gray-600 font-light leading-relaxed">
                   {etape.description}
                 </p>
               </motion.div>
@@ -418,15 +418,15 @@ const VendreSection: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-6"
+                className="bg-white rounded-lg shadow-sm p-6"
               >
                 <div className="flex items-center space-x-4 mb-4">
                   {avantage.icon}
-                  <h4 className="text-xl font-medium text-gray-900 dark:text-white">
+                  <h4 className="text-xl font-medium text-gray-900">
                     {avantage.title}
                   </h4>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 font-light leading-relaxed">
+                <p className="text-gray-600 font-light leading-relaxed">
                   {avantage.description}
                 </p>
               </motion.div>
