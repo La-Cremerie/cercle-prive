@@ -20,6 +20,48 @@ if ('serviceWorker' in navigator) {
 // Optimisation du rendu initial
 const root = createRoot(document.getElementById('root')!);
 
+// Timeout de sécurité pour éviter le blocage
+let appMounted = false;
+
+// Fonction de rendu avec gestion d'erreur
+const renderApp = () => {
+  try {
+    root.render(<App />);
+    appMounted = true;
+    
+    // Masquer le loader initial après le rendu réussi
+    setTimeout(() => {
+      document.body.classList.add('react-loaded');
+    }, 100);
+  } catch (error) {
+    console.error('Erreur critique lors du rendu:', error);
+    
+    // Afficher un message d'erreur de fallback
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+      rootElement.innerHTML = `
+        <div style="min-height: 100vh; background: #111827; display: flex; align-items: center; justify-content: center; color: white; text-align: center; font-family: system-ui; padding: 1rem;">
+          <div style="max-width: 400px;">
+            <h1 style="color: #D97706; font-size: 1.5rem; margin-bottom: 1rem; font-weight: 300; letter-spacing: 0.1em;">CERCLE PRIVÉ</h1>
+            <p style="color: #9CA3AF; margin-bottom: 1.5rem;">Erreur critique de rendu</p>
+            <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500;">
+              Recharger
+            </button>
+            <div style="margin-top: 1rem;">
+              <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.reload();" style="padding: 0.5rem 1rem; background: transparent; color: #6B7280; border: 1px solid #374151; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+                Réinitialiser
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Masquer le loader initial
+    document.body.classList.add('react-loaded');
+  }
+};
+
 // Gestion d'erreur globale pour éviter les pages blanches
 window.addEventListener('error', (event) => {
   console.error('Erreur globale:', event.error);
@@ -71,10 +113,5 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 });
 
-root.render(<App />);
-
-// Masquer le loader initial immédiatement
-requestAnimationFrame(() => {
-  document.body.classList.add('react-loaded');
-}
-)
+// Rendu avec protection
+renderApp();

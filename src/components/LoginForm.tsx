@@ -31,9 +31,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   // Vérifier immédiatement si l'utilisateur est déjà connecté
   React.useEffect(() => {
-    const userLoggedIn = localStorage.getItem('userLoggedIn');
-    if (userLoggedIn === 'true') {
-      onLoginSuccess();
+    try {
+      const userLoggedIn = localStorage.getItem('userLoggedIn');
+      if (userLoggedIn === 'true') {
+        // Délai minimal pour éviter les problèmes de timing
+        setTimeout(() => {
+          onLoginSuccess();
+        }, 100);
+      }
+    } catch (error) {
+      console.warn('Erreur lors de la vérification de connexion:', error);
+      // Continuer normalement même en cas d'erreur localStorage
     }
   }, [onLoginSuccess]);
 

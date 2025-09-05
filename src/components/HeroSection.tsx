@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   const [backgroundImage, setBackgroundImage] = useState(() => {
@@ -33,6 +33,7 @@ const HeroSection: React.FC = () => {
   });
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   const [heroContent, setHeroContent] = useState(() => {
     // Charger immédiatement le contenu depuis localStorage
     try {
@@ -54,16 +55,30 @@ const HeroSection: React.FC = () => {
 
   // Précharger l'image immédiatement
   useEffect(() => {
+    // Timeout de sécurité pour l'image
+    const timeoutId = setTimeout(() => {
+      if (!imageLoaded) {
+        setLoadingTimeout(true);
+        setImageLoaded(true); // Forcer le chargement même sans image
+      }
+    }, 5000); // 5 secondes max pour charger l'image
+    
     const img = new Image();
     img.onload = () => {
+      clearTimeout(timeoutId);
       setImageLoaded(true);
       setImageError(false);
+      setLoadingTimeout(false);
     };
     img.onerror = () => {
+      clearTimeout(timeoutId);
       setImageError(true);
       setImageLoaded(true);
+      setLoadingTimeout(false);
     };
     img.src = backgroundImage;
+    
+    return () => clearTimeout(timeoutId);
   }, [backgroundImage]);
     // Charger le contenu depuis localStorage
     const loadContent = () => {
