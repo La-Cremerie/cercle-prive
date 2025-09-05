@@ -219,12 +219,6 @@ export class DiagnosticsManager {
         return results;
       }
       
-      // Check if localStorage is available
-      if (typeof Storage === 'undefined' || typeof localStorage === 'undefined') {
-        results.localStorage.error = 'localStorage not supported';
-        return results;
-      }
-      
       localStorage.setItem('diagnostic-test', 'test');
       localStorage.removeItem('diagnostic-test');
       results.localStorage.available = true;
@@ -234,8 +228,6 @@ export class DiagnosticsManager {
       try {
         for (let key in localStorage) {
           if (localStorage.hasOwnProperty(key)) {
-            totalSize += (localStorage[key] || '').length;
-          }
             totalSize += (localStorage[key] || '').length;
           }
         }
@@ -325,32 +317,6 @@ export class DiagnosticsManager {
       reactDOMAvailable = false;
     }
     
-    // Safely check for React availability
-    let reactAvailable = false;
-    let reactDOMAvailable = false;
-    let reactVersion = 'Non disponible';
-    
-    try {
-      // Check if React is available globally
-      reactAvailable = typeof window !== 'undefined' && 
-                      (typeof (window as any).React !== 'undefined' || 
-                       typeof React !== 'undefined');
-      reactVersion = reactAvailable ? 
-                    ((window as any).React?.version || 'Version inconnue') : 
-                    'Non disponible';
-    } catch (error) {
-      reactAvailable = false;
-    }
-    
-    try {
-      // Check if ReactDOM is available globally
-      reactDOMAvailable = typeof window !== 'undefined' && 
-                         (typeof (window as any).ReactDOM !== 'undefined' || 
-                          typeof ReactDOM !== 'undefined');
-    } catch (error) {
-      reactDOMAvailable = false;
-    }
-    
     return {
       reactAvailable,
       reactDOMAvailable,
@@ -398,11 +364,6 @@ export class DiagnosticsManager {
   // Historique des erreurs
   private getErrorHistory() {
     try {
-      // Safely check localStorage availability
-      if (typeof localStorage === 'undefined') {
-        return { error: 'localStorage non disponible' };
-      }
-      
       // Safely check localStorage availability
       if (typeof localStorage === 'undefined') {
         return { error: 'localStorage non disponible' };
@@ -590,9 +551,6 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
         } catch (error) {
           corruptedKeys.push(key);
         }
-        results.localStorage.usage = totalSize;
-      } catch (storageError) {
-        results.localStorage.usage = 'Erreur de calcul';
       }
     }
     
@@ -618,18 +576,13 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
       localStorage.clear();
       
       // Nettoyer les caches
-      if (typeof navigator !== 'undefined' && 
-          'storage' in navigator && 
-          navigator.storage && 
-          'estimate' in navigator.storage) {
+      if ('caches' in window) {
         caches.keys().then(names => {
           names.forEach(name => caches.delete(name));
-        }).catch(() => {
-          results.localStorage.quota = 'Non disponible';
         });
       }
       
-      results.localStorage.error = error instanceof Error ? error.message : 'Erreur inconnue';
+      // Recharger la page après un délai
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -642,20 +595,14 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
   }
 }
 
-      if (typeof sessionStorage === 'undefined') {
-        results.sessionStorage.error = 'sessionStorage not supported';
-      } else {
 // Auto-initialisation pour diagnostic automatique
-      }
 if (typeof window !== 'undefined') {
-      results.sessionStorage.error = error instanceof Error ? error.message : 'Erreur inconnue';
   window.addEventListener('error', () => {
     setTimeout(() => {
       DiagnosticsManager.getInstance().runFullDiagnostic();
     }, 2000);
-      results.indexedDB.available = typeof window !== 'undefined' && 'indexedDB' in window;
+  });
   
-      results.indexedDB.error = error instanceof Error ? error.message : 'Erreur inconnue';
   if (import.meta.env.DEV) {
     (window as any).diagnostics = DiagnosticsManager.getInstance();
     console.log('🔧 Outils de diagnostic disponibles via window.diagnostics');
