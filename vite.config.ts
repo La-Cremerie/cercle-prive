@@ -29,8 +29,7 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           ui: ['lucide-react', 'framer-motion'],
-          utils: ['date-fns', 'react-hot-toast'],
-          supabase: ['@supabase/supabase-js']
+          utils: ['date-fns', 'react-hot-toast']
         }
       }
     },
@@ -49,6 +48,13 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
       port: 24678
-    }
+    },
+    // Configuration HTTPS pour le développement
+    https: false, // Laisser false pour éviter les problèmes de certificat en dev
+    cors: true
+  },
+  // Optimisations pour HTTPS
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(mode)
   }
 }));

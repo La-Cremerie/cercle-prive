@@ -4,8 +4,8 @@ import App from './App.tsx';
 import './index.css';
 import './i18n';
 
-// Service worker registration (non-blocking)
-if ('serviceWorker' in navigator) {
+// Service worker registration (non-blocking et sécurisé)
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
@@ -17,7 +17,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Fonction de rendu sécurisée
+// Fonction de rendu ultra-simplifiée
 const renderApp = () => {
   try {
     const rootElement = document.getElementById('root');
@@ -27,21 +27,22 @@ const renderApp = () => {
 
     const root = createRoot(rootElement);
     
-    // Rendu avec gestion d'erreur
     root.render(
       <StrictMode>
         <App />
       </StrictMode>
     );
     
-    // Masquer le loader initial après le rendu réussi
+    // Masquer le loader après rendu réussi
     setTimeout(() => {
       document.body.classList.add('react-loaded');
       const loader = document.getElementById('initial-loader');
       if (loader) {
         loader.style.opacity = '0';
         setTimeout(() => {
-          loader.style.display = 'none';
+          if (loader.parentNode) {
+            loader.parentNode.removeChild(loader);
+          }
         }, 300);
       }
     }, 100);
@@ -49,33 +50,17 @@ const renderApp = () => {
   } catch (error) {
     console.error('Erreur critique lors du rendu:', error);
     
-    // Masquer le loader
-    const loader = document.getElementById('initial-loader');
-    if (loader) {
-      loader.style.display = 'none';
-    }
-    
-    // Afficher un message d'erreur de fallback
+    // Fallback ultra-simple
     const rootElement = document.getElementById('root');
     if (rootElement) {
       rootElement.innerHTML = `
         <div style="min-height: 100vh; background: #111827; display: flex; align-items: center; justify-content: center; color: white; text-align: center; font-family: system-ui; padding: 1rem;">
           <div style="max-width: 400px;">
             <h1 style="color: #D97706; font-size: 1.5rem; margin-bottom: 1rem; font-weight: 300; letter-spacing: 0.1em;">CERCLE PRIVÉ</h1>
-            <p style="color: #9CA3AF; margin-bottom: 1.5rem;">Erreur critique de rendu</p>
+            <p style="color: #9CA3AF; margin-bottom: 1.5rem;">Erreur de chargement</p>
             <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500;">
               Recharger
             </button>
-            <div style="margin-top: 1rem;">
-              <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.reload();" style="padding: 0.5rem 1rem; background: transparent; color: #6B7280; border: 1px solid #374151; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
-                Réinitialiser
-              </button>
-            </div>
-            <div style="margin-top: 1rem;">
-              <a href="mailto:nicolas.c@lacremerie.fr" style="color: #D97706; text-decoration: none; font-size: 0.875rem;">
-                Contacter le support
-              </a>
-            </div>
           </div>
         </div>
       `;
@@ -83,36 +68,10 @@ const renderApp = () => {
   }
 };
 
-// Gestion d'erreur globale améliorée
+// Gestion d'erreur globale simplifiée
 window.addEventListener('error', (event) => {
   console.error('Erreur globale:', event.error);
-  
-  // Masquer le loader en cas d'erreur
-  const loader = document.getElementById('initial-loader');
-  if (loader) {
-    loader.style.display = 'none';
-  }
-  
-  // Afficher un message d'erreur si la page est vide
-  const rootElement = document.getElementById('root');
-  if (rootElement && (!rootElement.innerHTML || rootElement.innerHTML.trim() === '')) {
-    rootElement.innerHTML = `
-      <div style="min-height: 100vh; background: #111827; display: flex; align-items: center; justify-content: center; color: white; text-align: center; font-family: system-ui;">
-        <div style="max-width: 400px; padding: 2rem;">
-          <h1 style="color: #D97706; font-size: 1.5rem; margin-bottom: 1rem; font-weight: 300; letter-spacing: 0.1em;">CERCLE PRIVÉ</h1>
-          <p style="color: #9CA3AF; margin-bottom: 1.5rem;">Une erreur technique est survenue</p>
-          <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500;">
-            Recharger la page
-          </button>
-          <div style="margin-top: 1rem;">
-            <button onclick="localStorage.clear(); window.location.reload();" style="padding: 0.5rem 1rem; background: transparent; color: #6B7280; border: 1px solid #374151; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
-              Réinitialiser les données
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
+  event.preventDefault(); // Empêcher l'affichage d'erreur par défaut
 });
 
 window.addEventListener('unhandledrejection', (event) => {
@@ -120,5 +79,5 @@ window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault();
 });
 
-// Rendu immédiat
+// Rendu immédiat sans délai
 renderApp();

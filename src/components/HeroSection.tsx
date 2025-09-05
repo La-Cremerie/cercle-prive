@@ -1,167 +1,83 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   const [backgroundImage, setBackgroundImage] = useState(() => {
-    // Charger immédiatement l'image active depuis localStorage
-    try {
-      const stored = localStorage.getItem('presentationImages');
-      if (stored) {
-        const images = JSON.parse(stored);
-        const activeImage = images.find((img: any) => img.isActive);
-        if (activeImage) {
-          return activeImage.url;
-        }
-      }
-      
-      // Vérifier aussi dans le contenu du site
-      const siteContent = localStorage.getItem('siteContent');
-      if (siteContent) {
-        const content = JSON.parse(siteContent);
-        if (content.hero?.backgroundImage) {
-          return content.hero.backgroundImage;
-        }
-      }
-    } catch (error) {
-      console.warn('Erreur lors du chargement de l\'image:', error);
-    }
-    
-    // Image par défaut
+    // Image par défaut immédiate
     return 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920';
   });
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [loadingTimeout, setLoadingTimeout] = useState(false);
   const [heroContent, setHeroContent] = useState(() => {
-    // Charger immédiatement le contenu depuis localStorage
-    try {
-      const stored = localStorage.getItem('siteContent');
-      if (stored) {
-        const content = JSON.parse(stored);
-        return {
-          title: content.hero?.title || "l'excellence immobilière en toute discrétion"
-        };
-      }
-    } catch (error) {
-      console.warn('Erreur lors du chargement du contenu:', error);
-    }
-    
     return {
       title: "l'excellence immobilière en toute discrétion"
     };
   });
 
-  // Précharger l'image immédiatement
+  // Préchargement d'image optimisé pour HTTPS
   useEffect(() => {
-    // Timeout de sécurité pour l'image
-    const timeoutId = setTimeout(() => {
-      if (!imageLoaded) {
-        setLoadingTimeout(true);
-        setImageLoaded(true); // Forcer le chargement même sans image
-      }
-    }, 5000); // 5 secondes max pour charger l'image
-    
     const img = new Image();
     img.onload = () => {
-      clearTimeout(timeoutId);
       setImageLoaded(true);
-      setImageError(false);
-      setLoadingTimeout(false);
     };
     img.onerror = () => {
-      clearTimeout(timeoutId);
-      setImageError(true);
-      setImageLoaded(true);
-      setLoadingTimeout(false);
+      console.warn('Erreur chargement image, utilisation de l\'image par défaut');
+      setImageLoaded(true); // Continuer même en cas d'erreur
     };
     img.src = backgroundImage;
-    
+
+    // Timeout de sécurité pour l'image
+    const timeoutId = setTimeout(() => {
+      setImageLoaded(true);
+    }, 3000);
+
     return () => clearTimeout(timeoutId);
   }, [backgroundImage]);
-    // Charger le contenu depuis localStorage
-    const loadContent = () => {
-      const stored = localStorage.getItem('siteContent');
-      if (stored) {
-        const content = JSON.parse(stored);
-        setHeroContent({
-          title: content.hero?.title || "l'excellence immobilière en toute discrétion"
-        });
-        if (content.hero?.backgroundImage) {
-          const newImage = content.hero.backgroundImage;
-          if (newImage !== backgroundImage) {
-            setImageLoaded(false); // Reset pour la nouvelle image
-            setBackgroundImage(newImage);
-          }
-        }
-      }
-    };
 
-    // Charger l'image active depuis localStorage
-    const loadActiveImage = () => {
-      const stored = localStorage.getItem('presentationImages');
-      if (stored) {
-        const images = JSON.parse(stored);
-        const activeImage = images.find((img: any) => img.isActive);
-        if (activeImage && activeImage.url !== backgroundImage) {
-          setImageLoaded(false); // Reset pour la nouvelle image
-          setBackgroundImage(activeImage.url);
-        }
-      }
-    };
-
+  // Charger le contenu personnalisé de manière asynchrone
   useEffect(() => {
-    // Recharger le contenu et les images si nécessaire
     const loadContent = () => {
-      const stored = localStorage.getItem('siteContent');
-      if (stored) {
-        const content = JSON.parse(stored);
-        setHeroContent({
-          title: content.hero?.title || "l'excellence immobilière en toute discrétion"
-        });
-        if (content.hero?.backgroundImage && content.hero.backgroundImage !== backgroundImage) {
-          setImageLoaded(false);
-          setBackgroundImage(content.hero.backgroundImage);
-        }
-      }
-    };
-
-    const loadActiveImage = () => {
-      const stored = localStorage.getItem('presentationImages');
-      if (stored) {
-        const images = JSON.parse(stored);
-        const activeImage = images.find((img: any) => img.isActive);
-        if (activeImage && activeImage.url !== backgroundImage) {
-          setImageLoaded(false);
-          setBackgroundImage(activeImage.url);
-        }
-      }
-    };
-
-    loadContent();
-    loadActiveImage();
-
-    // Écouter les changements de contenu
-    const handleContentChange = (event: CustomEvent) => {
-      if (event.detail) {
-        setHeroContent({
-          title: event.detail.hero?.title || "l'excellence immobilière en toute discrétion"
-        });
-        if (event.detail.hero?.backgroundImage) {
-          const newImage = event.detail.hero.backgroundImage;
-          if (newImage !== backgroundImage) {
-            setImageLoaded(false); // Reset pour la nouvelle image
-            setBackgroundImage(newImage);
+      try {
+        const stored = localStorage.getItem('siteContent');
+        if (stored) {
+          const content = JSON.parse(stored);
+          if (content.hero?.title) {
+            setHeroContent({ title: content.hero.title });
+          }
+          if (content.hero?.backgroundImage) {
+            setBackgroundImage(content.hero.backgroundImage);
           }
         }
+
+        const storedImages = localStorage.getItem('presentationImages');
+        if (storedImages) {
+          const images = JSON.parse(storedImages);
+          const activeImage = images.find((img: any) => img.isActive);
+          if (activeImage) {
+            setBackgroundImage(activeImage.url);
+          }
+        }
+      } catch (error) {
+        console.warn('Erreur chargement contenu personnalisé:', error);
+        // Continuer avec le contenu par défaut
       }
     };
 
-    // Écouter les changements d'image de présentation
+    // Charger de manière asynchrone
+    setTimeout(loadContent, 100);
+
+    // Écouter les changements
+    const handleContentChange = (event: CustomEvent) => {
+      if (event.detail?.hero?.title) {
+        setHeroContent({ title: event.detail.hero.title });
+      }
+      if (event.detail?.hero?.backgroundImage) {
+        setBackgroundImage(event.detail.hero.backgroundImage);
+      }
+    };
+
     const handleImageChange = (event: CustomEvent) => {
-      if (event.detail && event.detail !== backgroundImage) {
-        setImageLoaded(false); // Reset pour la nouvelle image
+      if (event.detail) {
         setBackgroundImage(event.detail);
       }
     };
@@ -173,46 +89,40 @@ const HeroSection: React.FC = () => {
       window.removeEventListener('contentUpdated', handleContentChange as EventListener);
       window.removeEventListener('presentationImageChanged', handleImageChange as EventListener);
     };
-  }, [backgroundImage]);
+  }, []);
 
   const { t } = useTranslation();
-  
-  // Afficher un loader si l'image n'est pas encore chargée
-  if (!imageLoaded && !imageError) {
-    return (
-      <section className="relative h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <Loader2 className="w-16 h-16 text-yellow-600 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
-          <p className="text-gray-400 text-sm mt-2">Chargement de l'image...</p>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gray-900">
-      {/* Background Image */}
+      {/* Background Image avec fallback */}
       <div 
         className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url(${imageError ? 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920' : backgroundImage})`
+          backgroundImage: `url(${backgroundImage})`,
+          opacity: imageLoaded ? 1 : 0,
+          transition: 'opacity 0.5s ease-in-out'
         }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
       </div>
 
+      {/* Fallback background si image ne charge pas */}
+      {!imageLoaded && (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900"></div>
+      )}
+
       {/* Content */}
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.5 }}
+        transition={{ duration: 1, delay: 0.3 }}
         className="relative z-10 text-center px-4 max-w-4xl mx-auto"
       >
         <motion.h1 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.7 }}
+          transition={{ duration: 1, delay: 0.5 }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-8 leading-tight"
         >
           {heroContent.title}
@@ -221,7 +131,7 @@ const HeroSection: React.FC = () => {
         <motion.a 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1 }}
+          transition={{ duration: 1, delay: 0.7 }}
           href="mailto:nicolas.c@lacremerie.fr"
           className="inline-block border border-white text-white px-8 py-3 text-sm font-light tracking-wider hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105"
         >

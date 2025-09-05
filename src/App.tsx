@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Loader2, AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
-// Import direct des composants essentiels pour éviter les problèmes de lazy loading
+// Import direct des composants essentiels (pas de lazy loading)
 import LoginForm from './components/LoginForm';
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
@@ -14,7 +14,7 @@ import PropertyGallery from './components/PropertyGallery';
 import VendreSection from './components/VendreSection';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 
-// Composants admin uniquement en développement
+// Composants admin en lazy loading seulement en développement
 const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
 const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
 const Chatbot = React.lazy(() => import('./components/Chatbot'));
@@ -32,27 +32,32 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
-  // Initialisation ultra-rapide
+  // Initialisation ultra-rapide et sécurisée pour HTTPS
   useEffect(() => {
-    try {
-      // Vérification synchrone de l'état de connexion
-      const userLoggedIn = localStorage.getItem('userLoggedIn');
-      const adminLoggedIn = isDevelopment ? localStorage.getItem('adminLoggedIn') : null;
-      
-      if (userLoggedIn === 'true') {
-        setIsLoggedIn(true);
+    const initializeApp = () => {
+      try {
+        // Vérification synchrone et rapide
+        const userLoggedIn = localStorage.getItem('userLoggedIn');
+        const adminLoggedIn = isDevelopment ? localStorage.getItem('adminLoggedIn') : null;
+        
+        if (userLoggedIn === 'true') {
+          setIsLoggedIn(true);
+        }
+        
+        if (isDevelopment && adminLoggedIn === 'true') {
+          setIsAdminLoggedIn(true);
+        }
+      } catch (err) {
+        console.warn('Erreur localStorage (non critique):', err);
+        // Continuer même en cas d'erreur localStorage
       }
       
-      if (isDevelopment && adminLoggedIn === 'true') {
-        setIsAdminLoggedIn(true);
-      }
-    } catch (err) {
-      console.warn('Erreur localStorage:', err);
-      // Continuer même en cas d'erreur localStorage
-    }
-    
-    // Terminer l'initialisation immédiatement
-    setIsInitializing(false);
+      // Terminer l'initialisation immédiatement
+      setIsInitializing(false);
+    };
+
+    // Initialisation immédiate
+    initializeApp();
   }, []);
 
   const handleLoginSuccess = () => {
@@ -88,51 +93,35 @@ function App() {
     setShowAdminLogin(false);
   };
 
-  // Écran de chargement initial minimal
+  // Écran de chargement minimal (très court)
   if (isInitializing) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
-          <p className="text-gray-400 text-sm mt-2">Initialisation...</p>
+          <Loader2 className="w-8 h-8 text-yellow-600 animate-spin mx-auto mb-4" />
+          <h2 className="text-lg font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
         </div>
       </div>
     );
   }
 
-  // Affichage d'erreur si problème
+  // Affichage d'erreur simplifié
   if (error) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-light text-white mb-4 tracking-wider">
+          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-lg font-light text-white mb-4 tracking-wider">
             Problème technique
           </h2>
-          <p className="text-gray-400 font-light mb-6">
-            {error}
-          </p>
-          <div className="space-y-3">
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
-            >
-              <RefreshCw className="w-5 h-5" />
-              <span>Recharger la page</span>
-            </button>
-            <button
-              onClick={() => {
-                localStorage.clear();
-                sessionStorage.clear();
-                window.location.reload();
-              }}
-              className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-            >
-              <Home className="w-5 h-5" />
-              <span>Réinitialiser</span>
-            </button>
-          </div>
+          <p className="text-gray-400 font-light mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="flex items-center justify-center space-x-2 px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors mx-auto"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Recharger</span>
+          </button>
         </div>
       </div>
     );
@@ -154,8 +143,8 @@ function App() {
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+            <Loader2 className="w-8 h-8 text-yellow-600 animate-spin mx-auto mb-4" />
+            <h2 className="text-lg font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
           </div>
         </div>
       }>
@@ -174,8 +163,8 @@ function App() {
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+            <Loader2 className="w-8 h-8 text-yellow-600 animate-spin mx-auto mb-4" />
+            <h2 className="text-lg font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
           </div>
         </div>
       }>
@@ -185,7 +174,7 @@ function App() {
     );
   }
 
-  // Site principal avec tous les composants importés directement
+  // Site principal - tous les composants importés directement
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
       <Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
