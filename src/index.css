@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Variables CSS personnalisables */
+/* Variables CSS optimisées */
 :root {
   --color-primary: #D97706;
   --color-secondary: #1F2937;
@@ -13,9 +13,21 @@
   --font-body: 'Inter';
 }
 
+/* Optimisations de performance */
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   body {
@@ -23,6 +35,7 @@
     font-family: var(--font-body), sans-serif;
     color: var(--color-text);
     background-color: var(--color-background);
+    line-height: 1.6;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -32,10 +45,20 @@
 
 @layer components {
   .glass-effect {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
+    @apply bg-white/10 backdrop-blur-sm border border-white/20;
   }
   
   .gradient-text {
     @apply bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent;
+  }
+  
+  /* Optimisation des animations */
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import LoginForm from './components/LoginForm';
+
+// Import direct du LoginForm pour éviter le lazy loading
+const LoginForm = React.lazy(() => import('./components/LoginForm'));
 
 // Check if we're in development mode
 const isDevelopment = import.meta.env.DEV;
@@ -8,7 +10,6 @@ const isDevelopment = import.meta.env.DEV;
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  const [isLoadingMainSite, setIsLoadingMainSite] = useState(false);
   const [mainSiteLoaded, setMainSiteLoaded] = useState(false);
   
   // Admin states only in development
@@ -16,7 +17,7 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
-  // Lazy load main site components only after login
+  // Composants du site principal (chargés après login)
   const [MainSiteComponents, setMainSiteComponents] = useState<{
     Navigation: React.ComponentType<any>;
     HeroSection: React.ComponentType;
@@ -32,38 +33,33 @@ function App() {
     AdminPanel?: React.ComponentType<any>;
   } | null>(null);
 
+  // Chargement ultra-rapide de l'état initial
   useEffect(() => {
-    const initializeApp = async () => {
-      // Vérifier si l'utilisateur est déjà connecté
-      const userLoggedIn = localStorage.getItem('userLoggedIn');
-      if (userLoggedIn === 'true') {
-        setIsLoggedIn(true);
-        loadMainSite();
-      }
-      
-      // Check admin login only in development
-      if (isDevelopment) {
-        const adminLoggedIn = localStorage.getItem('adminLoggedIn');
-        if (adminLoggedIn === 'true') {
-          setIsAdminLoggedIn(true);
-        }
-      }
-      
-      setIsInitializing(false);
-    };
-
-    initializeApp();
+    // Vérification synchrone ultra-rapide
+    const userLoggedIn = localStorage.getItem('userLoggedIn');
+    const adminLoggedIn = isDevelopment ? localStorage.getItem('adminLoggedIn') : null;
+    
+    if (userLoggedIn === 'true') {
+      setIsLoggedIn(true);
+      // Démarrer le chargement du site principal immédiatement
+      loadMainSite();
+    }
+    
+    if (isDevelopment && adminLoggedIn === 'true') {
+      setIsAdminLoggedIn(true);
+    }
+    
+    // Initialisation terminée immédiatement
+    setIsInitializing(false);
   }, []);
 
+  // Chargement optimisé du site principal
   const loadMainSite = async () => {
-    if (mainSiteLoaded) return;
-    
-    setIsLoadingMainSite(true);
+    if (mainSiteLoaded || MainSiteComponents) return;
     
     try {
-      // Charger tous les composants principaux en parallèle
-      // Charger les composants principaux
-      const mainImports = await Promise.all([
+      // Chargement en parallèle avec Promise.allSettled pour éviter qu'une erreur bloque tout
+      const mainImports = await Promise.allSettled([
         import('./components/Navigation'),
         import('./components/HeroSection'),
         import('./components/NotreAdnSection'),
@@ -75,38 +71,53 @@ function App() {
         import('./components/PWAInstallPrompt')
       ]);
 
-      // Charger les composants admin conditionnellement
+      // Extraire les composants réussis
+      const successfulImports = mainImports
+        .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
+        .map(result => result.value);
+
+      // Chargement conditionnel des composants admin
       let adminImports: any[] = [];
       if (isDevelopment) {
-        adminImports = await Promise.all([
+        const adminImportResults = await Promise.allSettled([
           import('./components/Chatbot'),
           import('./components/AdminLogin'),
           import('./components/AdminPanel')
         ]);
+        
+        adminImports = adminImportResults
+          .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
+          .map(result => result.value);
       }
 
-      setMainSiteComponents({
-        Navigation: mainImports[0].default,
-        HeroSection: mainImports[1].default,
-        NotreAdnSection: mainImports[2].default,
-        ServicesSection: mainImports[3].default,
-        OffMarketSection: mainImports[4].default,
-        RechercheSection: mainImports[5].default,
-        PropertyGallery: mainImports[6].default,
-        VendreSection: mainImports[7].default,
-        PWAInstallPrompt: mainImports[8].default,
-        ...(isDevelopment && adminImports.length > 0 && {
-          Chatbot: adminImports[0].default,
-          AdminLogin: adminImports[1].default,
-          AdminPanel: adminImports[2].default
-        })
-      });
+      // Construire l'objet des composants
+      const components: any = {};
+      
+      if (successfulImports.length >= 9) {
+        components.Navigation = successfulImports[0].default;
+        components.HeroSection = successfulImports[1].default;
+        components.NotreAdnSection = successfulImports[2].default;
+        components.ServicesSection = successfulImports[3].default;
+        components.OffMarketSection = successfulImports[4].default;
+        components.RechercheSection = successfulImports[5].default;
+        components.PropertyGallery = successfulImports[6].default;
+        components.VendreSection = successfulImports[7].default;
+        components.PWAInstallPrompt = successfulImports[8].default;
+      }
+      
+      // Ajouter les composants admin si disponibles
+      if (isDevelopment && adminImports.length >= 3) {
+        components.Chatbot = adminImports[0].default;
+        components.AdminLogin = adminImports[1].default;
+        components.AdminPanel = adminImports[2].default;
+      }
 
+      setMainSiteComponents(components);
       setMainSiteLoaded(true);
     } catch (error) {
       console.error('Erreur lors du chargement du site:', error);
-    } finally {
-      setIsLoadingMainSite(false);
+      // En cas d'erreur, afficher au moins le login
+      setMainSiteLoaded(false);
     }
   };
 
@@ -147,32 +158,43 @@ function App() {
     setShowAdminLogin(false);
   };
 
-  // Écran de chargement initial pour éviter la page blanche
+  // Écran de chargement initial ultra-rapide
   if (isInitializing) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-light text-white tracking-wider">
-            CERCLE PRIVÉ
-          </h2>
+      <React.Suspense fallback={
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+          </div>
         </div>
-      </div>
+      }>
+        <div />
+      </React.Suspense>
     );
   }
 
-  // Afficher uniquement le formulaire de login si pas connecté
+  // Login avec Suspense pour éviter la page blanche
   if (!isLoggedIn) {
     return (
-      <>
-        <LoginForm onLoginSuccess={handleLoginSuccess} />
-        <Toaster position="top-right" />
-      </>
+      <React.Suspense fallback={
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+          </div>
+        </div>
+      }>
+        <>
+          <LoginForm onLoginSuccess={handleLoginSuccess} />
+          <Toaster position="top-right" />
+        </>
+      </React.Suspense>
     );
   }
 
-  // Afficher l'écran de chargement pendant le chargement du site principal
-  if (isLoadingMainSite || !mainSiteLoaded || !MainSiteComponents) {
+  // Chargement du site principal
+  if (!mainSiteLoaded || !MainSiteComponents) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -180,9 +202,7 @@ function App() {
           <h2 className="text-xl font-light text-white mb-2 tracking-wider">
             CERCLE PRIVÉ
           </h2>
-          <p className="text-gray-400 font-light">
-            Chargement de votre espace privé...
-          </p>
+          <p className="text-gray-400 font-light">Chargement de votre espace privé...</p>
         </div>
       </div>
     );
@@ -191,23 +211,41 @@ function App() {
   // Afficher l'admin login si demandé (développement uniquement)
   if (isDevelopment && showAdminLogin && MainSiteComponents.AdminLogin) {
     return (
-      <>
-        <MainSiteComponents.AdminLogin 
-          onLoginSuccess={handleAdminLoginSuccess}
-          onBack={handleBackFromAdminLogin}
-        />
-        <Toaster position="top-right" />
-      </>
+      <React.Suspense fallback={
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+          </div>
+        </div>
+      }>
+        <>
+          <MainSiteComponents.AdminLogin 
+            onLoginSuccess={handleAdminLoginSuccess}
+            onBack={handleBackFromAdminLogin}
+          />
+          <Toaster position="top-right" />
+        </>
+      </React.Suspense>
     );
   }
 
   // Afficher le panel admin si connecté (développement uniquement)
   if (isDevelopment && showAdmin && MainSiteComponents.AdminPanel) {
     return (
-      <>
-        <MainSiteComponents.AdminPanel onLogout={handleAdminLogout} />
-        <Toaster position="top-right" />
-      </>
+      <React.Suspense fallback={
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+          </div>
+        </div>
+      }>
+        <>
+          <MainSiteComponents.AdminPanel onLogout={handleAdminLogout} />
+          <Toaster position="top-right" />
+        </>
+      </React.Suspense>
     );
   }
 

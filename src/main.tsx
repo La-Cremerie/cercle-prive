@@ -2,9 +2,10 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import './i18n';
+// Import i18n seulement si nécessaire
+// import './i18n';
 
-// Enregistrer le service worker pour PWA
+// Service worker simplifié
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
@@ -12,18 +13,16 @@ if ('serviceWorker' in navigator) {
         console.log('Service Worker enregistré avec succès:', registration.scope);
       })
       .catch((error) => {
-        console.log('Échec de l\'enregistrement du Service Worker:', error);
+        console.warn('Service Worker non disponible:', error);
       });
   });
 }
 
+// Optimisation du rendu initial
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+  <App />
 );
 
-// Masquer le loader initial une fois React monté
-setTimeout(() => {
+// Masquer le loader initial immédiatement
+requestAnimationFrame(() => {
   document.body.classList.add('react-loaded');
-}, 50);

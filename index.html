@@ -24,7 +24,7 @@
   </head>
   <body>
     <style>
-      /* Écran de chargement initial pour éviter la page blanche */
+      /* Écran de chargement initial optimisé */
       #initial-loader {
         position: fixed;
         top: 0;
@@ -39,7 +39,7 @@
         z-index: 9999;
       }
       
-      #initial-loader h1 {
+      .loader-title {
         color: #D97706;
         font-size: 1.5rem;
         font-weight: 300;
@@ -48,7 +48,7 @@
         font-family: system-ui, -apple-system, sans-serif;
       }
       
-      .spinner {
+      .loader-spinner {
         width: 3rem;
         height: 3rem;
         border: 4px solid #374151;
@@ -57,32 +57,32 @@
         animation: spin 1s linear infinite;
       }
       
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      
-      /* Masquer le loader une fois React chargé */
+      /* Transition optimisée */
       .react-loaded #initial-loader {
-        display: none;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-out;
       }
     </style>
     
-    <!-- Écran de chargement initial -->
+    <!-- Écran de chargement initial optimisé -->
     <div id="initial-loader">
-      <h1>CERCLE PRIVÉ</h1>
-      <div class="spinner"></div>
+      <h1 class="loader-title">CERCLE PRIVÉ</h1>
+      <div class="loader-spinner"></div>
     </div>
     
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
     <script>
-      // Masquer le loader initial une fois que React est prêt
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          document.body.classList.add('react-loaded');
-        }, 100);
+      // Optimisation du chargement initial
+      window.addEventListener('DOMContentLoaded', function() {
+        // Précharger les polices critiques
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap';
+        link.as = 'style';
+        document.head.appendChild(link);
       });
     </script>
   </body>
