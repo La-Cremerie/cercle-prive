@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, GitCompare as Compare, Bell } from 'lucide-react';
+import { Calculator, GitCompare as Compare, Bell, LogOut, Settings } from 'lucide-react';
+import Chatbot from './components/Chatbot';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
+import ThemeToggle from './components/ThemeToggle';
 import AdminLogin from './components/AdminLogin';
 import AdminPanel from './components/AdminPanel';
 import RentabilityCalculator from './components/RentabilityCalculator';
@@ -130,6 +133,7 @@ function App() {
   const [showCalculator, setShowCalculator] = useState(false);
   const [showComparator, setShowComparator] = useState(false);
   const [showAlerts, setShowAlerts] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
     // Vérifier si l'utilisateur est déjà connecté
@@ -198,44 +202,86 @@ function App() {
 
   // Si connecté, afficher le site complet
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
       <div className="min-h-screen bg-gray-900 text-white">
         {/* Navigation */}
-        <nav className="bg-black/20 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
+        <nav className="bg-black/20 dark:bg-black/40 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              <h1 className="text-xl font-light tracking-wider">CERCLE PRIVÉ</h1>
+              <h1 className="text-xl font-light tracking-wider text-white">CERCLE PRIVÉ</h1>
               <div className="hidden md:flex items-center space-x-8">
-                <a href="#concept" className="text-sm font-light hover:text-yellow-500 transition-colors">CONCEPT</a>
-                <a href="#services" className="text-sm font-light hover:text-yellow-500 transition-colors">SERVICES</a>
-                <a href="#biens" className="text-sm font-light hover:text-yellow-500 transition-colors">BIENS</a>
-                <a href="#contact" className="text-sm font-light hover:text-yellow-500 transition-colors">CONTACT</a>
+                <a href="#concept" className="text-sm font-light text-white hover:text-yellow-500 transition-colors">CONCEPT</a>
+                <a href="#services" className="text-sm font-light text-white hover:text-yellow-500 transition-colors">SERVICES</a>
+                <a href="#biens" className="text-sm font-light text-white hover:text-yellow-500 transition-colors">BIENS</a>
+                <a href="#contact" className="text-sm font-light text-white hover:text-yellow-500 transition-colors">CONTACT</a>
+                <ThemeToggle />
                 <button
                   onClick={handleLogout}
-                  className="text-sm font-light text-red-400 hover:text-red-300 transition-colors"
+                  className="flex items-center space-x-2 text-sm font-light text-red-400 hover:text-red-300 transition-colors"
                 >
-                  DÉCONNEXION
+                  <LogOut className="w-4 h-4" />
+                  <span>DÉCONNEXION</span>
                 </button>
                 <button
                   onClick={() => setShowAdminLogin(true)}
-                  className="text-sm font-light text-gray-400 hover:text-yellow-500 transition-colors"
+                  className="flex items-center space-x-2 text-sm font-light text-gray-400 hover:text-yellow-500 transition-colors"
                 >
-                  ADMIN
+                  <Settings className="w-4 h-4" />
+                  <span>ADMIN</span>
+                </button>
+              </div>
+              
+              {/* Mobile menu button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setShowMobileMenu(!showMobileMenu)}
+                  className="text-white hover:text-yellow-500 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
                 </button>
               </div>
             </div>
+            
+            {/* Mobile menu */}
+            {showMobileMenu && (
+              <div className="md:hidden bg-black/40 backdrop-blur-sm">
+                <div className="px-4 py-4 space-y-4">
+                  <a href="#concept" className="block text-sm font-light text-white hover:text-yellow-500 transition-colors">CONCEPT</a>
+                  <a href="#services" className="block text-sm font-light text-white hover:text-yellow-500 transition-colors">SERVICES</a>
+                  <a href="#biens" className="block text-sm font-light text-white hover:text-yellow-500 transition-colors">BIENS</a>
+                  <a href="#contact" className="block text-sm font-light text-white hover:text-yellow-500 transition-colors">CONTACT</a>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/20">
+                    <ThemeToggle />
+                    <button
+                      onClick={handleLogout}
+                      className="text-sm font-light text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      DÉCONNEXION
+                    </button>
+                    <button
+                      onClick={() => setShowAdminLogin(true)}
+                      className="text-sm font-light text-gray-400 hover:text-yellow-500 transition-colors"
+                    >
+                      ADMIN
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </nav>
 
         {/* Hero Section */}
-        <section className="relative h-screen flex items-center justify-center">
+        <section className="relative h-screen flex items-center justify-center bg-gray-900 dark:bg-black">
           <div 
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage: 'url(https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920)'
             }}
           >
-            <div className="absolute inset-0 bg-black/40"></div>
+            <div className="absolute inset-0 bg-black/40 dark:bg-black/60"></div>
           </div>
           
           <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
@@ -252,31 +298,31 @@ function App() {
         </section>
 
         {/* Concept Section */}
-        <section id="concept" className="py-20 bg-white text-gray-900">
+        <section id="concept" className="py-20 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-3xl font-light text-yellow-600 mb-8">CONCEPT</h2>
+                <h2 className="text-3xl font-light text-yellow-600 dark:text-yellow-500 mb-8">CONCEPT</h2>
                 <div className="space-y-6">
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                     Donnez de la puissance à votre capital, construisez un patrimoine solide.
                   </p>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                     Notre approche d'investissement vous permet de transformer un capital financier existant 
                     en une rentabilité complémentaire, tout en créant un véritable effet de levier patrimonial.
                   </p>
                   <ul className="space-y-3">
                     <li className="flex items-start">
                       <span className="w-2 h-2 bg-yellow-600 rounded-full mt-2 mr-3"></span>
-                      Acquisition immobilière rigoureusement sélectionnée
+                      <span className="text-gray-700 dark:text-gray-300">Acquisition immobilière rigoureusement sélectionnée</span>
                     </li>
                     <li className="flex items-start">
                       <span className="w-2 h-2 bg-yellow-600 rounded-full mt-2 mr-3"></span>
-                      Travaux et ameublement pensés pour la valorisation
+                      <span className="text-gray-700 dark:text-gray-300">Travaux et ameublement pensés pour la valorisation</span>
                     </li>
                     <li className="flex items-start">
                       <span className="w-2 h-2 bg-yellow-600 rounded-full mt-2 mr-3"></span>
-                      Financement et structuration patrimoniale sur mesure
+                      <span className="text-gray-700 dark:text-gray-300">Financement et structuration patrimoniale sur mesure</span>
                     </li>
                   </ul>
                 </div>
@@ -293,10 +339,10 @@ function App() {
         </section>
 
         {/* Services Section */}
-        <section id="services" className="py-20 bg-gray-50">
+        <section id="services" className="py-20 bg-gray-50 dark:bg-gray-900 transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-light text-gray-900 mb-8">ACCOMPAGNEMENT PERSONNALISÉ</h2>
+              <h2 className="text-3xl font-light text-gray-900 dark:text-white mb-8">ACCOMPAGNEMENT PERSONNALISÉ</h2>
               <div className="w-24 h-px bg-yellow-600 mx-auto"></div>
             </div>
             
@@ -319,10 +365,10 @@ function App() {
                   description: "Prestations sur-mesure adaptées à vos besoins spécifiques et à votre style de vie d'exception"
                 }
               ].map((service, index) => (
-                <div key={index} className="bg-white p-8 border border-gray-200 hover:border-yellow-600/30 transition-all">
-                  <h3 className="text-xl font-light text-gray-900 mb-4">{service.title}</h3>
+                <div key={index} className="bg-white dark:bg-gray-800 p-8 border border-gray-200 dark:border-gray-700 hover:border-yellow-600/30 transition-all">
+                  <h3 className="text-xl font-light text-gray-900 dark:text-white mb-4">{service.title}</h3>
                   <div className="w-12 h-px bg-yellow-600/30 mb-4"></div>
-                  <p className="text-gray-600 font-light leading-relaxed">{service.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 font-light leading-relaxed">{service.description}</p>
                 </div>
               ))}
             </div>
@@ -330,10 +376,10 @@ function App() {
         </section>
 
         {/* Biens Section */}
-        <section id="biens" className="py-20 bg-white">
+        <section id="biens" className="py-20 bg-white dark:bg-gray-800 transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-light text-yellow-600 mb-8">BIENS D'EXCEPTION</h2>
+              <h2 className="text-3xl font-light text-yellow-600 dark:text-yellow-500 mb-8">BIENS D'EXCEPTION</h2>
               <div className="w-24 h-px bg-yellow-600 mx-auto"></div>
             </div>
             
@@ -361,16 +407,16 @@ function App() {
                   image: "https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800"
                 }
               ].map((property, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div key={index} className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all border border-gray-200 dark:border-gray-700">
                   <img 
                     src={property.image}
                     alt={property.name}
                     className="w-full h-64 object-cover"
                   />
                   <div className="p-6">
-                    <h3 className="text-xl font-light text-gray-900 mb-2">{property.name}</h3>
-                    <p className="text-gray-600 mb-4">{property.location}</p>
-                    <div className="text-xl font-medium text-yellow-600">{property.price}</div>
+                    <h3 className="text-xl font-light text-gray-900 dark:text-white mb-2">{property.name}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">{property.location}</p>
+                    <div className="text-xl font-medium text-yellow-600 dark:text-yellow-500">{property.price}</div>
                     <div className="text-sm text-green-600 font-medium mb-4">
                       Rendement : {property.yield}
                     </div>
@@ -387,7 +433,7 @@ function App() {
             
             {/* Outils immobiliers */}
             <div className="mt-16 text-center">
-              <h3 className="text-2xl font-light text-gray-900 mb-8">Outils d'Investissement</h3>
+              <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-8">Outils d'Investissement</h3>
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={() => setShowCalculator(true)}
@@ -416,22 +462,22 @@ function App() {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="py-20 bg-gray-900">
+        <section id="contact" className="py-20 bg-gray-900 dark:bg-black transition-colors">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-light text-white mb-8">CONTACT</h2>
+            <h2 className="text-3xl font-light text-white dark:text-gray-100 mb-8">CONTACT</h2>
             <div className="w-24 h-px bg-yellow-600 mx-auto mb-12"></div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
-                <h3 className="text-xl font-medium text-white mb-4">Téléphone</h3>
-                <a href="tel:+33652913556" className="text-gray-300 hover:text-white transition-colors">
+              <div className="bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-lg p-8 border border-white/20">
+                <h3 className="text-xl font-medium text-white dark:text-gray-100 mb-4">Téléphone</h3>
+                <a href="tel:+33652913556" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
                   +33 6 52 91 35 56
                 </a>
               </div>
               
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20">
-                <h3 className="text-xl font-medium text-white mb-4">Email</h3>
-                <a href="mailto:nicolas.c@lacremerie.fr" className="text-gray-300 hover:text-white transition-colors">
+              <div className="bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-lg p-8 border border-white/20">
+                <h3 className="text-xl font-medium text-white dark:text-gray-100 mb-4">Email</h3>
+                <a href="mailto:nicolas.c@lacremerie.fr" className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
                   nicolas.c@lacremerie.fr
                 </a>
               </div>
@@ -439,6 +485,10 @@ function App() {
           </div>
         </section>
       </div>
+      
+      {/* Composants UX avancés */}
+      <Chatbot />
+      <PWAInstallPrompt />
       
       {/* Modals pour les outils immobiliers */}
       {showCalculator && (
@@ -453,7 +503,7 @@ function App() {
         <PropertyAlerts onClose={() => setShowAlerts(false)} />
       )}
       <Toaster position="top-right" />
-    </>
+    </div>
   );
 }
 
