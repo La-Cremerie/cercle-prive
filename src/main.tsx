@@ -1,8 +1,8 @@
-  }, 1000);
-}
-    navigator.serviceWorker.register('/sw.js')
-  setTimeout(() => {
-      .then(() => console.log('Service Worker enregistré'))
+  // Service worker registration (après le rendu)
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
-      .catch(() => console.warn('Service Worker non disponible'));
-// Service worker registration (après le rendu)
+    setTimeout(() => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(() => console.log('Service Worker enregistré'))
+            .catch(() => console.warn('Service Worker non disponible'));
+    }, 1000);
+}
