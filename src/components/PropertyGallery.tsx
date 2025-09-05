@@ -454,32 +454,6 @@ const PropertyGallery: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Outils supplémentaires */}
-        <div className="mt-16 text-center">
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={() => setShowComparator(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <Compare className="w-5 h-5" />
-              <span>Comparer les biens</span>
-            </button>
-            <button
-              onClick={() => setShowCalculator(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-            >
-              <Calculator className="w-5 h-5" />
-              <span>Calculer la rentabilité</span>
-            </button>
-            <button
-              onClick={() => setShowAlerts(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-            >
-              <Bell className="w-5 h-5" />
-              <span>Créer une alerte</span>
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Modals */}
