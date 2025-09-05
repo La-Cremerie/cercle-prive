@@ -14,6 +14,8 @@ import PropertyGallery from './components/PropertyGallery';
 import VendreSection from './components/VendreSection';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 const AdminLogin = isDevelopment ? React.lazy(() => import('./components/AdminLogin')) : null;
 const AdminPanel = isDevelopment ? React.lazy(() => import('./components/AdminPanel')) : null;
 const Chatbot = isDevelopment ? React.lazy(() => import('./components/Chatbot')) : null;
@@ -26,12 +28,23 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
-    }, 0);
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        setTimeout(() => {
+          const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+          const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+        }, 0);
         
         setIsLoggedIn(userLoggedIn);
         if (isDevelopment) setIsAdminLoggedIn(adminLoggedIn);
       } catch (err) {
-  };
+        console.error('Initialization error:', err);
+      }
+    };
+
+    initializeApp();
+  }, []);
 
   const toggleAdmin = () => {
     if (!isDevelopment) return;
@@ -64,8 +77,15 @@ function App() {
   // Pas d'écran de chargement bloquant
   if (isInitializing) {
     return (
-      <div className="min-h-screen bg-gray-900"></div>
-        />
+      <React.Suspense fallback={
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 text-yellow-600 animate-spin mx-auto mb-4" />
+            <h2 className="text-lg font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+          </div>
+        </div>
+      }>
+        <div className="min-h-screen bg-gray-900"></div>
         <Toaster position="top-right" />
       </React.Suspense>
     );
