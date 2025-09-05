@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
 // Import direct du LoginForm pour éviter le lazy loading
 const LoginForm = React.lazy(() => import('./components/LoginForm'));
@@ -12,6 +12,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [mainSiteLoaded, setMainSiteLoaded] = useState(false);
+  const [loadingError, setLoadingError] = useState<string | null>(null);
   
   // Admin states only in development
   const [showAdmin, setShowAdmin] = useState(false);
@@ -59,6 +60,7 @@ function App() {
     if (mainSiteLoaded || MainSiteComponents) return;
     
     try {
+      setLoadingError(null);
       // Chargement en parallèle avec Promise.allSettled pour éviter qu'une erreur bloque tout
       const mainImports = await Promise.allSettled([
         import('./components/Navigation'),
@@ -80,8 +82,7 @@ function App() {
       // Vérifier que tous les composants essentiels sont chargés
       if (successfulImports.length < 9) {
         console.error('Certains composants n\'ont pas pu être chargés');
-        // Forcer un rechargement si des composants manquent
-        window.location.reload();
+        setLoadingError('Erreur de chargement des composants');
         return;
       }
 
@@ -127,10 +128,7 @@ function App() {
       setMainSiteLoaded(true);
     } catch (error) {
       console.error('Erreur lors du chargement du site:', error);
-      // En cas d'erreur critique, forcer un rechargement
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      setLoadingError('Erreur critique lors du chargement');
     }
   };
 
@@ -206,6 +204,28 @@ function App() {
 
   // Chargement du site principal
   if (!mainSiteLoaded || !MainSiteComponents) {
+    if (loadingError) {
+      return (
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+          <div className="text-center max-w-md">
+            <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-light text-white mb-4 tracking-wider">
+              Erreur de chargement
+            </h2>
+            <p className="text-gray-400 font-light mb-6">
+              {loadingError}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
+            >
+              Recharger la page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -262,31 +282,33 @@ function App() {
 
   // Afficher le site principal
   return (
-    <React.Suspense fallback={
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-16 h-16 text-yellow-600 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-light text-white mb-2 tracking-wider">
-            CERCLE PRIVÉ
-          </h2>
-          <p className="text-gray-400 font-light">Chargement du site...</p>
+    <React.Suspense 
+      fallback={
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-16 h-16 text-yellow-600 animate-spin mx-auto mb-4" />
+            <h2 className="text-xl font-light text-white mb-2 tracking-wider">
+              CERCLE PRIVÉ
+            </h2>
+            <p className="text-gray-400 font-light">Chargement du site...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-        <MainSiteComponents.Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
-        <MainSiteComponents.HeroSection />
-        <MainSiteComponents.NotreAdnSection />
-        <MainSiteComponents.ServicesSection />
-        <MainSiteComponents.OffMarketSection />
-        <MainSiteComponents.RechercheSection />
-        <MainSiteComponents.PropertyGallery />
-        <MainSiteComponents.VendreSection />
-        {/* Chatbot only in development */}
-        {isDevelopment && MainSiteComponents.Chatbot && (
-          <MainSiteComponents.Chatbot />
+        {MainSiteComponents.Navigation && (
+          <MainSiteComponents.Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
         )}
-        <MainSiteComponents.PWAInstallPrompt />
+        {MainSiteComponents.HeroSection && <MainSiteComponents.HeroSection />}
+        {MainSiteComponents.NotreAdnSection && <MainSiteComponents.NotreAdnSection />}
+        {MainSiteComponents.ServicesSection && <MainSiteComponents.ServicesSection />}
+        {MainSiteComponents.OffMarketSection && <MainSiteComponents.OffMarketSection />}
+        {MainSiteComponents.RechercheSection && <MainSiteComponents.RechercheSection />}
+        {MainSiteComponents.PropertyGallery && <MainSiteComponents.PropertyGallery />}
+        {MainSiteComponents.VendreSection && <MainSiteComponents.VendreSection />}
+        {/* Chatbot only in development */}
+        {isDevelopment && MainSiteComponents.Chatbot && <MainSiteComponents.Chatbot />}
+        {MainSiteComponents.PWAInstallPrompt && <MainSiteComponents.PWAInstallPrompt />}
       </div>
       <Toaster position="top-right" />
     </React.Suspense>
