@@ -11,6 +11,8 @@ import PropertyGallery from './components/PropertyGallery';
 import VendreSection from './components/VendreSection';
 import Chatbot from './components/Chatbot';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
+import ContactSection from './components/ContactSection';
+import Footer from './components/Footer';
 
 // Import admin components only in development
 const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
