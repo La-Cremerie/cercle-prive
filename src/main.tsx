@@ -37,3 +37,5 @@ root.render(<App />);
 // Masquer le loader initial immédiatement
 requestAnimationFrame(() => {
   document.body.classList.add('react-loaded');
+}
+)
