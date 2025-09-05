@@ -254,27 +254,6 @@ const PropertyGallery: React.FC = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Actions du modal */}
-                <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={() => setSelectedProperty(null)}
-                    className="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    Fermer
-                  </button>
-                  <button className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
-                    Contacter l'agent
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
-  );
-};
               </div>
             </motion.div>
           ))}
@@ -448,6 +427,59 @@ const PropertyGallery: React.FC = () => {
                       ))}
                     </div>
                   </div>
+
+                  {/* Actions */}
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => toggleFavorite(selectedProperty.id)}
+                      className={`flex items-center space-x-2 px-6 py-3 rounded-md transition-colors ${
+                        favorites.has(selectedProperty.id)
+                          ? 'bg-red-500 text-white hover:bg-red-600'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      <Heart className={`w-5 h-5 ${favorites.has(selectedProperty.id) ? 'fill-current' : ''}`} />
+                      <span>{favorites.has(selectedProperty.id) ? 'Retiré des favoris' : 'Ajouter aux favoris'}</span>
+                    </button>
+                    <a
+                      href="mailto:nicolas.c@lacremerie.fr?subject=Demande d'information - Villa Horizon"
+                      className="flex-1 bg-yellow-600 text-white px-6 py-3 rounded-md hover:bg-yellow-700 transition-colors text-center font-medium"
+                    >
+                      Demander des informations
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Outils supplémentaires */}
+        <div className="mt-16 text-center">
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={() => setShowComparator(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Compare className="w-5 h-5" />
+              <span>Comparer les biens</span>
+            </button>
+            <button
+              onClick={() => setShowCalculator(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              <Calculator className="w-5 h-5" />
+              <span>Calculer la rentabilité</span>
+            </button>
+            <button
+              onClick={() => setShowAlerts(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            >
+              <Bell className="w-5 h-5" />
+              <span>Créer une alerte</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Modals */}
