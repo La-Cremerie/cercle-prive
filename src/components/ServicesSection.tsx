@@ -1,9 +1,7 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Package, Ruler, Sofa, Wrench, Crown, Sparkles } from 'lucide-react';
 
 export default function ServicesSection() {
-  const { t } = useTranslation();
 
   const services = [
     {

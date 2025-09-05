@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
 
 const HeroSection: React.FC = () => {
   const [backgroundImage, setBackgroundImage] = useState(() => {
@@ -92,8 +91,6 @@ const HeroSection: React.FC = () => {
       window.removeEventListener('presentationImageChanged', handleImageChange as EventListener);
     };
   }, []);
-
-  const { t } = useTranslation();
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gray-900">

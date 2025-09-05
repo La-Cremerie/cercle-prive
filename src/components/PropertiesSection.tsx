@@ -1,9 +1,7 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { MapPin, Bed, Bath, Square, Euro } from 'lucide-react';
 
 export default function PropertiesSection() {
-  const { t } = useTranslation();
 
   const properties = [
     {
@@ -42,8 +40,8 @@ export default function PropertiesSection() {
     <section className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">{t('properties.title')}</h2>
-          <p className="text-xl text-gray-600">{t('properties.subtitle')}</p>
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">Nos biens d'exception</h2>
+          <p className="text-xl text-gray-600">Une sélection de propriétés uniques sur la Côte d'Azur</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
