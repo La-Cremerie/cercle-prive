@@ -256,9 +256,9 @@ export class DiagnosticsManager {
       if (typeof sessionStorage === 'undefined') {
         results.sessionStorage.error = 'sessionStorage not supported';
       } else {
-      sessionStorage.setItem('diagnostic-test', 'test');
-      sessionStorage.removeItem('diagnostic-test');
-      results.sessionStorage.available = true;
+        sessionStorage.setItem('diagnostic-test', 'test');
+        sessionStorage.removeItem('diagnostic-test');
+        results.sessionStorage.available = true;
       }
     } catch (error) {
       results.sessionStorage.error = error instanceof Error ? error.message : 'Erreur inconnue';
@@ -582,7 +582,6 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
         });
       }
       
-      // Recharger la page après un délai
       setTimeout(() => {
         window.location.reload();
       }, 1000);
