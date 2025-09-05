@@ -106,7 +106,7 @@ function App() {
         let adminLoggedIn = false;
         
         try {
-          if (typeof window !== 'undefined' && window.localStorage) {
+          if (typeof window !== 'undefined' && window && window.localStorage) {
             userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
             adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
           }
