@@ -245,3 +245,5 @@ try {
   attemptRecovery(error);
   }
 }
+  }
+}
