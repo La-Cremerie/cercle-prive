@@ -213,43 +213,70 @@ export class DiagnosticsManager {
 
     // LocalStorage
     try {
+      // Check if localStorage is available
+      if (typeof Storage === 'undefined' || typeof localStorage === 'undefined') {
+        results.localStorage.error = 'localStorage not supported';
+        return results;
+      }
+      
+      // Check if localStorage is available
+      if (typeof Storage === 'undefined' || typeof localStorage === 'undefined') {
+        results.localStorage.error = 'localStorage not supported';
+        return results;
+      }
+      
       localStorage.setItem('diagnostic-test', 'test');
       localStorage.removeItem('diagnostic-test');
       results.localStorage.available = true;
 
       // Estimation de l'usage
       let totalSize = 0;
-      for (let key in localStorage) {
-        if (localStorage.hasOwnProperty(key)) {
-          totalSize += localStorage[key].length;
+      try {
+        for (let key in localStorage) {
+          if (localStorage.hasOwnProperty(key)) {
+            totalSize += (localStorage[key] || '').length;
+          }
+            totalSize += (localStorage[key] || '').length;
+          }
         }
+        results.localStorage.usage = totalSize;
+      } catch (storageError) {
+        results.localStorage.usage = 'Erreur de calcul';
       }
-      results.localStorage.usage = totalSize;
 
       // Quota (estimation)
-      if ('storage' in navigator && 'estimate' in navigator.storage) {
+      if (typeof navigator !== 'undefined' && 
+          'storage' in navigator && 
+          navigator.storage && 
+          'estimate' in navigator.storage) {
         navigator.storage.estimate().then(estimate => {
           results.localStorage.quota = estimate.quota;
+        }).catch(() => {
+          results.localStorage.quota = 'Non disponible';
         });
       }
     } catch (error) {
-      results.localStorage.error = error.message;
+      results.localStorage.error = error instanceof Error ? error.message : 'Erreur inconnue';
     }
 
     // SessionStorage
     try {
+      if (typeof sessionStorage === 'undefined') {
+        results.sessionStorage.error = 'sessionStorage not supported';
+      } else {
       sessionStorage.setItem('diagnostic-test', 'test');
       sessionStorage.removeItem('diagnostic-test');
       results.sessionStorage.available = true;
+      }
     } catch (error) {
-      results.sessionStorage.error = error.message;
+      results.sessionStorage.error = error instanceof Error ? error.message : 'Erreur inconnue';
     }
 
     // IndexedDB
     try {
-      results.indexedDB.available = 'indexedDB' in window;
+      results.indexedDB.available = typeof window !== 'undefined' && 'indexedDB' in window;
     } catch (error) {
-      results.indexedDB.error = error.message;
+      results.indexedDB.error = error instanceof Error ? error.message : 'Erreur inconnue';
     }
 
     return results;
@@ -272,10 +299,62 @@ export class DiagnosticsManager {
 
   // Vérification de l'état de React
   private checkReactState() {
+    // Safely check for React availability
+    let reactAvailable = false;
+    let reactDOMAvailable = false;
+    let reactVersion = 'Non disponible';
+    
+    try {
+      // Check if React is available globally
+      reactAvailable = typeof window !== 'undefined' && 
+                      (typeof (window as any).React !== 'undefined' || 
+                       typeof React !== 'undefined');
+      reactVersion = reactAvailable ? 
+                    ((window as any).React?.version || 'Version inconnue') : 
+                    'Non disponible';
+    } catch (error) {
+      reactAvailable = false;
+    }
+    
+    try {
+      // Check if ReactDOM is available globally
+      reactDOMAvailable = typeof window !== 'undefined' && 
+                         (typeof (window as any).ReactDOM !== 'undefined' || 
+                          typeof ReactDOM !== 'undefined');
+    } catch (error) {
+      reactDOMAvailable = false;
+    }
+    
+    // Safely check for React availability
+    let reactAvailable = false;
+    let reactDOMAvailable = false;
+    let reactVersion = 'Non disponible';
+    
+    try {
+      // Check if React is available globally
+      reactAvailable = typeof window !== 'undefined' && 
+                      (typeof (window as any).React !== 'undefined' || 
+                       typeof React !== 'undefined');
+      reactVersion = reactAvailable ? 
+                    ((window as any).React?.version || 'Version inconnue') : 
+                    'Non disponible';
+    } catch (error) {
+      reactAvailable = false;
+    }
+    
+    try {
+      // Check if ReactDOM is available globally
+      reactDOMAvailable = typeof window !== 'undefined' && 
+                         (typeof (window as any).ReactDOM !== 'undefined' || 
+                          typeof ReactDOM !== 'undefined');
+    } catch (error) {
+      reactDOMAvailable = false;
+    }
+    
     return {
-      reactAvailable: typeof React !== 'undefined',
-      reactDOMAvailable: typeof ReactDOM !== 'undefined',
-      reactVersion: React?.version || 'Non disponible',
+      reactAvailable,
+      reactDOMAvailable,
+      reactVersion,
       reactRootMounted: !!document.querySelector('[data-reactroot]') || 
                        document.getElementById('root')?.children.length > 0,
       reactDevTools: !!(window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__
@@ -319,6 +398,16 @@ export class DiagnosticsManager {
   // Historique des erreurs
   private getErrorHistory() {
     try {
+      // Safely check localStorage availability
+      if (typeof localStorage === 'undefined') {
+        return { error: 'localStorage non disponible' };
+      }
+      
+      // Safely check localStorage availability
+      if (typeof localStorage === 'undefined') {
+        return { error: 'localStorage non disponible' };
+      }
+      
       const errorLog = localStorage.getItem('errorLog');
       const errors = errorLog ? JSON.parse(errorLog) : [];
       
@@ -501,6 +590,9 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
         } catch (error) {
           corruptedKeys.push(key);
         }
+        results.localStorage.usage = totalSize;
+      } catch (storageError) {
+        results.localStorage.usage = 'Erreur de calcul';
       }
     }
     
@@ -524,16 +616,20 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
     try {
       // Nettoyer tout le stockage
       localStorage.clear();
-      sessionStorage.clear();
       
       // Nettoyer les caches
-      if ('caches' in window) {
+      if (typeof navigator !== 'undefined' && 
+          'storage' in navigator && 
+          navigator.storage && 
+          'estimate' in navigator.storage) {
         caches.keys().then(names => {
           names.forEach(name => caches.delete(name));
+        }).catch(() => {
+          results.localStorage.quota = 'Non disponible';
         });
       }
       
-      // Recharger la page
+      results.localStorage.error = error instanceof Error ? error.message : 'Erreur inconnue';
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -546,16 +642,20 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
   }
 }
 
+      if (typeof sessionStorage === 'undefined') {
+        results.sessionStorage.error = 'sessionStorage not supported';
+      } else {
 // Auto-initialisation pour diagnostic automatique
+      }
 if (typeof window !== 'undefined') {
-  // Diagnostic automatique en cas de problème
+      results.sessionStorage.error = error instanceof Error ? error.message : 'Erreur inconnue';
   window.addEventListener('error', () => {
     setTimeout(() => {
       DiagnosticsManager.getInstance().runFullDiagnostic();
     }, 2000);
-  });
+      results.indexedDB.available = typeof window !== 'undefined' && 'indexedDB' in window;
   
-  // Exposer les outils de diagnostic en mode développement
+      results.indexedDB.error = error instanceof Error ? error.message : 'Erreur inconnue';
   if (import.meta.env.DEV) {
     (window as any).diagnostics = DiagnosticsManager.getInstance();
     console.log('🔧 Outils de diagnostic disponibles via window.diagnostics');
