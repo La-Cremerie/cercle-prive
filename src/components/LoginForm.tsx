@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { User, Phone, Mail, UserCheck, Eye, EyeOff } from 'lucide-react';
 import { UserService } from '../services/userService';
 import { EmailService } from '../services/emailService';
-import { supabase } from '../lib/supabase';
 import type { NewUserRegistration } from '../types/database';
 import toast from 'react-hot-toast';
 
