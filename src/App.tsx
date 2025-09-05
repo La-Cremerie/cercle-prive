@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import Chatbot from './components/Chatbot';
+import RechercheSection from './components/RechercheSection';
+import VendreSection from './components/VendreSection';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
