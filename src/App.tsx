@@ -14,11 +14,12 @@ import PropertyGallery from './components/PropertyGallery';
 import VendreSection from './components/VendreSection';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 
-const isDevelopment = import.meta.env.DEV;
-
-const AdminLogin = isDevelopment ? React.lazy(() => import('./components/AdminLogin')) : null;
-const AdminPanel = isDevelopment ? React.lazy(() => import('./components/AdminPanel')) : null;
-const Chatbot = isDevelopment ? React.lazy(() => import('./components/Chatbot')) : null;
+// Toutes les fonctionnalités sont maintenant disponibles en production
+const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
+const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
+const Chatbot = React.lazy(() => import('./components/Chatbot'));
+const Footer = React.lazy(() => import('./components/Footer'));
+const ContactSection = React.lazy(() => import('./components/ContactSection'));
 
 function App() {
   const [isLoadingApp, setIsLoadingApp] = useState(true);
@@ -171,8 +172,6 @@ function App() {
   }
 
   const toggleAdmin = () => {
-    if (!isDevelopment) return;
-    
     if (isAdminLoggedIn) {
       setShowAdmin(!showAdmin);
     } else {
@@ -181,20 +180,17 @@ function App() {
   };
 
   const handleAdminLoginSuccess = () => {
-    if (!isDevelopment) return;
     setIsAdminLoggedIn(true);
     setShowAdminLogin(false);
     setShowAdmin(true);
   };
 
   const handleAdminLogout = () => {
-    if (!isDevelopment) return;
     setIsAdminLoggedIn(false);
     setShowAdmin(false);
   };
 
   const handleBackFromAdminLogin = () => {
-    if (!isDevelopment) return;
     setShowAdminLogin(false);
   };
 
@@ -248,7 +244,7 @@ function App() {
   // Site principal - accès direct sans connexion
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-      <Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
+      <Navigation onAdminClick={toggleAdmin} />
       <HeroSection />
       <NotreAdnSection />
       <ServicesSection />
@@ -257,12 +253,20 @@ function App() {
       <PropertyGallery />
       <VendreSection />
       
-      {/* Chatbot uniquement en développement */}
-      {Chatbot && (
-        <React.Suspense fallback={null}>
-          <Chatbot />
-        </React.Suspense>
-      )}
+      {/* Contact Section */}
+      <React.Suspense fallback={null}>
+        <ContactSection />
+      </React.Suspense>
+      
+      {/* Footer */}
+      <React.Suspense fallback={null}>
+        <Footer />
+      </React.Suspense>
+      
+      {/* Chatbot */}
+      <React.Suspense fallback={null}>
+        <Chatbot />
+      </React.Suspense>
       
       <PWAInstallPrompt />
       <Toaster position="top-right" />
