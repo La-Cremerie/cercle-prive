@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     target: 'es2015',
-    minify: 'terser',
+    minify: 'esbuild',
     sourcemap: false,
     // Configuration robuste pour éviter les erreurs de build
     rollupOptions: {
@@ -30,19 +30,6 @@ export default defineConfig(({ mode }) => ({
         if (warning.code === 'THIS_IS_UNDEFINED') return;
         if (warning.code === 'EVAL') return;
         warn(warning);
-      }
-    },
-    terserOptions: {
-      compress: {
-        drop_console: mode === 'production',
-        drop_debugger: true,
-        pure_funcs: mode === 'production' ? ['console.log', 'console.warn'] : [],
-        // Éviter les optimisations trop agressives qui peuvent causer des erreurs
-        unsafe: false,
-        unsafe_comps: false
-      },
-      mangle: {
-        safari10: true // Compatibilité Safari
       }
     },
     assetsInlineLimit: 4096,

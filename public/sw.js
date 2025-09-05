@@ -47,8 +47,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Ignorer les requêtes non-HTTPS en développement
-  if (event.request.url.startsWith('http:') && !event.request.url.includes('localhost')) {
+  // Ignorer les requêtes problématiques
+  if (event.request.url.includes('chrome-extension') || 
+      event.request.url.includes('moz-extension') ||
+      event.request.url.includes('safari-extension')) {
     return;
   }
 
@@ -56,7 +58,7 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request)
       .then((response) => {
         // Mettre en cache seulement les réponses valides
-        if (response.status === 200 && response.type === 'basic') {
+        if (response && response.status === 200 && (response.type === 'basic' || response.type === 'cors')) {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME)
             .then((cache) => cache.put(event.request, responseToCache))
@@ -68,13 +70,24 @@ self.addEventListener('fetch', (event) => {
         // Fallback vers le cache uniquement pour les ressources importantes
         return caches.match(event.request).then(cachedResponse => {
           if (cachedResponse) {
+            console.log('SW: Ressource servie depuis le cache:', event.request.url);
             return cachedResponse;
           }
           // Pour les pages, retourner la page d'accueil en cache
           if (event.request.mode === 'navigate') {
-            return caches.match('/');
+            return caches.match('/').then(indexResponse => {
+              if (indexResponse) {
+                console.log('SW: Page d\'accueil servie depuis le cache');
+                return indexResponse;
+              }
+              // Dernière option : réponse d'erreur propre
+              return new Response('<!DOCTYPE html><html><head><title>Offline</title></head><body><h1>Site temporairement indisponible</h1><p>Veuillez vérifier votre connexion internet.</p></body></html>', {
+                headers: { 'Content-Type': 'text/html' }
+              });
+            });
           }
-          throw new Error('Ressource non disponible');
+          // Pour les autres ressources, retourner une erreur propre
+          return new Response('Resource not available offline', { status: 503 });
         });
       })
   );

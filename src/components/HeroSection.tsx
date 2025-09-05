@@ -2,32 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const HeroSection: React.FC = () => {
-  const [backgroundImage, setBackgroundImage] = useState(() => {
-    // Charger immédiatement l'image depuis l'admin si disponible
-    try {
-      const storedImages = localStorage.getItem('presentationImages');
-      if (storedImages) {
-        const images = JSON.parse(storedImages);
-        const activeImage = images.find((img: any) => img.isActive);
-        if (activeImage) {
-          return activeImage.url;
-        }
-      }
-      
-      const stored = localStorage.getItem('siteContent');
-      if (stored) {
-        const content = JSON.parse(stored);
-        if (content.hero?.backgroundImage) {
-          return content.hero.backgroundImage;
-        }
-      }
-    } catch (error) {
-      console.warn('Erreur chargement image admin:', error);
-    }
-    
-    // Image par défaut seulement si aucune image admin
-    return 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920';
-  });
+  const [backgroundImage, setBackgroundImage] = useState('');
   const [imageLoaded, setImageLoaded] = useState(false);
   const [heroContent, setHeroContent] = useState(() => {
     return {
@@ -35,16 +10,62 @@ const HeroSection: React.FC = () => {
     };
   });
 
+  // Charger l'image admin en priorité
+  useEffect(() => {
+    const loadAdminImage = () => {
+      try {
+        // 1. Priorité absolue : image sélectionnée dans l'admin
+        const storedImages = localStorage.getItem('presentationImages');
+        if (storedImages) {
+          const images = JSON.parse(storedImages);
+          const activeImage = images.find((img: any) => img.isActive);
+          if (activeImage?.url) {
+            console.log('Image admin trouvée:', activeImage.url);
+            setBackgroundImage(activeImage.url);
+            return;
+          }
+        }
+        
+        // 2. Fallback : image du contenu du site
+        const stored = localStorage.getItem('siteContent');
+        if (stored) {
+          const content = JSON.parse(stored);
+          if (content.hero?.backgroundImage) {
+            console.log('Image contenu trouvée:', content.hero.backgroundImage);
+            setBackgroundImage(content.hero.backgroundImage);
+            return;
+          }
+        }
+        
+        // 3. Image par défaut seulement en dernier recours
+        console.log('Utilisation image par défaut');
+        setBackgroundImage('https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920');
+        
+      } catch (error) {
+        console.warn('Erreur chargement image:', error);
+        setBackgroundImage('https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920');
+      }
+    };
+
+    loadAdminImage();
+  }, []);
+
   // Chargement d'image optimisé
   useEffect(() => {
+    if (!backgroundImage) return;
+    
     let isMounted = true;
     
     const img = new Image();
     img.onload = () => {
-      if (isMounted) setImageLoaded(true);
+      if (isMounted) {
+        console.log('Image chargée avec succès:', backgroundImage);
+        setImageLoaded(true);
+      }
     };
     img.onerror = () => {
       if (isMounted) {
+        console.warn('Erreur chargement image:', backgroundImage);
         setImageLoaded(true);
       }
     };
@@ -81,13 +102,12 @@ const HeroSection: React.FC = () => {
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gray-900">
-      {/* Background Image unique - Priorité à l'image admin */}
-      {imageLoaded && (
+      {/* Background Image - Uniquement l'image admin sélectionnée */}
+      {backgroundImage && imageLoaded && (
         <div 
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-500"
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url(${backgroundImage})`,
-            opacity: 1
+            backgroundImage: `url(${backgroundImage})`
           }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -95,7 +115,7 @@ const HeroSection: React.FC = () => {
       )}
 
       {/* Fallback pendant le chargement */}
-      {!imageLoaded && (
+      {(!backgroundImage || !imageLoaded) && (
         <div 
           className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800 to-gray-900"
         >
@@ -104,7 +124,7 @@ const HeroSection: React.FC = () => {
       )}
 
       {/* Loader d'image discret */}
-      {!imageLoaded && (
+      {backgroundImage && !imageLoaded && (
         <div className="absolute top-4 right-4 z-20">
           <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
         </div>
@@ -114,13 +134,13 @@ const HeroSection: React.FC = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: imageLoaded ? 0.2 : 0.5 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
         className="relative z-10 text-center px-4 max-w-4xl mx-auto"
       >
         <motion.h1 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: imageLoaded ? 0.4 : 0.7 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-8 leading-tight"
         >
           {heroContent.title}
@@ -129,7 +149,7 @@ const HeroSection: React.FC = () => {
         <motion.a 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: imageLoaded ? 0.6 : 0.9 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
           href="mailto:nicolas.c@lacremerie.fr"
           className="inline-block border border-white text-white px-8 py-3 text-sm font-light tracking-wider hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105"
         >

@@ -22,8 +22,7 @@
     <link rel="manifest" href="/manifest.json" />
     
     <!-- HTTPS Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https: wss:;">
     
     <title>CERCLE PRIVÉ - Site Immobilier de Luxe</title>
   </head>
@@ -75,13 +74,6 @@
       }
       
       /* Timeout automatique */
-      #initial-loader {
-        animation: autoHide 0.5s ease-out 2s forwards;
-      }
-      
-      @keyframes autoHide {
-        to { opacity: 0; pointer-events: none; }
-      }
     </style>
     
     <!-- Loader minimal -->
@@ -96,8 +88,36 @@
     <script>
       // Timeout de sécurité simple
       setTimeout(function() {
+        console.log('Loader timeout - forçage du chargement');
+        document.body.classList.add('app-ready');
+        var loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(function() {
+            loader.style.display = 'none';
+          }, 300);
+        }
+      }, 1500);
+      
+      // Gestion d'erreur globale pour HTTPS
+      window.addEventListener('error', function(e) {
+        console.warn('Erreur détectée:', e.error);
+        // Forcer l'affichage même en cas d'erreur
         document.body.classList.add('app-ready');
         var loader = document.getElementById('initial-loader');
         if (loader) loader.style.display = 'none';
-      }, 2000);
+      });
+      
+      // Détection de chargement réussi
+      window.addEventListener('load', function() {
+        console.log('Page chargée avec succès');
+        document.body.classList.add('app-ready');
+        var loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(function() {
+            loader.style.display = 'none';
+          }, 300);
+        }
+      });
     </script>
