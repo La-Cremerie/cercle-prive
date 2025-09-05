@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, X, Smartphone } from 'lucide-react';
+import { Download, X, Smartphone, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePWA } from '../hooks/usePWA';
 
@@ -8,7 +8,36 @@ const PWAInstallPrompt: React.FC = () => {
   const [showPrompt, setShowPrompt] = React.useState(false);
   const [showManualInstructions, setShowManualInstructions] = React.useState(false);
   const [showWelcomePrompt, setShowWelcomePrompt] = React.useState(false);
+  const [showRefreshButton, setShowRefreshButton] = React.useState(false);
 
+  // Détecter si l'app est installée et afficher le bouton refresh
+  React.useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isInWebAppiOS = (window.navigator as any).standalone === true;
+    setShowRefreshButton(isStandalone || isInWebAppiOS);
+  }, []);
+
+  const handleRefresh = () => {
+    if ('serviceWorker' in navigator) {
+      // Forcer la mise à jour du service worker
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => {
+          registration.update();
+        });
+      });
+    }
+    
+    // Vider le cache et recharger
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => caches.delete(name));
+      }).then(() => {
+        window.location.reload();
+      });
+    } else {
+      window.location.reload();
+    }
+  };
   React.useEffect(() => {
     // Vérifier si déjà installé
     if (isInstalled) {
@@ -68,6 +97,19 @@ const PWAInstallPrompt: React.FC = () => {
 
   return (
     <AnimatePresence>
+      {/* Bouton de rafraîchissement pour PWA */}
+      {showRefreshButton && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onClick={handleRefresh}
+          className="fixed top-4 right-4 w-12 h-12 bg-yellow-600 text-white rounded-full shadow-lg hover:bg-yellow-700 transition-colors z-40 flex items-center justify-center"
+          title="Actualiser l'application"
+        >
+          <RefreshCw className="w-5 h-5" />
+        </motion.button>
+      )}
+
       {/* Prompt de bienvenue avec auto-installation */}
       {showWelcomePrompt && showPrompt && (isInstallable || canInstall) && (
         <motion.div
