@@ -23,7 +23,6 @@ const Chatbot = isDevelopment ? React.lazy(() => import('./components/Chatbot'))
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
-  // Admin states only in development
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -54,6 +53,16 @@ function App() {
     };
 
     // Initialisation non-bloquante
+  // Si l'utilisateur n'est pas connecté, afficher le formulaire de connexion
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-900">
+        <LoginForm onLoginSuccess={() => setIsLoggedIn(true)} />
+        <Toaster position="top-right" />
+      </div>
+    );
+  }
+
     setTimeout(initializeApp, 100);
   }, []);
 
@@ -103,7 +112,7 @@ function App() {
   }
 
   // Admin panel (développement uniquement)
-  if (isDevelopment && showAdmin && AdminPanel) {
+  if (showAdmin && AdminPanel) {
     return (
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -114,6 +123,26 @@ function App() {
         </div>
       }>
         <AdminPanel onLogout={handleAdminLogout} />
+        <Toaster position="top-right" />
+      </React.Suspense>
+    );
+  }
+
+  // Admin login (développement uniquement)
+  if (showAdminLogin && AdminLogin) {
+    return (
+      <React.Suspense fallback={
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 text-yellow-600 animate-spin mx-auto mb-4" />
+            <h2 className="text-lg font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+          </div>
+        </div>
+      }>
+        <AdminLogin 
+          onLoginSuccess={handleAdminLoginSuccess}
+          onBack={handleBackFromAdminLogin}
+        />
         <Toaster position="top-right" />
       </React.Suspense>
     );
@@ -132,7 +161,7 @@ function App() {
       <VendreSection />
       
       {/* Chatbot uniquement en développement */}
-      {isDevelopment && Chatbot && (
+      {Chatbot && (
         <React.Suspense fallback={null}>
           <Chatbot />
         </React.Suspense>
