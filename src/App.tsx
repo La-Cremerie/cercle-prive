@@ -40,14 +40,18 @@ function App() {
   // Initialisation ultra-simple et robuste
   useEffect(() => {
     try {
+      console.log('App initialization started');
       // Vérifier les connexions de manière sécurisée
       const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
       const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+      
+      console.log('Login status check:', { userLoggedIn, adminLoggedIn });
       
       setIsUserLoggedIn(userLoggedIn);
       setIsAdminLoggedIn(adminLoggedIn);
       setAppReady(true);
       
+      console.log('App ready, hiding loader');
       // Masquer le loader HTML
       document.body.classList.add('app-ready');
       const loader = document.getElementById('initial-loader');
@@ -69,6 +73,7 @@ function App() {
   };
 
   const handleLoginSuccess = () => {
+    console.log('Login success callback triggered');
     setIsUserLoggedIn(true);
   };
 

@@ -91,27 +91,34 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
     setIsLoading(true);
     setError(null);
+    
+    console.log('Login form submission started');
 
     try {
       if (isLogin) {
+        console.log('Login mode - checking existing user');
         // Mode connexion - vérifier dans les utilisateurs enregistrés
         const existingUser = await UserService.getUserByEmail(formData.email);
         
         if (!existingUser) {
+          console.log('No user found for email:', formData.email);
           throw new Error('Aucun compte trouvé avec cet email. Veuillez vous inscrire d\'abord.');
         }
         
+        console.log('User found, logging in');
         // Pour la démo, accepter n'importe quel mot de passe pour un utilisateur existant
         localStorage.setItem('userLoggedIn', 'true');
         localStorage.setItem('userData', JSON.stringify(existingUser));
         
         onLoginSuccess();
       } else {
+        console.log('Registration mode - creating new user');
         // Mode inscription
         // Vérifier si l'utilisateur existe déjà
         const existingUser = await UserService.getUserByEmail(formData.email);
         
         if (existingUser) {
+          console.log('User already exists, logging them in');
           // Si l'utilisateur existe déjà, le connecter directement
           localStorage.setItem('userLoggedIn', 'true');
           localStorage.setItem('userData', JSON.stringify(existingUser));
@@ -120,6 +127,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           return;
         }
 
+        console.log('Creating new user');
         // Nouvel utilisateur - procéder à l'inscription
         const userData: Omit<NewUserRegistration, 'id' | 'created_at'> = {
           nom: formData.nom,
@@ -131,11 +139,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         const registeredUser = await UserService.registerUser(userData);
 
         // Store user data locally
+        console.log('User registered successfully, storing session');
         localStorage.setItem('userLoggedIn', 'true');
         localStorage.setItem('userData', JSON.stringify(registeredUser));
         
         // Envoyer les emails automatiques (simulation)
         try {
+          console.log('Attempting to send welcome emails');
           const { EmailService } = await import('../services/emailService');
           await EmailService.sendWelcomeEmail(registeredUser);
           await EmailService.sendAdminNotification(registeredUser);
@@ -149,16 +159,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         
         // Redirect after a short delay
         setTimeout(() => {
+          console.log('Redirecting to main site');
           onLoginSuccess();
         }, 1500);
       }
 
     } catch (err) {
+      console.error('Login/Registration error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
+      console.log('Login form submission completed');
     }
   };
 

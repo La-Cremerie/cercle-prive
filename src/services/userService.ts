@@ -5,7 +5,11 @@ import type { NewUserRegistration, UserRegistration } from '../types/database';
 const isSupabaseConfigured = () => {
   const url = import.meta.env.VITE_SUPABASE_URL;
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  return url && key && url !== 'https://your-project.supabase.co' && key !== 'your-anon-key';
+  return url && key && 
+         url !== 'https://your-project.supabase.co' && 
+         key !== 'your-anon-key' &&
+         url.startsWith('https://') &&
+         key.length > 20;
 };
 
 // Stockage local comme fallback
@@ -28,8 +32,11 @@ const saveLocalUsers = (users: UserRegistration[]) => {
 
 export class UserService {
   static async registerUser(userData: Omit<NewUserRegistration, 'id' | 'created_at'>): Promise<UserRegistration> {
+    console.log('UserService.registerUser called with:', { email: userData.email });
+    
     // Si Supabase n'est pas configuré, utiliser le stockage local
     if (!isSupabaseConfigured()) {
+      console.log('Using local storage fallback for user registration');
       const users = getLocalUsers();
       
       // Vérifier si l'email existe déjà
@@ -49,6 +56,7 @@ export class UserService {
       return newUser;
     }
 
+    console.log('Attempting Supabase registration');
     try {
       const { data, error } = await supabase
         .from('user_registrations')
@@ -63,21 +71,42 @@ export class UserService {
         throw new Error(`Erreur lors de l'inscription: ${error.message}`);
       }
 
+      console.log('Supabase registration successful:', data);
       return data;
     } catch (error) {
       // Fallback vers le stockage local en cas d'erreur réseau
-      console.warn('Erreur Supabase, utilisation du stockage local:', error);
-      return this.registerUser(userData);
+      console.warn('Supabase error, falling back to local storage:', error);
+      
+      // Éviter la récursion infinie
+      const users = getLocalUsers();
+      const existingUser = users.find(u => u.email === userData.email);
+      if (existingUser) {
+        throw new Error('Cette adresse email est déjà utilisée');
+      }
+      
+      const newUser: UserRegistration = {
+        id: Date.now().toString(),
+        ...userData,
+        created_at: new Date().toISOString()
+      };
+      
+      users.push(newUser);
+      saveLocalUsers(users);
+      return newUser;
     }
   }
 
   static async getUserByEmail(email: string): Promise<UserRegistration | null> {
+    console.log('UserService.getUserByEmail called with:', email);
+    
     // Si Supabase n'est pas configuré, utiliser le stockage local
     if (!isSupabaseConfigured()) {
+      console.log('Using local storage for user lookup');
       const users = getLocalUsers();
       return users.find(u => u.email === email) || null;
     }
 
+    console.log('Attempting Supabase user lookup');
     try {
       const { data, error } = await supabase
         .from('user_registrations')
@@ -89,10 +118,11 @@ export class UserService {
         throw new Error(`Erreur lors de la recherche: ${error.message}`);
       }
 
+      console.log('Supabase lookup result:', data);
       return data;
     } catch (error) {
       // Fallback vers le stockage local
-      console.warn('Erreur Supabase, utilisation du stockage local:', error);
+      console.warn('Supabase lookup error, using local storage:', error);
       const users = getLocalUsers();
       return users.find(u => u.email === email) || null;
     }
