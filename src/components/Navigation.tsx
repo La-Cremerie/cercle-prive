@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Settings, Bell } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 // Import ThemeToggle only in development
@@ -11,6 +12,7 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { unreadCount, markAsRead } = useNotifications();
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -21,34 +23,56 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
     onAdminClick?.();
   };
 
+  const isHomePage = location.pathname === '/';
+
+  const navLinks = [
+    { href: '/#notre-adn', label: 'CONCEPT', isAnchor: true },
+    { href: '/#nos-services', label: 'NOS SERVICES', isAnchor: true },
+    { href: '/#recherche', label: 'RECHERCHE', isAnchor: true },
+    { href: '/#galerie-biens', label: 'ACHETER', isAnchor: true },
+    { href: '/#vendre', label: 'VENDRE', isAnchor: true },
+    { href: '/about', label: 'À PROPOS', isAnchor: false },
+    { href: '/services', label: 'SERVICES', isAnchor: false },
+    { href: '/portfolio', label: 'PORTFOLIO', isAnchor: false },
+    { href: '/blog', label: 'BLOG', isAnchor: false },
+    { href: '/contact', label: 'CONTACT', isAnchor: false }
+  ];
+
+  const displayedLinks = isHomePage 
+    ? navLinks.filter(link => link.isAnchor)
+    : navLinks.filter(link => !link.isAnchor);
   return (
     <nav className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-xl md:text-2xl font-light text-gray-900 dark:text-white tracking-wider">
+            <Link to="/" className="text-xl md:text-2xl font-light text-gray-900 dark:text-white tracking-wider hover:text-yellow-600 transition-colors">
               CERCLE PRIVÉ
-            </h1>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            <a href="#notre-adn" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
-              CONCEPT
-            </a>
-            <a href="#nos-services" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
-              NOS SERVICES
-            </a>
-            <a href="#recherche" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
-              RECHERCHE
-            </a>
-            <a href="#galerie-biens" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
-              ACHETER
-            </a>
-            <a href="#vendre" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
-              VENDRE
-            </a>
+            {displayedLinks.map((link) => (
+              link.isAnchor ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
+                >
+                  {link.label}
+                </Link>
+              )
+            ))}
             
             {/* Theme toggle only in development */}
             {import.meta.env.DEV && (
@@ -87,41 +111,27 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
         {isMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-lg">
             <div className="px-4 py-6 space-y-4">
-              <a
-                href="#notre-adn"
-                onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
-              >
-                CONCEPT
-              </a>
-              <a
-                href="#nos-services"
-                onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
-              >
-                NOS SERVICES
-              </a>
-              <a
-                href="#recherche"
-                onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
-              >
-                RECHERCHE
-              </a>
-              <a
-                href="#galerie-biens"
-                onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
-              >
-                ACHETER
-              </a>
-              <a
-                href="#vendre"
-                onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
-              >
-                VENDRE
-              </a>
+              {displayedLinks.map((link) => (
+                link.isAnchor ? (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={toggleMenu}
+                    className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    onClick={toggleMenu}
+                    className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
+                  >
+                    {link.label}
+                  </Link>
+                )
+              ))}
               {onAdminClick && import.meta.env.DEV && (
                 <button
                   onClick={() => {

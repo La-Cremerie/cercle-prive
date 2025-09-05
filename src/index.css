@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Variables CSS */
+/* Variables CSS optimisées */
 :root {
   --color-primary: #D97706;
   --color-secondary: #1F2937;
@@ -11,6 +11,10 @@
   --color-text: #111827;
   --font-heading: 'Inter';
   --font-body: 'Inter';
+  
+  /* Optimisations de performance */
+  --animation-duration: 0.3s;
+  --transition-duration: 0.2s;
 }
 
 @layer base {
@@ -20,6 +24,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     -webkit-text-size-adjust: 100%;
+    /* Optimisation GPU */
+    transform: translateZ(0);
   }
   
   body {
@@ -30,30 +36,44 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Optimisation de rendu */
+    contain: layout style paint;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading), sans-serif;
     text-rendering: optimizeLegibility;
+    /* Optimisation typographie */
+    font-display: swap;
   }
   
   /* Optimisations de performance */
   img {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
+    image-rendering: auto;
+    /* Optimisation chargement */
+    loading: lazy;
+    decoding: async;
   }
   
-  /* Prévention du FOUC */
-  .fade-in-ready {
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
+  /* Optimisations animations */
+  * {
+    transition-duration: var(--transition-duration);
   }
   
-  /* Optimisations GPU */
-  .gpu-optimized {
+  /* Optimisations GPU pour éléments animés */
+  .will-change-transform {
+    will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
-    perspective: 1000px;
+  }
+  
+  /* Réduction des animations si préféré */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -66,24 +86,15 @@
     @apply bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent;
   }
   
-  .fade-in {
-    animation: fadeIn 0.5s ease-out;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
   /* Optimisations de performance */
   .performance-optimized {
     contain: layout style paint;
-    will-change: transform;
+    content-visibility: auto;
   }
   
-  /* Préchargement des images critiques */
-  .preload-image {
-    content-visibility: auto;
-    contain-intrinsic-size: 1920px 1080px;
+  /* Optimisation du scroll */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
 }

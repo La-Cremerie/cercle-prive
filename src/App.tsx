@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
 import LoginForm from './components/LoginForm';
 import { PerformanceOptimizer } from './utils/performance';
 import { ErrorBoundaryManager } from './utils/errorBoundary';
@@ -21,6 +21,29 @@ import Chatbot from './components/Chatbot';
 import Footer from './components/Footer';
 import ContactSection from './components/ContactSection';
 
+// Pages
+import About from './pages/About';
+import Services from './pages/Services';
+import Portfolio from './pages/Portfolio';
+import Blog from './pages/Blog';
+import Contact from './pages/Contact';
+import NotFound from './pages/NotFound';
+
+// Layout pour les pages avec navigation
+const PageLayout: React.FC<{ children: React.ReactNode; showAdmin?: boolean; onAdminClick?: () => void }> = ({ 
+  children, 
+  showAdmin = false, 
+  onAdminClick 
+}) => (
+  <div className="min-h-screen bg-white dark:bg-gray-900">
+    <Navigation onAdminClick={onAdminClick} />
+    <main>{children}</main>
+    <Footer />
+    {showAdmin && <Chatbot />}
+    <PWAInstallPrompt />
+  </div>
+);
+
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
@@ -28,13 +51,12 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
-  // Initialisation simple
+  // Initialisation optimisée
   useEffect(() => {
-    // Initialiser les optimisations de performance
     const performanceOptimizer = PerformanceOptimizer.getInstance();
     const errorBoundary = ErrorBoundaryManager.getInstance();
     
-    console.log('🚀 Initialisation des optimisations de performance');
+    console.log('🚀 Initialisation optimisée');
     
     // Vérifier les connexions
     const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
@@ -43,32 +65,22 @@ function App() {
     setIsUserLoggedIn(userLoggedIn);
     setIsAdminLoggedIn(adminLoggedIn);
     
-    // Masquer le loader après un délai court
+    // Masquer le loader
     setTimeout(() => {
       setIsLoading(false);
       document.body.classList.add('app-ready');
       
-      // Mesurer les performances après le chargement initial
+      // Mesurer les performances
       setTimeout(() => {
         performanceOptimizer.measureWebVitals();
-        console.log('📊 Métriques de performance collectées');
+        console.log('📊 Métriques collectées');
       }, 1000);
-    }, 1000);
-    
-    // Nettoyage au démontage
-    return () => {
-      console.log('🧹 Nettoyage des optimisations');
-    };
+    }, 800);
   }, []);
 
   const handleLoginSuccess = () => {
     setIsUserLoggedIn(true);
   };
-
-  // Loading state simple
-  if (isLoading) {
-    return null; // Le loader HTML s'occupe de l'affichage
-  }
 
   const toggleAdmin = () => {
     if (isAdminLoggedIn) {
@@ -93,7 +105,12 @@ function App() {
     setShowAdminLogin(false);
   };
 
-  // Si l'utilisateur n'est pas connecté, afficher le formulaire de connexion
+  // Loading state
+  if (isLoading) {
+    return null;
+  }
+
+  // Formulaire de connexion
   if (!isUserLoggedIn) {
     return (
       <>
@@ -113,8 +130,8 @@ function App() {
     );
   }
 
-  // Admin panel (développement uniquement)
-  if (showAdmin && AdminPanel) {
+  // Admin panel
+  if (showAdmin && import.meta.env.DEV) {
     return (
       <>
         <AdminPanel onLogout={handleAdminLogout} />
@@ -133,8 +150,8 @@ function App() {
     );
   }
 
-  // Admin login (développement uniquement)
-  if (showAdminLogin && AdminLogin) {
+  // Admin login
+  if (showAdminLogin && import.meta.env.DEV) {
     return (
       <>
         <AdminLogin 
@@ -156,47 +173,96 @@ function App() {
     );
   }
 
-  // Site principal
+  // Application principale avec routage
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors performance-optimized">
-      <Navigation onAdminClick={toggleAdmin} />
-      <HeroSection />
-      <NotreAdnSection />
-      <ServicesSection />
-      <OffMarketSection />
-      <RechercheSection />
-      <PropertyGallery />
-      <VendreSection />
-      
-      <ContactSection />
-      <Footer />
-      <Chatbot />
-      
-      <PWAInstallPrompt />
-      <Toaster 
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#1F2937',
-            color: '#F9FAFB',
-            border: '1px solid #374151'
-          },
-          success: {
-            iconTheme: {
-              primary: '#10B981',
-              secondary: '#F9FAFB'
+    <Router>
+      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
+        <Routes>
+          {/* Page d'accueil */}
+          <Route path="/" element={
+            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
+              <Navigation onAdminClick={toggleAdmin} />
+              <HeroSection />
+              <NotreAdnSection />
+              <ServicesSection />
+              <OffMarketSection />
+              <RechercheSection />
+              <PropertyGallery />
+              <VendreSection />
+              <ContactSection />
+              <Footer />
+              {import.meta.env.DEV && <Chatbot />}
+              <PWAInstallPrompt />
+            </PageLayout>
+          } />
+          
+          {/* Pages statiques converties */}
+          <Route path="/about" element={
+            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
+              <About />
+            </PageLayout>
+          } />
+          
+          <Route path="/services" element={
+            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
+              <Services />
+            </PageLayout>
+          } />
+          
+          <Route path="/portfolio" element={
+            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
+              <Portfolio />
+            </PageLayout>
+          } />
+          
+          <Route path="/blog" element={
+            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
+              <Blog />
+            </PageLayout>
+          } />
+          
+          <Route path="/contact" element={
+            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
+              <Contact />
+            </PageLayout>
+          } />
+          
+          {/* Page 404 */}
+          <Route path="/404" element={
+            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
+              <NotFound />
+            </PageLayout>
+          } />
+          
+          {/* Redirection pour toutes les autres routes */}
+          <Route path="*" element={<Navigate to="/404" replace />} />
+        </Routes>
+
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#1F2937',
+              color: '#F9FAFB',
+              border: '1px solid #374151'
+            },
+            success: {
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#F9FAFB'
+              }
+            },
+            error: {
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#F9FAFB'
+              }
             }
-          },
-          error: {
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: '#F9FAFB'
-            }
-          }
-        }}
-      />
-    </div>
+          }}
+        />
+      </div>
+    </Router>
   );
 }
 
