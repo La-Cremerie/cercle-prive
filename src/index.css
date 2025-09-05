@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables CSS personnalisables */
+:root {
+  --color-primary: #D97706;
+  --color-secondary: #1F2937;
+  --color-accent: #F59E0B;
+  --color-background: #FFFFFF;
+  --color-text: #111827;
+  --font-heading: 'Inter';
+  --font-body: 'Inter';
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply transition-colors duration-300;
+    font-family: var(--font-body), sans-serif;
+    color: var(--color-text);
+    background-color: var(--color-background);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), sans-serif;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent;
+  }
+}
