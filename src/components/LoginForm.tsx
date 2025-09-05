@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Phone, Mail, UserCheck, Eye, EyeOff } from 'lucide-react';
 import { UserService } from '../services/userService';
 import { EmailService } from '../services/emailService';
+import { useTranslation } from 'react-i18next';
 import type { NewUserRegistration } from '../types/database';
 import toast from 'react-hot-toast';
 
@@ -17,6 +18,7 @@ interface FormData {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     nom: '',
     prenom: '',
@@ -108,7 +110,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         }
 
         // Nouvel utilisateur - procéder à l'inscription
-        const userData: Omit<NewUserRegistration, 'id' | 'created_at'> = {
+        const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
           nom: formData.nom,
           prenom: formData.prenom,
           telephone: formData.telephone,
