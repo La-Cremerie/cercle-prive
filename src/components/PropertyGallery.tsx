@@ -233,6 +233,16 @@ const PropertyGallery: React.FC = () => {
                     </span>
                   </div>
                 )}
+                
+                {/* Rendement */}
+                {property.yield && (
+                  <div className="mb-3">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      Rendement : <span className="font-medium text-green-600">{property.yield.toLocaleString('fr-FR')} € / an</span>
+                    </span>
+                  </div>
+                )}
+                
                 <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
                   <MapPin className="w-4 h-4 mr-1" />
                   <span className="text-sm">{property.location}</span>
