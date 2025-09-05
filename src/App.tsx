@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Loader2, CheckCircle } from 'lucide-react';
+import LoginForm from './components/LoginForm';
 
 // Import direct des composants essentiels
 import Navigation from './components/Navigation';
@@ -22,25 +23,31 @@ const Chatbot = isDevelopment ? React.lazy(() => import('./components/Chatbot'))
 function App() {
   const [isLoadingApp, setIsLoadingApp] = useState(true);
   const [isContentReady, setIsContentReady] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
+  // Tous les hooks doivent être appelés dans le même ordre à chaque rendu
   useEffect(() => {
     const initializeApp = async () => {
       try {
         // Précharger les ressources critiques
         await preloadCriticalResources();
         
+        // Vérifier si l'utilisateur est connecté
+        let userLoggedIn = false;
         let adminLoggedIn = false;
         
         try {
+          userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
           adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
         } catch (storageError) {
           console.warn('Erreur localStorage (non-bloquante):', storageError);
           // Continuer avec les valeurs par défaut
         }
         
+        setIsUserLoggedIn(userLoggedIn);
         if (isDevelopment) setIsAdminLoggedIn(adminLoggedIn);
         
         // Marquer le contenu comme prêt
@@ -52,6 +59,7 @@ function App() {
       } catch (err) {
         console.error('Initialization error:', err);
         // Ne pas bloquer l'application en cas d'erreur
+        setIsUserLoggedIn(false);
         if (isDevelopment) setIsAdminLoggedIn(false);
         setIsContentReady(true); // Afficher quand même en cas d'erreur
       } finally {
@@ -66,6 +74,45 @@ function App() {
 
     initializeApp();
   }, []);
+
+  // Vérification de l'état de chargement pour éviter le rendu prématuré
+  useEffect(() => {
+    if (!isLoadingApp && isContentReady) {
+      // Assurer que le DOM est prêt avant de signaler à l'HTML
+      const timer = setTimeout(() => {
+        document.body.classList.add('react-loaded');
+      }, 100);
+    
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingApp, isContentReady]);
+
+  // Hook pour gérer le chargement des images - toujours appelé
+  useEffect(() => {
+    if (isContentReady) {
+      // Ajouter la classe 'loaded' aux images une fois qu'elles sont chargées
+      const images = document.querySelectorAll('img');
+      images.forEach(img => {
+        if (img.complete) {
+          img.classList.add('loaded');
+        } else {
+          img.onload = () => img.classList.add('loaded');
+        }
+      });
+    }
+  }, [isContentReady]);
+
+  // Hook pour signaler que le DOM est prêt - toujours appelé
+  useEffect(() => {
+    if (!isLoadingApp && isContentReady) {
+      // Assurer que le DOM est prêt avant de signaler à l'HTML
+      const timer = setTimeout(() => {
+        document.body.classList.add('react-loaded');
+      }, 100);
+    
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingApp, isContentReady]);
 
   // Fonction de préchargement des ressources critiques
   const preloadCriticalResources = async () => {
@@ -99,21 +146,6 @@ function App() {
     });
   };
 
-  // Effet pour gérer le chargement des images
-  useEffect(() => {
-    if (isContentReady) {
-      // Ajouter la classe 'loaded' aux images une fois qu'elles sont chargées
-      const images = document.querySelectorAll('img');
-      images.forEach(img => {
-        if (img.complete) {
-          img.classList.add('loaded');
-        } else {
-          img.onload = () => img.classList.add('loaded');
-        }
-      });
-    }
-  }, [isContentReady]);
-
   // Loading state amélioré
   if (isLoadingApp || !isContentReady) {
     return (
@@ -128,26 +160,6 @@ function App() {
             <p className="text-sm text-gray-400 font-light">Préparation de votre expérience</p>
           </div>
           <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
-            <div className="w-2 h-2 bg-yellow-600 rounded-full animate-pulse"></div>
-            <span>Chargement des ressources</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Vérification de l'état de chargement pour éviter le rendu prématuré
-  useEffect(() => {
-    if (!isLoadingApp && isContentReady) {
-      // Assurer que le DOM est prêt avant de signaler à l'HTML
-      const timer = setTimeout(() => {
-        document.body.classList.add('react-loaded');
-      }, 100);
-    
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
   const toggleAdmin = () => {
     if (!isDevelopment) return;
     
@@ -175,6 +187,16 @@ function App() {
     if (!isDevelopment) return;
     setShowAdminLogin(false);
   };
+
+  // Si l'utilisateur n'est pas connecté, afficher le formulaire de connexion
+  if (!isUserLoggedIn) {
+    return (
+      <>
+        <LoginForm onLoginSuccess={handleLoginSuccess} />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
 
   // Admin panel (développement uniquement)
   if (showAdmin && AdminPanel) {
