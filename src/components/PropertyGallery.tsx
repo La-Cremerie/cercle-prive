@@ -254,6 +254,27 @@ const PropertyGallery: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Actions du modal */}
+                <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => setSelectedProperty(null)}
+                    className="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    Fermer
+                  </button>
+                  <button className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                    Contacter l'agent
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+};
               </div>
             </motion.div>
           ))}
