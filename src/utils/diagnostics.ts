@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Système de diagnostic avancé pour résoudre les pages blanches
 export class DiagnosticsManager {
   private static instance: DiagnosticsManager;
@@ -274,7 +276,7 @@ export class DiagnosticsManager {
   private checkReactState() {
     return {
       reactAvailable: typeof React !== 'undefined',
-      reactDOMAvailable: typeof ReactDOM !== 'undefined',
+      reactDOMAvailable: typeof window !== 'undefined' && typeof (window as any).ReactDOM !== 'undefined',
       reactVersion: React?.version || 'Non disponible',
       reactRootMounted: !!document.querySelector('[data-reactroot]') || 
                        document.getElementById('root')?.children.length > 0,

@@ -106,8 +106,10 @@ function App() {
         let adminLoggedIn = false;
         
         try {
-          userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-          adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+          if (typeof window !== 'undefined' && window.localStorage) {
+            userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+          }
         } catch (storageError) {
           console.warn('⚠️ Erreur localStorage:', storageError);
           // Continuer avec les valeurs par défaut
