@@ -7,6 +7,7 @@ const isDevelopment = import.meta.env.DEV;
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [isLoadingMainSite, setIsLoadingMainSite] = useState(false);
   const [mainSiteLoaded, setMainSiteLoaded] = useState(false);
   
@@ -32,20 +33,29 @@ function App() {
   } | null>(null);
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est déjà connecté
-    const userLoggedIn = localStorage.getItem('userLoggedIn');
-    if (userLoggedIn === 'true') {
-      setIsLoggedIn(true);
-      loadMainSite();
-    }
-    
-    // Check admin login only in development
-    if (isDevelopment) {
-      const adminLoggedIn = localStorage.getItem('adminLoggedIn');
-      if (adminLoggedIn === 'true') {
-        setIsAdminLoggedIn(true);
+    const initializeApp = async () => {
+      // Petit délai pour éviter la page blanche
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Vérifier si l'utilisateur est déjà connecté
+      const userLoggedIn = localStorage.getItem('userLoggedIn');
+      if (userLoggedIn === 'true') {
+        setIsLoggedIn(true);
+        loadMainSite();
       }
-    }
+      
+      // Check admin login only in development
+      if (isDevelopment) {
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+        if (adminLoggedIn === 'true') {
+          setIsAdminLoggedIn(true);
+        }
+      }
+      
+      setIsInitializing(false);
+    };
+
+    initializeApp();
   }, []);
 
   const loadMainSite = async () => {
@@ -139,6 +149,20 @@ function App() {
     if (!isDevelopment) return;
     setShowAdminLogin(false);
   };
+
+  // Écran de chargement initial pour éviter la page blanche
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-light text-white tracking-wider">
+            CERCLE PRIVÉ
+          </h2>
+        </div>
+      </div>
+    );
+  }
 
   // Afficher uniquement le formulaire de login si pas connecté
   if (!isLoggedIn) {
