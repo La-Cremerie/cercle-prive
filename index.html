@@ -81,6 +81,15 @@
       @keyframes fadeOut {
         to { opacity: 0; pointer-events: none; }
       }
+      
+      /* Fallback si React ne charge pas */
+      body:not(.react-loaded) #initial-loader {
+        animation: fadeOut 0.5s ease-out 3s forwards;
+      }
+      
+      @keyframes fadeOut {
+        to { opacity: 0; pointer-events: none; }
+      }
     </style>
     
     <!-- Loader initial ultra-simplifié -->
@@ -97,6 +106,3 @@
       setTimeout(function() {
         document.body.classList.add('react-loaded');
       }, 2000); // 2 secondes max pour HTTPS
-    </script>
-  </body>
-</html>
