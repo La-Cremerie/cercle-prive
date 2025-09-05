@@ -156,18 +156,7 @@ function App() {
   // Site principal
   return (
     <>
-      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-        <Navigation onAdminClick={import.meta.env.DEV ? toggleAdmin : undefined} />
-        <HeroSection />
-        <NotreAdnSection />
-        <ServicesSection />
-        <OffMarketSection />
-        <RechercheSection />
-        <PropertyGallery />
-        <VendreSection />
-        <Chatbot />
-        <PWAInstallPrompt />
-      </div>
+      <LoginForm onLoginSuccess={handleLoginSuccess} />
       <Toaster position="top-right" />
     </>
   );
