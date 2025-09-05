@@ -431,7 +431,7 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
     const diagnostic = await this.runFullDiagnostic();
 
     // Fix 1: Nettoyer le localStorage corrompu
-    if (diagnostic.storage.localStorage.available) {
+    if (typeof window !== 'undefined' && window.localStorage && diagnostic.storage.localStorage.available) {
       try {
         const corruptedKeys = this.findCorruptedStorageKeys();
         if (corruptedKeys.length > 0) {
