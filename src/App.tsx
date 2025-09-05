@@ -83,7 +83,7 @@ function App() {
     );
   }
 
-  // Site principal - Version ultra-simplifiée
+  // Site principal - Version complète
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -102,6 +102,12 @@ function App() {
               </a>
               <a href="#biens" className="text-sm text-gray-700 hover:text-yellow-600 transition-colors">
                 BIENS
+              </a>
+              <a href="#recherche" className="text-sm text-gray-700 hover:text-yellow-600 transition-colors">
+                RECHERCHE
+              </a>
+              <a href="#vendre" className="text-sm text-gray-700 hover:text-yellow-600 transition-colors">
+                VENDRE
               </a>
               <a href="#contact" className="text-sm text-gray-700 hover:text-yellow-600 transition-colors">
                 CONTACT
