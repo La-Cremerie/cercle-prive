@@ -427,33 +427,6 @@ const PropertyGallery: React.FC = () => {
                       ))}
                     </div>
                   </div>
-
-                  {/* Actions */}
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={() => toggleFavorite(selectedProperty.id)}
-                      className={`flex items-center space-x-2 px-6 py-3 rounded-md transition-colors ${
-                        favorites.has(selectedProperty.id)
-                          ? 'bg-red-500 text-white hover:bg-red-600'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }`}
-                    >
-                      <Heart className={`w-5 h-5 ${favorites.has(selectedProperty.id) ? 'fill-current' : ''}`} />
-                      <span>{favorites.has(selectedProperty.id) ? 'Retiré des favoris' : 'Ajouter aux favoris'}</span>
-                    </button>
-                    <a
-                      href="mailto:nicolas.c@lacremerie.fr?subject=Demande d'information - Villa Horizon"
-                      className="flex-1 bg-yellow-600 text-white px-6 py-3 rounded-md hover:bg-yellow-700 transition-colors text-center font-medium"
-                    >
-                      Demander des informations
-                    </a>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
       </div>
 
       {/* Modals */}
