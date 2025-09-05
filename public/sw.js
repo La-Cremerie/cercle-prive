@@ -2,7 +2,7 @@ const CACHE_NAME = 'cercle-prive-https-v1';
 const urlsToCache = [
   '/',
   '/manifest.json',
-  '/src/main.tsx'
+  '/src/main.tsx',
   '/src/main.tsx'
 ];
 
@@ -13,21 +13,29 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('SW: Cache HTTPS ouvert');
-    fetch(event.request)
+        return cache.addAll(urlsToCache);
       })
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
         // Mettre en cache les réponses valides
         if (response.status === 200) {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME)
             .then((cache) => cache.put(event.request, responseToCache))
             .catch(() => {}); // Ignorer les erreurs de cache
+        }
         // Ne pas faire échouer l'installation
         return response;
-          }
+      })
       .catch(() => {
         // Fallback vers le cache en cas d'échec réseau
         return caches.match(event.request);
-    })
+      })
   );
 });
 
@@ -39,3 +47,4 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Stratégie simple : Network First avec fallback cache
+});
