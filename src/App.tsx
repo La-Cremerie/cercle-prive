@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 
-// Import direct des composants pour éviter les problèmes de chargement
-const LoginForm = React.lazy(() => import('./components/LoginForm'));
-const Navigation = React.lazy(() => import('./components/Navigation'));
-const HeroSection = React.lazy(() => import('./components/HeroSection'));
-const NotreAdnSection = React.lazy(() => import('./components/NotreAdnSection'));
-const ServicesSection = React.lazy(() => import('./components/ServicesSection'));
-const OffMarketSection = React.lazy(() => import('./components/OffMarketSection'));
-const RechercheSection = React.lazy(() => import('./components/RechercheSection'));
-const PropertyGallery = React.lazy(() => import('./components/PropertyGallery'));
-const VendreSection = React.lazy(() => import('./components/VendreSection'));
-const PWAInstallPrompt = React.lazy(() => import('./components/PWAInstallPrompt'));
-const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
-const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
-const Chatbot = React.lazy(() => import('./components/Chatbot'));
-const Footer = React.lazy(() => import('./components/Footer'));
-const ContactSection = React.lazy(() => import('./components/ContactSection'));
+// Import direct des composants
+import LoginForm from './components/LoginForm';
+import Navigation from './components/Navigation';
+import HeroSection from './components/HeroSection';
+import NotreAdnSection from './components/NotreAdnSection';
+import ServicesSection from './components/ServicesSection';
+import OffMarketSection from './components/OffMarketSection';
+import RechercheSection from './components/RechercheSection';
+import PropertyGallery from './components/PropertyGallery';
+import VendreSection from './components/VendreSection';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
+import AdminLogin from './components/AdminLogin';
+import AdminPanel from './components/AdminPanel';
+import Chatbot from './components/Chatbot';
+import Footer from './components/Footer';
+import ContactSection from './components/ContactSection';
 
 // Fallback de chargement
 const LoadingFallback = () => (
@@ -125,39 +125,39 @@ function App() {
   // Si l'utilisateur n'est pas connecté, afficher le formulaire de connexion
   if (!isUserLoggedIn) {
     return (
-      <React.Suspense fallback={<LoadingFallback />}>
+      <>
         <LoginForm onLoginSuccess={handleLoginSuccess} />
         <Toaster position="top-right" />
-      </React.Suspense>
+      </>
     );
   }
 
   // Admin panel (développement uniquement)
   if (showAdmin && import.meta.env.DEV) {
     return (
-      <React.Suspense fallback={<LoadingFallback />}>
+      <>
         <AdminPanel onLogout={handleAdminLogout} />
         <Toaster position="top-right" />
-      </React.Suspense>
+      </>
     );
   }
 
   // Admin login (développement uniquement)
   if (showAdminLogin && import.meta.env.DEV) {
     return (
-      <React.Suspense fallback={<LoadingFallback />}>
+      <>
         <AdminLogin 
           onLoginSuccess={handleAdminLoginSuccess}
           onBack={handleBackFromAdminLogin}
         />
         <Toaster position="top-right" />
-      </React.Suspense>
+      </>
     );
   }
 
   // Site principal
   return (
-    <React.Suspense fallback={<LoadingFallback />}>
+    <>
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
         <Navigation onAdminClick={import.meta.env.DEV ? toggleAdmin : undefined} />
         <HeroSection />
@@ -173,7 +173,7 @@ function App() {
         <PWAInstallPrompt />
       </div>
       <Toaster position="top-right" />
-    </React.Suspense>
+    </>
   );
 }
 
