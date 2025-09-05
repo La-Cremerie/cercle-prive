@@ -2,8 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Loader2, AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
-// Import direct du LoginForm pour éviter le lazy loading
-const LoginForm = React.lazy(() => import('./components/LoginForm'));
+// Import direct des composants essentiels pour éviter les problèmes de lazy loading
+import LoginForm from './components/LoginForm';
+import Navigation from './components/Navigation';
+import HeroSection from './components/HeroSection';
+import NotreAdnSection from './components/NotreAdnSection';
+import ServicesSection from './components/ServicesSection';
+import OffMarketSection from './components/OffMarketSection';
+import RechercheSection from './components/RechercheSection';
+import PropertyGallery from './components/PropertyGallery';
+import VendreSection from './components/VendreSection';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
+
+// Composants admin uniquement en développement
+const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
+const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
+const Chatbot = React.lazy(() => import('./components/Chatbot'));
 
 // Check if we're in development mode
 const isDevelopment = import.meta.env.DEV;
@@ -11,175 +25,43 @@ const isDevelopment = import.meta.env.DEV;
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  const [mainSiteLoaded, setMainSiteLoaded] = useState(false);
-  const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   // Admin states only in development
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
-  // États pour la gestion d'erreur avancée
-  const [retryCount, setRetryCount] = useState(0);
-  const [lastError, setLastError] = useState<string | null>(null);
-
-  // Composants du site principal (chargés après login)
-  const [MainSiteComponents, setMainSiteComponents] = useState<{
-    Navigation: React.ComponentType<any>;
-    HeroSection: React.ComponentType;
-    NotreAdnSection: React.ComponentType;
-    ServicesSection: React.ComponentType;
-    OffMarketSection: React.ComponentType;
-    RechercheSection: React.ComponentType;
-    PropertyGallery: React.ComponentType;
-    VendreSection: React.ComponentType;
-    PWAInstallPrompt: React.ComponentType;
-    Chatbot?: React.ComponentType;
-    AdminLogin?: React.ComponentType<any>;
-    AdminPanel?: React.ComponentType<any>;
-  } | null>(null);
-
-  // Chargement ultra-rapide de l'état initial
+  // Initialisation ultra-rapide
   useEffect(() => {
-    // Vérification synchrone ultra-rapide
-    const userLoggedIn = localStorage.getItem('userLoggedIn');
-    const adminLoggedIn = isDevelopment ? localStorage.getItem('adminLoggedIn') : null;
-    
-    if (userLoggedIn === 'true') {
-      setIsLoggedIn(true);
-      // Démarrer le chargement du site principal immédiatement
-      loadMainSite();
+    try {
+      // Vérification synchrone de l'état de connexion
+      const userLoggedIn = localStorage.getItem('userLoggedIn');
+      const adminLoggedIn = isDevelopment ? localStorage.getItem('adminLoggedIn') : null;
+      
+      if (userLoggedIn === 'true') {
+        setIsLoggedIn(true);
+      }
+      
+      if (isDevelopment && adminLoggedIn === 'true') {
+        setIsAdminLoggedIn(true);
+      }
+    } catch (err) {
+      console.warn('Erreur localStorage:', err);
+      // Continuer même en cas d'erreur localStorage
     }
     
-    if (isDevelopment && adminLoggedIn === 'true') {
-      setIsAdminLoggedIn(true);
-    }
-    
-    // Initialisation terminée immédiatement
+    // Terminer l'initialisation immédiatement
     setIsInitializing(false);
   }, []);
 
-  // Chargement optimisé du site principal
-  const loadMainSite = async () => {
-    if (mainSiteLoaded || MainSiteComponents) return;
-    
-    try {
-      setLoadingError(null);
-      setLastError(null);
-      // Chargement en parallèle avec Promise.allSettled pour éviter qu'une erreur bloque tout
-      const mainImports = await Promise.allSettled([
-        import('./components/Navigation'),
-        import('./components/HeroSection'),
-        import('./components/NotreAdnSection'),
-        import('./components/ServicesSection'),
-        import('./components/OffMarketSection'),
-        import('./components/RechercheSection'),
-        import('./components/PropertyGallery'),
-        import('./components/VendreSection'),
-        import('./components/PWAInstallPrompt')
-      ]);
-
-      // Extraire les composants réussis
-      const successfulImports = mainImports
-        .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-        .map(result => result.value);
-
-      // Vérifier que tous les composants essentiels sont chargés
-      if (successfulImports.length < 9) {
-        console.error('Certains composants n\'ont pas pu être chargés');
-        setLoadingError('Erreur de chargement des composants');
-        return;
-      }
-
-      // Chargement conditionnel des composants admin
-      let adminImports: any[] = [];
-      if (isDevelopment) {
-        try {
-          const adminImportResults = await Promise.allSettled([
-            import('./components/Chatbot'),
-            import('./components/AdminLogin'),
-            import('./components/AdminPanel')
-          ]);
-          
-          adminImports = adminImportResults
-            .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-            .map(result => result.value);
-        } catch (error) {
-          console.warn('Composants admin non disponibles:', error);
-        }
-      }
-
-      // Construire l'objet des composants
-      const components: any = {
-        Navigation: successfulImports[0].default,
-        HeroSection: successfulImports[1].default,
-        NotreAdnSection: successfulImports[2].default,
-        ServicesSection: successfulImports[3].default,
-        OffMarketSection: successfulImports[4].default,
-        RechercheSection: successfulImports[5].default,
-        PropertyGallery: successfulImports[6].default,
-        VendreSection: successfulImports[7].default,
-        PWAInstallPrompt: successfulImports[8].default
-      };
-      
-      // Ajouter les composants admin si disponibles
-      if (isDevelopment && adminImports.length >= 3) {
-        components.Chatbot = adminImports[0].default;
-        components.AdminLogin = adminImports[1].default;
-        components.AdminPanel = adminImports[2].default;
-      }
-
-      setMainSiteComponents(components);
-      setMainSiteLoaded(true);
-      setRetryCount(0); // Reset retry count on success
-    } catch (error) {
-      console.error('Erreur lors du chargement du site:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Erreur critique lors du chargement';
-      setLoadingError(errorMessage);
-      setLastError(errorMessage);
-    }
-  };
-
-  // Fonction de retry avec backoff
-  const retryLoadMainSite = async () => {
-    if (retryCount >= 3) {
-      setLoadingError('Impossible de charger le site après plusieurs tentatives');
-      return;
-    }
-    
-    setRetryCount(prev => prev + 1);
-    setLoadingError(null);
-    setMainSiteLoaded(false);
-    setMainSiteComponents(null);
-    
-    // Délai progressif : 1s, 2s, 3s
-    await new Promise(resolve => setTimeout(resolve, retryCount * 1000 + 1000));
-    
-    await loadMainSite();
-  };
-
-  // Fonction pour revenir au login
-  const backToLogin = () => {
-    localStorage.removeItem('userLoggedIn');
-    localStorage.removeItem('userData');
-    setIsLoggedIn(false);
-    setMainSiteLoaded(false);
-    setMainSiteComponents(null);
-    setLoadingError(null);
-    setRetryCount(0);
-  };
-
-  const handleLoginSuccess = async () => {
+  const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    await loadMainSite();
+    setError(null);
   };
 
   const toggleAdmin = () => {
-    // Admin access only in development
-    if (!isDevelopment || !MainSiteComponents?.AdminLogin || !MainSiteComponents?.AdminPanel) {
-      console.log('Admin panel not available');
-      return;
-    }
+    if (!isDevelopment) return;
     
     if (isAdminLoggedIn) {
       setShowAdmin(!showAdmin);
@@ -206,7 +88,7 @@ function App() {
     setShowAdminLogin(false);
   };
 
-  // Écran de chargement initial ultra-rapide
+  // Écran de chargement initial minimal
   if (isInitializing) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -219,101 +101,55 @@ function App() {
     );
   }
 
-  // Login avec Suspense pour éviter la page blanche
+  // Affichage d'erreur si problème
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-light text-white mb-4 tracking-wider">
+            Problème technique
+          </h2>
+          <p className="text-gray-400 font-light mb-6">
+            {error}
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
+            >
+              <RefreshCw className="w-5 h-5" />
+              <span>Recharger la page</span>
+            </button>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.reload();
+              }}
+              className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+            >
+              <Home className="w-5 h-5" />
+              <span>Réinitialiser</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Login
   if (!isLoggedIn) {
     return (
-      <React.Suspense fallback={
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
-            <p className="text-gray-400 text-sm mt-2">Chargement du formulaire...</p>
-          </div>
-        </div>
-      }>
-        <>
-          <LoginForm onLoginSuccess={handleLoginSuccess} />
-          <Toaster position="top-right" />
-        </>
-      </React.Suspense>
+      <>
+        <LoginForm onLoginSuccess={handleLoginSuccess} />
+        <Toaster position="top-right" />
+      </>
     );
   }
 
-  // Chargement du site principal
-  if (!mainSiteLoaded || !MainSiteComponents) {
-    if (loadingError) {
-      return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
-          <div className="text-center max-w-md">
-            <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-light text-white mb-4 tracking-wider">
-              Problème de chargement
-            </h2>
-            <p className="text-gray-400 font-light mb-6">
-              {loadingError}
-            </p>
-            <div className="space-y-3">
-              {retryCount < 3 && (
-                <button
-                  onClick={retryLoadMainSite}
-                  disabled={retryCount >= 3}
-                  className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50"
-                >
-                  <RefreshCw className="w-5 h-5" />
-                  <span>Réessayer ({retryCount}/3)</span>
-                </button>
-              )}
-              <button
-                onClick={() => window.location.reload()}
-                className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                <RefreshCw className="w-5 h-5" />
-                <span>Recharger la page</span>
-              </button>
-              <button
-                onClick={backToLogin}
-                className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-              >
-                <Home className="w-5 h-5" />
-                <span>Retour à l'accueil</span>
-              </button>
-            </div>
-            {lastError && (
-              <details className="mt-4 text-left">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-400">
-                  Détails techniques
-                </summary>
-                <pre className="mt-2 text-xs text-gray-600 bg-gray-800 p-3 rounded overflow-auto">
-                  {lastError}
-                </pre>
-              </details>
-            )}
-          </div>
-        </div>
-      );
-    }
-    
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-16 h-16 text-yellow-600 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-light text-white mb-2 tracking-wider">
-            CERCLE PRIVÉ
-          </h2>
-          <p className="text-gray-400 font-light">
-            Chargement de votre espace privé...
-            {retryCount > 0 && ` (Tentative ${retryCount + 1})`}
-          </p>
-          <div className="mt-4 w-64 bg-gray-800 rounded-full h-1 mx-auto">
-            <div className="bg-yellow-600 h-1 rounded-full animate-pulse" style={{ width: '60%' }}></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Afficher l'admin login si demandé (développement uniquement)
-  if (isDevelopment && showAdminLogin && MainSiteComponents.AdminLogin) {
+  // Admin login (développement uniquement)
+  if (isDevelopment && showAdminLogin) {
     return (
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -323,19 +159,17 @@ function App() {
           </div>
         </div>
       }>
-        <>
-          <MainSiteComponents.AdminLogin 
-            onLoginSuccess={handleAdminLoginSuccess}
-            onBack={handleBackFromAdminLogin}
-          />
-          <Toaster position="top-right" />
-        </>
+        <AdminLogin 
+          onLoginSuccess={handleAdminLoginSuccess}
+          onBack={handleBackFromAdminLogin}
+        />
+        <Toaster position="top-right" />
       </React.Suspense>
     );
   }
 
-  // Afficher le panel admin si connecté (développement uniquement)
-  if (isDevelopment && showAdmin && MainSiteComponents.AdminPanel) {
+  // Admin panel (développement uniquement)
+  if (isDevelopment && showAdmin) {
     return (
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -345,46 +179,34 @@ function App() {
           </div>
         </div>
       }>
-        <>
-          <MainSiteComponents.AdminPanel onLogout={handleAdminLogout} />
-          <Toaster position="top-right" />
-        </>
+        <AdminPanel onLogout={handleAdminLogout} />
+        <Toaster position="top-right" />
       </React.Suspense>
     );
   }
 
-  // Afficher le site principal
+  // Site principal avec tous les composants importés directement
   return (
-    <React.Suspense 
-      fallback={
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="w-16 h-16 text-yellow-600 animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-light text-white mb-2 tracking-wider">
-              CERCLE PRIVÉ
-            </h2>
-            <p className="text-gray-400 font-light">Chargement du site...</p>
-          </div>
-        </div>
-      }
-    >
-      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-        {MainSiteComponents.Navigation && (
-          <MainSiteComponents.Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
-        )}
-        {MainSiteComponents.HeroSection && <MainSiteComponents.HeroSection />}
-        {MainSiteComponents.NotreAdnSection && <MainSiteComponents.NotreAdnSection />}
-        {MainSiteComponents.ServicesSection && <MainSiteComponents.ServicesSection />}
-        {MainSiteComponents.OffMarketSection && <MainSiteComponents.OffMarketSection />}
-        {MainSiteComponents.RechercheSection && <MainSiteComponents.RechercheSection />}
-        {MainSiteComponents.PropertyGallery && <MainSiteComponents.PropertyGallery />}
-        {MainSiteComponents.VendreSection && <MainSiteComponents.VendreSection />}
-        {/* Chatbot only in development */}
-        {isDevelopment && MainSiteComponents.Chatbot && <MainSiteComponents.Chatbot />}
-        {MainSiteComponents.PWAInstallPrompt && <MainSiteComponents.PWAInstallPrompt />}
-      </div>
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
+      <Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
+      <HeroSection />
+      <NotreAdnSection />
+      <ServicesSection />
+      <OffMarketSection />
+      <RechercheSection />
+      <PropertyGallery />
+      <VendreSection />
+      
+      {/* Chatbot uniquement en développement */}
+      {isDevelopment && (
+        <React.Suspense fallback={null}>
+          <Chatbot />
+        </React.Suspense>
+      )}
+      
+      <PWAInstallPrompt />
       <Toaster position="top-right" />
-    </React.Suspense>
+    </div>
   );
 }
 

@@ -4,12 +4,12 @@ import App from './App.tsx';
 import './index.css';
 import './i18n';
 
-// Service worker simplifié
+// Service worker registration (non-blocking)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('Service Worker enregistré avec succès:', registration.scope);
+        console.log('Service Worker enregistré:', registration.scope);
       })
       .catch((error) => {
         console.warn('Service Worker non disponible:', error);
@@ -17,24 +17,43 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Optimisation du rendu initial
-const root = createRoot(document.getElementById('root')!);
-
-// Timeout de sécurité pour éviter le blocage
-let appMounted = false;
-
-// Fonction de rendu avec gestion d'erreur
+// Fonction de rendu sécurisée
 const renderApp = () => {
   try {
-    root.render(<App />);
-    appMounted = true;
+    const rootElement = document.getElementById('root');
+    if (!rootElement) {
+      throw new Error('Element root non trouvé');
+    }
+
+    const root = createRoot(rootElement);
+    
+    // Rendu avec gestion d'erreur
+    root.render(
+      <StrictMode>
+        <App />
+      </StrictMode>
+    );
     
     // Masquer le loader initial après le rendu réussi
     setTimeout(() => {
       document.body.classList.add('react-loaded');
+      const loader = document.getElementById('initial-loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 300);
+      }
     }, 100);
+    
   } catch (error) {
     console.error('Erreur critique lors du rendu:', error);
+    
+    // Masquer le loader
+    const loader = document.getElementById('initial-loader');
+    if (loader) {
+      loader.style.display = 'none';
+    }
     
     // Afficher un message d'erreur de fallback
     const rootElement = document.getElementById('root');
@@ -52,21 +71,29 @@ const renderApp = () => {
                 Réinitialiser
               </button>
             </div>
+            <div style="margin-top: 1rem;">
+              <a href="mailto:nicolas.c@lacremerie.fr" style="color: #D97706; text-decoration: none; font-size: 0.875rem;">
+                Contacter le support
+              </a>
+            </div>
           </div>
         </div>
       `;
     }
-    
-    // Masquer le loader initial
-    document.body.classList.add('react-loaded');
   }
 };
 
-// Gestion d'erreur globale pour éviter les pages blanches
+// Gestion d'erreur globale améliorée
 window.addEventListener('error', (event) => {
   console.error('Erreur globale:', event.error);
   
-  // En cas d'erreur critique, afficher un message d'erreur au lieu d'une page blanche
+  // Masquer le loader en cas d'erreur
+  const loader = document.getElementById('initial-loader');
+  if (loader) {
+    loader.style.display = 'none';
+  }
+  
+  // Afficher un message d'erreur si la page est vide
   const rootElement = document.getElementById('root');
   if (rootElement && (!rootElement.innerHTML || rootElement.innerHTML.trim() === '')) {
     rootElement.innerHTML = `
@@ -74,7 +101,7 @@ window.addEventListener('error', (event) => {
         <div style="max-width: 400px; padding: 2rem;">
           <h1 style="color: #D97706; font-size: 1.5rem; margin-bottom: 1rem; font-weight: 300; letter-spacing: 0.1em;">CERCLE PRIVÉ</h1>
           <p style="color: #9CA3AF; margin-bottom: 1.5rem;">Une erreur technique est survenue</p>
-          <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500; transition: background-color 0.2s;">
+          <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500;">
             Recharger la page
           </button>
           <div style="margin-top: 1rem;">
@@ -90,28 +117,8 @@ window.addEventListener('error', (event) => {
 
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Promise rejetée:', event.reason);
-  
-  // Empêcher que les promises rejetées cassent l'app
   event.preventDefault();
-  
-  // Si c'est une erreur critique de chargement, afficher un fallback
-  if (event.reason?.message?.includes('Loading') || event.reason?.message?.includes('import')) {
-    const rootElement = document.getElementById('root');
-    if (rootElement && (!rootElement.innerHTML || rootElement.innerHTML.trim() === '')) {
-      rootElement.innerHTML = `
-        <div style="min-height: 100vh; background: #111827; display: flex; align-items: center; justify-content: center; color: white; text-align: center; font-family: system-ui;">
-          <div style="max-width: 400px; padding: 2rem;">
-            <h1 style="color: #D97706; font-size: 1.5rem; margin-bottom: 1rem; font-weight: 300; letter-spacing: 0.1em;">CERCLE PRIVÉ</h1>
-            <p style="color: #9CA3AF; margin-bottom: 1.5rem;">Problème de chargement des ressources</p>
-            <button onclick="window.location.reload()" style="padding: 0.75rem 1.5rem; background: #D97706; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500;">
-              Recharger
-            </button>
-          </div>
-        </div>
-      `;
-    }
-  }
 });
 
-// Rendu avec protection
+// Rendu immédiat
 renderApp();

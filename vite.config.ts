@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'es2015',
     minify: 'terser',
-    sourcemap: false, // Désactiver les sourcemaps en production pour réduire la taille
+    sourcemap: false,
     terserOptions: {
       compress: {
         drop_console: mode === 'production',
@@ -32,14 +32,11 @@ export default defineConfig(({ mode }) => ({
           utils: ['date-fns', 'react-hot-toast'],
           supabase: ['@supabase/supabase-js']
         }
-      },
-      external: []
+      }
     },
-    // Optimisations pour éviter les erreurs de chargement
-    assetsInlineLimit: 4096, // Inline les petits assets
-    chunkSizeWarningLimit: 1000 // Augmenter la limite pour éviter les warnings
+    assetsInlineLimit: 4096,
+    chunkSizeWarningLimit: 1000
   },
-  // Configuration pour éviter les erreurs de réseau
   preview: {
     port: 4173,
     strictPort: true,
