@@ -81,6 +81,7 @@ const PropertyGallery: React.FC = () => {
   const [showComparator, setShowComparator] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
   const [showAlerts, setShowAlerts] = useState(false);
+  const [showAdvancedTools, setShowAdvancedTools] = useState(true);
 
   // Écouter les changements dans localStorage
   useEffect(() => {
@@ -90,6 +91,31 @@ const PropertyGallery: React.FC = () => {
     
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Écouter les changements de configuration des fonctionnalités
+  useEffect(() => {
+    const loadFeatureSettings = () => {
+      const stored = localStorage.getItem('siteContent');
+      if (stored) {
+        const content = JSON.parse(stored);
+        setShowAdvancedTools(content.features?.showAdvancedTools ?? true);
+      }
+    };
+
+    loadFeatureSettings();
+
+    const handleContentChange = (event: CustomEvent) => {
+      if (event.detail?.features) {
+        setShowAdvancedTools(event.detail.features.showAdvancedTools ?? true);
+      }
+    };
+
+    window.addEventListener('contentUpdated', handleContentChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('contentUpdated', handleContentChange as EventListener);
+    };
   }, []);
 
   const filteredProperties = filter === 'all' 
@@ -132,27 +158,29 @@ const PropertyGallery: React.FC = () => {
             ACHETER
           </h2>
           
-          {/* Outils avancés */}
-          <div className="flex justify-center space-x-4 mb-8">
-            <button
-              onClick={() => setShowCalculator(true)}
-              className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
-            >
-              Calculateur de Rentabilité
-            </button>
-            <button
-              onClick={() => setShowComparator(true)}
-              className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
-            >
-              Comparer les Biens
-            </button>
-            <button
-              onClick={() => setShowAlerts(true)}
-              className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
-            >
-              Créer une Alerte
-            </button>
-          </div>
+          {/* Outils avancés - Conditionnellement affichés */}
+          {showAdvancedTools && (
+            <div className="flex justify-center space-x-4 mb-8">
+              <button
+                onClick={() => setShowCalculator(true)}
+                className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
+              >
+                Calculateur de Rentabilité
+              </button>
+              <button
+                onClick={() => setShowComparator(true)}
+                className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
+              >
+                Comparer les Biens
+              </button>
+              <button
+                onClick={() => setShowAlerts(true)}
+                className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
+              >
+                Créer une Alerte
+              </button>
+            </div>
+          )}
           
           {/* Filtres */}
           <div className="flex justify-center space-x-4 mb-8">
@@ -494,9 +522,9 @@ const PropertyGallery: React.FC = () => {
               </motion.div>
             </motion.div>
           )}
-        </AnimatePresence>
-
-      </div>
+      {showAdvancedTools && showCalculator && <RentabilityCalculator onClose={() => setShowCalculator(false)} />}
+      {showAdvancedTools && showComparator && <PropertyComparator properties={properties} onClose={() => setShowComparator(false)} />}
+      {showAdvancedTools && showAlerts && <PropertyAlerts onClose={() => setShowAlerts(false)} />}
     </section>
   );
 };

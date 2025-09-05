@@ -46,6 +46,9 @@ interface SiteContent {
     siteName: string;
     logoUrl: string;
   };
+  features: {
+    showAdvancedTools: boolean;
+  };
 }
 
 const ContentManager: React.FC = () => {
@@ -118,6 +121,9 @@ const ContentManager: React.FC = () => {
       branding: {
         siteName: "CERCLE PRIVÉ",
         logoUrl: ""
+      },
+      features: {
+        showAdvancedTools: true
       }
     };
   });
@@ -215,7 +221,8 @@ const ContentManager: React.FC = () => {
     { key: 'offMarket', label: 'Off-Market', icon: Globe },
     { key: 'services', label: 'Services', icon: Edit },
     { key: 'contact', label: 'Contact', icon: Type },
-    { key: 'branding', label: 'Marque', icon: Image }
+    { key: 'branding', label: 'Marque', icon: Image },
+    { key: 'features', label: 'Fonctionnalités', icon: Edit }
   ];
 
   const renderField = (
@@ -630,6 +637,54 @@ const ContentManager: React.FC = () => {
                     </h4>
                     <p className="text-sm text-yellow-700 dark:text-yellow-300">
                       Les modifications du nom du site nécessitent une sauvegarde et un rechargement de la page pour être visibles.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Section Fonctionnalités */}
+              {activeSection === 'features' && (
+                <div className="space-y-6">
+                  <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+                    Fonctionnalités du Site
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">
+                          Outils Avancés
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Calculateur de rentabilité, comparateur de biens et alertes immobilières
+                        </p>
+                      </div>
+                      <label className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          checked={content.features?.showAdvancedTools ?? true}
+                          onChange={(e) => setContent(prev => ({
+                            ...prev,
+                            features: {
+                              ...prev.features,
+                              showAdvancedTools: e.target.checked
+                            }
+                          }))}
+                          className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          Afficher sur le site
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                      💡 Outils Avancés
+                    </h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      Ces outils permettent à vos visiteurs de calculer la rentabilité, comparer les biens et créer des alertes personnalisées.
                     </p>
                   </div>
                 </div>
