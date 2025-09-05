@@ -31,10 +31,8 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        setTimeout(() => {
-          const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-          const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
-        }, 0);
+        const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
         
         setIsLoggedIn(userLoggedIn);
         if (isDevelopment) setIsAdminLoggedIn(adminLoggedIn);

@@ -6,9 +6,12 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react()
   ],
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-hot-toast'],
-    exclude: []
+    exclude: ['@vite/client', '@vite/env']
   },
   build: {
     target: 'es2015',

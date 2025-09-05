@@ -59,14 +59,11 @@ const HeroSection: React.FC = () => {
         }
       } catch (error) {
         console.warn('Erreur chargement contenu personnalisé:', error);
-        // Continuer avec le contenu par défaut
       }
     };
 
-    // Charger de manière asynchrone
     setTimeout(loadContent, 100);
 
-    // Écouter les changements
     const handleContentChange = (event: CustomEvent) => {
       if (event.detail?.hero?.title) {
         setHeroContent({ title: event.detail.hero.title });
