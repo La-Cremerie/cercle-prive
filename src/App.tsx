@@ -1,95 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { User, Phone, Mail, UserCheck, Eye, EyeOff, Menu, X } from 'lucide-react';
-import { UserService } from './services/userService';
-import type { NewUserRegistration } from './types/database';
-import toast from 'react-hot-toast';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Vérification simple de connexion
-  useEffect(() => {
-    const userLoggedIn = localStorage.getItem('userLoggedIn');
-    if (userLoggedIn === 'true') {
-      setIsLoggedIn(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      return localStorage.getItem('userLoggedIn') === 'true';
+    } catch {
+      return false;
     }
-    setIsLoading(false);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-light text-yellow-600 tracking-wider mb-4">CERCLE PRIVÉ</h1>
-          <div className="w-8 h-8 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
+  });
 
   if (!isLoggedIn) {
-    return <LoginForm onLoginSuccess={() => setIsLoggedIn(true)} />;
+    return <LoginPage onLogin={() => setIsLoggedIn(true)} />;
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
-      <HeroSection />
-      <ConceptSection />
-      <ServicesSection />
-      <PropertySection />
-      <ContactSection />
+      <Header />
+      <Hero />
+      <Concept />
+      <Services />
+      <Properties />
+      <Contact />
       <Toaster position="top-right" />
     </div>
   );
 }
 
-// Composant de connexion simplifié
-const LoginForm: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess }) => {
+// Composant de connexion ultra-simple
+const LoginPage: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const [formData, setFormData] = useState({
     nom: '',
     prenom: '',
-    telephone: '',
-    email: ''
+    email: '',
+    telephone: ''
   });
-  const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    
+    if (!formData.email || !formData.nom || !formData.prenom) {
+      alert('Veuillez remplir tous les champs');
+      return;
+    }
 
     try {
-      if (isLogin) {
-        // Mode connexion simple
-        const existingUser = await UserService.getUserByEmail(formData.email);
-        if (!existingUser) {
-          throw new Error('Aucun compte trouvé avec cet email');
-        }
-        localStorage.setItem('userLoggedIn', 'true');
-        onLoginSuccess();
-      } else {
-        // Mode inscription
-        const userData: Omit<NewUserRegistration, 'id' | 'created_at'> = {
-          nom: formData.nom,
-          prenom: formData.prenom,
-          telephone: formData.telephone,
-          email: formData.email
-        };
-
-        await UserService.registerUser(userData);
-        localStorage.setItem('userLoggedIn', 'true');
-        toast.success('Inscription réussie !');
-        onLoginSuccess();
-      }
+      localStorage.setItem('userLoggedIn', 'true');
+      localStorage.setItem('userData', JSON.stringify(formData));
+      onLogin();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Erreur');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Erreur:', error);
+      onLogin(); // Continuer même en cas d'erreur localStorage
     }
   };
 
@@ -103,62 +64,28 @@ const LoginForm: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess })
           </p>
         </div>
 
-        <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
-          <button
-            type="button"
-            onClick={() => setIsLogin(false)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-              !isLogin ? 'bg-yellow-600 text-white' : 'text-gray-600'
-            }`}
-          >
-            Inscription
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsLogin(true)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-              isLogin ? 'bg-yellow-600 text-white' : 'text-gray-600'
-            }`}
-          >
-            Connexion
-          </button>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
-                <input
-                  type="text"
-                  value={formData.nom}
-                  onChange={(e) => setFormData(prev => ({ ...prev, nom: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
-                <input
-                  type="text"
-                  value={formData.prenom}
-                  onChange={(e) => setFormData(prev => ({ ...prev, prenom: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label>
-                <input
-                  type="tel"
-                  value={formData.telephone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, telephone: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
-                  required
-                />
-              </div>
-            </>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+            <input
+              type="text"
+              value={formData.nom}
+              onChange={(e) => setFormData(prev => ({ ...prev, nom: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
+            <input
+              type="text"
+              value={formData.prenom}
+              onChange={(e) => setFormData(prev => ({ ...prev, prenom: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
@@ -172,31 +99,20 @@ const LoginForm: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess })
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Mot de passe *</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 pr-12"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+            <input
+              type="tel"
+              value={formData.telephone}
+              onChange={(e) => setFormData(prev => ({ ...prev, telephone: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            />
           </div>
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-yellow-600 text-white py-3 px-4 rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50"
+            className="w-full bg-yellow-600 text-white py-3 px-4 rounded-md hover:bg-yellow-700 transition-colors"
           >
-            {isSubmitting ? 'Chargement...' : 'Accéder au site'}
+            Accéder au site
           </button>
         </form>
       </div>
@@ -204,8 +120,8 @@ const LoginForm: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess })
   );
 };
 
-// Navigation simplifiée
-const Navigation: React.FC = () => {
+// Header simple
+const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -225,17 +141,17 @@ const Navigation: React.FC = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden text-gray-700"
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMenuOpen ? '✕' : '☰'}
           </button>
         </div>
 
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg">
             <div className="px-4 py-4 space-y-4">
-              <a href="#concept" className="block text-gray-700">CONCEPT</a>
-              <a href="#services" className="block text-gray-700">SERVICES</a>
-              <a href="#biens" className="block text-gray-700">BIENS</a>
-              <a href="#contact" className="block text-gray-700">CONTACT</a>
+              <a href="#concept" onClick={() => setIsMenuOpen(false)} className="block text-gray-700">CONCEPT</a>
+              <a href="#services" onClick={() => setIsMenuOpen(false)} className="block text-gray-700">SERVICES</a>
+              <a href="#biens" onClick={() => setIsMenuOpen(false)} className="block text-gray-700">BIENS</a>
+              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="block text-gray-700">CONTACT</a>
             </div>
           </div>
         )}
@@ -244,8 +160,8 @@ const Navigation: React.FC = () => {
   );
 };
 
-// Hero Section simplifiée
-const HeroSection: React.FC = () => {
+// Hero Section simple
+const Hero: React.FC = () => {
   return (
     <section className="relative h-screen flex items-center justify-center bg-gray-900">
       <div 
@@ -272,8 +188,8 @@ const HeroSection: React.FC = () => {
   );
 };
 
-// Section Concept simplifiée
-const ConceptSection: React.FC = () => {
+// Section Concept simple
+const Concept: React.FC = () => {
   return (
     <section id="concept" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -303,8 +219,8 @@ const ConceptSection: React.FC = () => {
   );
 };
 
-// Section Services simplifiée
-const ServicesSection: React.FC = () => {
+// Section Services simple
+const Services: React.FC = () => {
   const services = [
     {
       title: "Acquisition",
@@ -347,8 +263,8 @@ const ServicesSection: React.FC = () => {
   );
 };
 
-// Section Biens simplifiée
-const PropertySection: React.FC = () => {
+// Section Biens simple
+const Properties: React.FC = () => {
   const properties = [
     {
       name: 'Villa Horizon',
@@ -379,7 +295,7 @@ const PropertySection: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {properties.map((property, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
               <img
                 src={property.image}
                 alt={property.name}
@@ -398,8 +314,8 @@ const PropertySection: React.FC = () => {
   );
 };
 
-// Section Contact simplifiée
-const ContactSection: React.FC = () => {
+// Section Contact simple
+const Contact: React.FC = () => {
   return (
     <section id="contact" className="py-20 bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -410,7 +326,9 @@ const ContactSection: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8">
-            <Phone className="w-8 h-8 text-yellow-500 mx-auto mb-4" />
+            <div className="w-8 h-8 bg-yellow-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+              📞
+            </div>
             <h3 className="text-xl font-medium text-white mb-2">Téléphone</h3>
             <a href="tel:+33652913556" className="text-gray-300 hover:text-white transition-colors">
               +33 6 52 91 35 56
@@ -418,7 +336,9 @@ const ContactSection: React.FC = () => {
           </div>
           
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8">
-            <Mail className="w-8 h-8 text-yellow-500 mx-auto mb-4" />
+            <div className="w-8 h-8 bg-yellow-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+              ✉️
+            </div>
             <h3 className="text-xl font-medium text-white mb-2">Email</h3>
             <a href="mailto:nicolas.c@lacremerie.fr" className="text-gray-300 hover:text-white transition-colors">
               nicolas.c@lacremerie.fr
