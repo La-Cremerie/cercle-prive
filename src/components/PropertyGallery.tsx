@@ -521,7 +521,6 @@ const PropertyGallery: React.FC = () => {
       {showAdvancedTools && showCalculator && <RentabilityCalculator onClose={() => setShowCalculator(false)} />}
       {showAdvancedTools && showComparator && <PropertyComparator properties={properties} onClose={() => setShowComparator(false)} />}
       {showAdvancedTools && showAlerts && <PropertyAlerts onClose={() => setShowAlerts(false)} />}
-      </div>
     </section>
   );
 };
