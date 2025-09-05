@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import './i18n';
 
-// Components
+// Import only essential components that we know work
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
 import NotreAdnSection from './components/NotreAdnSection';
@@ -13,8 +13,6 @@ import PropertyGallery from './components/PropertyGallery';
 import VendreSection from './components/VendreSection';
 import ContactSection from './components/ContactSection';
 import LoginForm from './components/LoginForm';
-import Chatbot from './components/Chatbot';
-import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -35,12 +33,6 @@ function App() {
   const handleAdminLoginSuccess = () => {
     setIsAdminLoggedIn(true);
     setShowAdminLogin(false);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('userLoggedIn');
-    localStorage.removeItem('userData');
-    setIsLoggedIn(false);
   };
 
   const handleAdminLogout = () => {
@@ -152,6 +144,14 @@ function App() {
         email: 'marie.martin@email.com',
         telephone: '06 98 76 54 32',
         created_at: new Date(Date.now() - 86400000).toISOString()
+      },
+      {
+        id: '3',
+        nom: 'Bernard',
+        prenom: 'Pierre',
+        email: 'pierre.bernard@email.com',
+        telephone: '06 11 22 33 44',
+        created_at: new Date(Date.now() - 172800000).toISOString()
       }
     ]);
     const [activeTab, setActiveTab] = useState('users');
@@ -170,6 +170,7 @@ function App() {
       a.href = url;
       a.download = 'inscriptions.csv';
       a.click();
+      URL.revokeObjectURL(url);
     };
 
     return (
@@ -472,8 +473,6 @@ function App() {
         <PropertyGallery />
         <VendreSection />
         <ContactSection />
-        <Chatbot />
-        <PWAInstallPrompt />
       </div>
       <Toaster position="top-right" />
     </>
