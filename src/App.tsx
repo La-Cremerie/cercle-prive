@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 
-// Import direct des composants essentiels (pas de lazy loading)
-import LoginForm from './components/LoginForm';
+// Import direct des composants essentiels
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
 import NotreAdnSection from './components/NotreAdnSection';
@@ -21,7 +20,6 @@ const AdminPanel = isDevelopment ? React.lazy(() => import('./components/AdminPa
 const Chatbot = isDevelopment ? React.lazy(() => import('./components/Chatbot')) : null;
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoadingApp, setIsLoadingApp] = useState(true);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
@@ -30,24 +28,19 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Vérifications localStorage avec gestion d'erreur robuste
-        let userLoggedIn = false;
         let adminLoggedIn = false;
         
         try {
-          userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
           adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
         } catch (storageError) {
           console.warn('Erreur localStorage (non-bloquante):', storageError);
           // Continuer avec les valeurs par défaut
         }
         
-        setIsLoggedIn(userLoggedIn);
         if (isDevelopment) setIsAdminLoggedIn(adminLoggedIn);
       } catch (err) {
         console.error('Initialization error:', err);
         // Ne pas bloquer l'application en cas d'erreur
-        setIsLoggedIn(false);
         if (isDevelopment) setIsAdminLoggedIn(false);
       } finally {
         setIsLoadingApp(false);
@@ -69,16 +62,6 @@ function App() {
           <Loader2 className="w-8 h-8 text-yellow-600 animate-spin mx-auto mb-4" />
           <h2 className="text-lg font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
         </div>
-      </div>
-    );
-  }
-
-  // Si l'utilisateur n'est pas connecté, afficher le formulaire de connexion
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gray-900">
-        <LoginForm onLoginSuccess={() => setIsLoggedIn(true)} />
-        <Toaster position="top-right" />
       </div>
     );
   }
@@ -148,7 +131,7 @@ function App() {
     );
   }
 
-  // Site principal - tous les composants importés directement
+  // Site principal - accès direct sans connexion
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
       <Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
