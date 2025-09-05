@@ -127,7 +127,6 @@ function App() {
         <RechercheSection />
         <PropertyGallery />
         <VendreSection />
-        <Footer />
         {/* Chatbot only in development */}
         {import.meta.env.DEV && (
           <React.Suspense fallback={null}>
