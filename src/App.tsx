@@ -1,14 +1,353 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, GitCompare as Compare, Bell, LogOut, Settings } from 'lucide-react';
+import { Calculator, GitCompare as Compare, Bell, LogOut, Settings, Users, BarChart3, Mail } from 'lucide-react';
 import Chatbot from './components/Chatbot';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import ThemeToggle from './components/ThemeToggle';
 import AdminLogin from './components/AdminLogin';
-import AdvancedAdminPanel from './components/AdvancedAdminPanel';
 import RentabilityCalculator from './components/RentabilityCalculator';
 import PropertyComparator from './components/PropertyComparator';
 import PropertyAlerts from './components/PropertyAlerts';
 import { Toaster } from 'react-hot-toast';
+
+// Panel d'administration simplifié
+const SimpleAdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
+  const [users, setUsers] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState('users');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Charger les utilisateurs depuis localStorage
+    const loadUsers = () => {
+      try {
+        const stored = localStorage.getItem('registeredUsers') || '[]';
+        const userData = JSON.parse(stored);
+        setUsers(userData);
+      } catch (error) {
+        console.error('Erreur chargement:', error);
+        setUsers([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadUsers();
+  }, []);
+
+  const exportCSV = () => {
+    if (users.length === 0) {
+      alert('Aucune donnée à exporter');
+      return;
+    }
+
+    const headers = ['Nom', 'Prénom', 'Email', 'Téléphone', 'Date'];
+    const csvContent = [
+      headers.join(','),
+      ...users.map(user => [
+        `"${user.nom || ''}"`,
+        `"${user.prenom || ''}"`,
+        `"${user.email || ''}"`,
+        `"${user.telephone || ''}"`,
+        `"${user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR') : ''}"`
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `inscriptions_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert(`${users.length} utilisateurs exportés`);
+  };
+
+  const tabs = [
+    { key: 'users', label: 'Utilisateurs', icon: Users },
+    { key: 'stats', label: 'Statistiques', icon: BarChart3 },
+    { key: 'emails', label: 'Emails', icon: Mail }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <Settings className="w-8 h-8 text-yellow-600" />
+              <div>
+                <h1 className="text-xl font-light text-gray-900 dark:text-white">
+                  Administration CERCLE PRIVÉ
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Gestion complète de votre site immobilier
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onLogout}
+              className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Déconnexion</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sticky top-4">
+              <nav className="space-y-2">
+                {tabs.map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveTab(key)}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-md text-left transition-colors ${
+                      activeTab === key
+                        ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="text-sm font-medium">{label}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-4">
+            {/* Onglet Utilisateurs */}
+            {activeTab === 'users' && (
+              <div className="space-y-8">
+                {/* Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Inscriptions</p>
+                        <p className="text-2xl font-light text-gray-900 dark:text-white">{users.length}</p>
+                      </div>
+                      <Users className="w-8 h-8 text-yellow-600" />
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Cette Semaine</p>
+                        <p className="text-2xl font-light text-gray-900 dark:text-white">
+                          {users.filter(u => {
+                            if (!u.created_at) return false;
+                            const weekAgo = new Date();
+                            weekAgo.setDate(weekAgo.getDate() - 7);
+                            return new Date(u.created_at) >= weekAgo;
+                          }).length}
+                        </p>
+                      </div>
+                      <BarChart3 className="w-8 h-8 text-green-600" />
+                    </div>
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Actions</p>
+                        <button
+                          onClick={exportCSV}
+                          className="text-sm text-yellow-600 hover:text-yellow-700 transition-colors"
+                        >
+                          Exporter CSV
+                        </button>
+                      </div>
+                      <Mail className="w-8 h-8 text-blue-600" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table des utilisateurs */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                      Utilisateurs Inscrits ({users.length})
+                    </h3>
+                  </div>
+
+                  {isLoading ? (
+                    <div className="px-6 py-12 text-center">
+                      <div className="w-8 h-8 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                      <p className="text-gray-600 dark:text-gray-400">Chargement...</p>
+                    </div>
+                  ) : users.length === 0 ? (
+                    <div className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                      Aucune inscription pour le moment
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-900">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                              Utilisateur
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                              Contact
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                              Date
+                            </th>
+                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                          {users.map((user, index) => (
+                            <tr key={user.id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+                                    <Users className="w-5 h-5 text-yellow-600" />
+                                  </div>
+                                  <div className="ml-4">
+                                    <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                      {user.prenom} {user.nom}
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900 dark:text-white">{user.email}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">{user.telephone}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR') : 'N/A'}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-center">
+                                <div className="flex items-center justify-center space-x-2">
+                                  <a
+                                    href={`mailto:${user.email}`}
+                                    className="text-blue-600 hover:text-blue-700 transition-colors"
+                                    title="Envoyer un email"
+                                  >
+                                    <Mail className="w-4 h-4" />
+                                  </a>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Onglet Statistiques */}
+            {activeTab === 'stats' && (
+              <div className="space-y-8">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
+                    Statistiques d'Inscription
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="text-center p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <div className="text-3xl font-light text-blue-600 mb-2">{users.length}</div>
+                      <div className="text-sm text-blue-800 dark:text-blue-200">Total Inscriptions</div>
+                    </div>
+                    
+                    <div className="text-center p-6 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                      <div className="text-3xl font-light text-green-600 mb-2">
+                        {users.filter(u => {
+                          if (!u.created_at) return false;
+                          const today = new Date();
+                          return new Date(u.created_at).toDateString() === today.toDateString();
+                        }).length}
+                      </div>
+                      <div className="text-sm text-green-800 dark:text-green-200">Aujourd'hui</div>
+                    </div>
+                    
+                    <div className="text-center p-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                      <div className="text-3xl font-light text-yellow-600 mb-2">
+                        {users.filter(u => {
+                          if (!u.created_at) return false;
+                          const weekAgo = new Date();
+                          weekAgo.setDate(weekAgo.getDate() - 7);
+                          return new Date(u.created_at) >= weekAgo;
+                        }).length}
+                      </div>
+                      <div className="text-sm text-yellow-800 dark:text-yellow-200">Cette Semaine</div>
+                    </div>
+                    
+                    <div className="text-center p-6 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                      <div className="text-3xl font-light text-purple-600 mb-2">
+                        {users.filter(u => {
+                          if (!u.created_at) return false;
+                          const monthAgo = new Date();
+                          monthAgo.setMonth(monthAgo.getMonth() - 1);
+                          return new Date(u.created_at) >= monthAgo;
+                        }).length}
+                      </div>
+                      <div className="text-sm text-purple-800 dark:text-purple-200">Ce Mois</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Onglet Emails */}
+            {activeTab === 'emails' && (
+              <div className="space-y-8">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
+                    Configuration des Emails
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">
+                        ✅ Email de bienvenue
+                      </h4>
+                      <p className="text-sm text-green-600 dark:text-green-400">
+                        Envoyé automatiquement à chaque nouvelle inscription
+                      </p>
+                    </div>
+                    
+                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                        ✅ Notification admin
+                      </h4>
+                      <p className="text-sm text-blue-600 dark:text-blue-400">
+                        Notification envoyée à nicolas.c@lacremerie.fr pour chaque inscription
+                      </p>
+                    </div>
+                    
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                      <h4 className="font-medium text-yellow-800 dark:text-yellow-200 mb-2">
+                        📧 Template personnalisé
+                      </h4>
+                      <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                        Messages personnalisés avec variables dynamiques (nom, prénom, etc.)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Composant de connexion simplifié
 const LoginForm: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess }) => {
@@ -177,7 +516,7 @@ function App() {
 
   // Si admin connecté, afficher le panel admin
   if (isAdminLoggedIn) {
-    return <AdvancedAdminPanel onLogout={handleAdminLogout} />;
+    return <SimpleAdminPanel onLogout={handleAdminLogout} />;
   }
 
   // Si demande de connexion admin, afficher le formulaire admin
