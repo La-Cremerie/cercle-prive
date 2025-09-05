@@ -75,7 +75,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   // Définir le premier onglet accessible comme onglet par défaut
   useEffect(() => {
     if (currentUser) {
-      const accessibleTabs = getAccessibleTabs();
+      const accessibleTabs = getAccessibleTabs;
       if (accessibleTabs.length > 0 && !accessibleTabs.find(tab => tab.key === activeTab)) {
         setActiveTab(accessibleTabs[0].key);
       }
@@ -340,7 +340,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         <div className="bg-white rounded-lg shadow-sm mb-8">
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8 px-6">
-              {getAccessibleTabs().map((tab) => {
+              {getAccessibleTabs.map((tab) => {
                 const getTabIcon = (tabKey: string) => {
                   switch (tabKey) {
                     case 'users': return <Users className="w-4 h-4" />;
