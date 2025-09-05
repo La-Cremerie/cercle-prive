@@ -476,45 +476,138 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
   // Solutions automatiques
   async autoFix(): Promise<string[]> {
     const fixes: string[] = [];
-    const diagnostic = await this.runFullDiagnostic();
-
-    // Fix 1: Nettoyer le localStorage corrompu
-    if (diagnostic.storage.localStorage.available) {
-      try {
-        const corruptedKeys = this.findCorruptedStorageKeys();
-        if (corruptedKeys.length > 0) {
-          corruptedKeys.forEach(key => localStorage.removeItem(key));
-          fixes.push(`🧹 Supprimé ${corruptedKeys.length} clé(s) corrompue(s) du localStorage`);
-        }
-      } catch (error) {
-        fixes.push('❌ Impossible de nettoyer le localStorage');
-      }
-    }
-
-    // Fix 2: Vider les caches obsolètes
-    if ('caches' in window) {
-      try {
-        const cacheNames = await caches.keys();
-        const oldCaches = cacheNames.filter(name => !name.includes('v3'));
-        
-        for (const cacheName of oldCaches) {
-          await caches.delete(cacheName);
-        }
-        
-        if (oldCaches.length > 0) {
-          fixes.push(`🗑️ Supprimé ${oldCaches.length} cache(s) obsolète(s)`);
-        }
-      } catch (error) {
-        fixes.push('❌ Impossible de nettoyer les caches');
-      }
-    }
-
-    // Fix 3: Réinitialiser les paramètres corrompus
+    
     try {
-      const settingsKeys = ['designSettings', 'siteContent', 'emailSettings'];
-      let resetCount = 0;
+      const diagnostic = await this.runFullDiagnostic();
       
-      settingsKeys.forEach(key => {
+      if (diagnostic.error) {
+        console.warn('Diagnostic échoué, application des fixes de base uniquement');
+        return this.applyBasicFixes();
+      }
+
+      // Fix 1: Nettoyer le localStorage corrompu
+      if (diagnostic.storage?.localStorage?.available) {
+        try {
+          const corruptedKeys = this.findCorruptedStorageKeys();
+          if (corruptedKeys.length > 0) {
+            corruptedKeys.forEach(key => localStorage.removeItem(key));
+            fixes.push(`🧹 Supprimé ${corruptedKeys.length} clé(s) corrompue(s) du localStorage`);
+          }
+        } catch (error) {
+          fixes.push('❌ Impossible de nettoyer le localStorage');
+        }
+      }
+
+      // Fix 2: Vider les caches obsolètes
+      if ('caches' in window) {
+        try {
+          const cacheNames = await caches.keys();
+          const oldCaches = cacheNames.filter(name => !name.includes('v3'));
+          
+          for (const cacheName of oldCaches) {
+            await caches.delete(cacheName);
+          }
+          
+          if (oldCaches.length > 0) {
+            fixes.push(`🗑️ Supprimé ${oldCaches.length} cache(s) obsolète(s)`);
+          }
+        } catch (error) {
+          fixes.push('❌ Impossible de nettoyer les caches');
+        }
+      }
+
+      // Fix 3: Réinitialiser les paramètres corrompus
+      try {
+        const settingsKeys = ['designSettings', 'siteContent', 'emailSettings'];
+        let resetCount = 0;
+        
+        settingsKeys.forEach(key => {
+          try {
+            const value = localStorage.getItem(key);
+            if (value) {
+              JSON.parse(value); // Test de validité JSON
+            }
+          } catch (error) {
+            localStorage.removeItem(key);
+            resetCount++;
+          }
+        });
+        
+        if (resetCount > 0) {
+          fixes.push(`⚙️ Réinitialisé ${resetCount} paramètre(s) corrompu(s)`);
+        }
+      } catch (error) {
+        fixes.push('❌ Impossible de vérifier les paramètres');
+      }
+      
+      return fixes;
+      
+    } catch (error) {
+      console.error('Erreur dans autoFix:', error);
+      return this.applyBasicFixes();
+    }
+  }
+
+  // Fixes de base en cas d'erreur de diagnostic
+  private applyBasicFixes(): string[] {
+    const fixes: string[] = [];
+    
+    try {
+      // Vérification de base du localStorage
+      if (typeof localStorage !== 'undefined') {
+        // Nettoyer les clés temporaires
+        const tempKeys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('temp_') || key.startsWith('cache_'))) {
+            tempKeys.push(key);
+          }
+        }
+        
+        tempKeys.forEach(key => {
+          localStorage.removeItem(key);
+        });
+        
+        if (tempKeys.length > 0) {
+          fixes.push(`🧹 Nettoyage de base: ${tempKeys.length} clé(s) temporaire(s) supprimée(s)`);
+        }
+      }
+    } catch (error) {
+      fixes.push('❌ Impossible d\'appliquer les fixes de base');
+    }
+    
+    return fixes;
+  }
+
+  // Trouver les clés corrompues dans le localStorage
+  private findCorruptedStorageKeys(): string[] {
+    const corruptedKeys: string[] = [];
+    
+    // Vérification de sécurité
+    if (typeof localStorage === 'undefined') {
+      return corruptedKeys;
+    }
+    
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) {
+          try {
+            const value = localStorage.getItem(key);
+            if (value && value.startsWith('{')) {
+              JSON.parse(value); // Test de validité JSON
+            }
+          } catch (error) {
+            corruptedKeys.push(key);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Erreur lors de la vérification des clés:', error);
+    }
+    
+    return corruptedKeys;
+  }
         try {
           const value = localStorage.getItem(key);
           if (value) {
