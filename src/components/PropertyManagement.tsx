@@ -225,6 +225,7 @@ const PropertyManagement: React.FC = () => {
       }
     }
   };
+
   const handleDelete = (propertyId: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce bien ?')) {
       const updatedProperties = properties.filter(p => p.id !== propertyId);
