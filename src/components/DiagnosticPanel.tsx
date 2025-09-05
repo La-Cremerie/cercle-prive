@@ -95,7 +95,7 @@ const DiagnosticPanel: React.FC = () => {
   };
 
   // Vérifier la santé du localStorage
-  private checkLocalStorageHealth() {
+  const checkLocalStorageHealth = () => {
     try {
       const totalSize = JSON.stringify(localStorage).length;
       const itemCount = localStorage.length;
@@ -128,10 +128,10 @@ const DiagnosticPanel: React.FC = () => {
         health: 'error'
       };
     }
-  }
+  };
 
   // Vérifier la santé du sessionStorage
-  private checkSessionStorageHealth() {
+  const checkSessionStorageHealth = () => {
     try {
       sessionStorage.setItem('test', 'test');
       sessionStorage.removeItem('test');
@@ -139,10 +139,10 @@ const DiagnosticPanel: React.FC = () => {
     } catch (error) {
       return { available: false, error: error.message, health: 'error' };
     }
-  }
+  };
 
   // Vérifier la santé du cache
-  private async checkCacheHealth() {
+  const checkCacheHealth = async () => {
     if ('caches' in window) {
       try {
         const cacheNames = await caches.keys();
@@ -169,10 +169,10 @@ const DiagnosticPanel: React.FC = () => {
       }
     }
     return { available: false, health: 'warning' };
-  }
+  };
 
   // Obtenir l'historique des erreurs
-  private getErrorHistory() {
+  const getErrorHistory = () => {
     try {
       const errorLog = localStorage.getItem('errorLog');
       const errors = errorLog ? JSON.parse(errorLog) : [];
@@ -185,10 +185,10 @@ const DiagnosticPanel: React.FC = () => {
     } catch (error) {
       return { error: 'Impossible de lire l\'historique' };
     }
-  }
+  };
 
   // Catégoriser les erreurs
-  private categorizeErrors(errors: any[]) {
+  const categorizeErrors = (errors: any[]) => {
     const categories: any = {};
     
     errors.forEach(error => {
@@ -197,14 +197,14 @@ const DiagnosticPanel: React.FC = () => {
     });
 
     return categories;
-  }
+  };
 
   // Générer des recommandations
-  private generateRecommendations(codeAnalysis: any, bundleAnalysis: any, healthCheck: any) {
+  const generateRecommendations = (codeAnalysis: any, bundleAnalysis: any, healthCheck: any) => {
     const recommendations = [];
 
     // Recommandations basées sur la santé du stockage
-    if (healthCheck.storage.localStorage.corrupted > 0) {
+    if (healthCheck.storage?.localStorage?.corrupted > 0) {
       recommendations.push({
         type: 'critical',
         title: 'Données corrompues détectées',
@@ -214,7 +214,7 @@ const DiagnosticPanel: React.FC = () => {
     }
 
     // Recommandations basées sur les performances
-    if (healthCheck.performance.memory?.used > 100) {
+    if (healthCheck.performance?.memory?.used > 100) {
       recommendations.push({
         type: 'warning',
         title: 'Utilisation mémoire élevée',
@@ -224,7 +224,7 @@ const DiagnosticPanel: React.FC = () => {
     }
 
     // Recommandations basées sur les erreurs
-    if (healthCheck.errors.total > 10) {
+    if (healthCheck.errors?.total > 10) {
       recommendations.push({
         type: 'warning',
         title: 'Nombreuses erreurs détectées',
@@ -234,7 +234,7 @@ const DiagnosticPanel: React.FC = () => {
     }
 
     // Recommandations d'optimisation
-    if (bundleAnalysis.duplications.totalDuplications > 10) {
+    if (bundleAnalysis.duplications?.totalDuplications > 10) {
       recommendations.push({
         type: 'info',
         title: 'Code dupliqué détecté',
@@ -244,7 +244,7 @@ const DiagnosticPanel: React.FC = () => {
     }
 
     return recommendations;
-  }
+  };
 
   // Exporter le rapport complet
   const exportReport = () => {
