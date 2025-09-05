@@ -2,63 +2,35 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
-import { ErrorBoundaryManager } from './utils/errorBoundary';
-import { PerformanceOptimizer } from './utils/performance';
 
-// Diagnostic et récupération automatique
-console.log('🔧 Main.tsx - Initialisation du diagnostic');
+// Point d'entrée simplifié
+console.log('🔧 Main.tsx - Initialisation simplifiée');
 
-// Initialiser les gestionnaires d'erreur
-ErrorBoundaryManager.getInstance().init();
-PerformanceOptimizer.getInstance().init();
-
-// Fonction de diagnostic de l'état de l'application
-function diagnoseApplicationState() {
-  const checks = {
-    domReady: document.readyState === 'complete',
-    rootElement: !!document.getElementById('root'),
-    reactAvailable: typeof React !== 'undefined',
-    vitalsSupported: 'PerformanceObserver' in window,
-    storageAvailable: (() => {
-      try {
-        localStorage.setItem('test', 'test');
-        localStorage.removeItem('test');
-        return true;
-      } catch (e) {
-        return false;
-      }
-    })()
-  };
-  
-  console.log('📊 État de l\'application:', checks);
-  return checks;
-}
-
-// Fonction de récupération en cas d'erreur
-function attemptRecovery(error) {
-  console.error('🚨 Erreur critique détectée:', error);
-  
-  // Nettoyer le localStorage corrompu
-  try {
-    const corruptedKeys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      try {
-        JSON.parse(localStorage.getItem(key) || '{}');
-      } catch (e) {
-        corruptedKeys.push(key);
-      }
-    }
+// Rendu simple et direct
+try {
+  const rootElement = document.getElementById('root');
+  if (rootElement) {
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+    console.log('✅ Application React montée avec succès');
     
-    corruptedKeys.forEach(key => {
-      console.warn('🧹 Suppression clé corrompue:', key);
-      localStorage.removeItem(key);
-    });
-  } catch (e) {
-    console.warn('Erreur nettoyage localStorage:', e);
+    // Marquer l'application comme prête
+    setTimeout(() => {
+      document.body.classList.add('app-loaded');
+      console.log('🎉 Application complètement chargée');
+    }, 500);
+  } else {
+    console.error('❌ Élément root non trouvé');
+    throw new Error('Root element not found');
   }
+} catch (error) {
+  console.error('❌ Erreur critique lors du montage:', error);
   
-  // Afficher un message d'erreur utilisateur-friendly
+  // Interface d'erreur simple
   const rootElement = document.getElementById('root');
   if (rootElement) {
     rootElement.innerHTML = `
@@ -81,73 +53,19 @@ function attemptRecovery(error) {
             Nous rencontrons un problème technique temporaire.<br>
             Nos équipes travaillent à le résoudre rapidement.
           </p>
-          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <button onclick="window.location.reload()" style="
-              background: #D97706;
-              color: white;
-              border: none;
-              padding: 0.75rem 1.5rem;
-              border-radius: 0.375rem;
-              cursor: pointer;
-              font-weight: 500;
-            ">
-              Réessayer
-            </button>
-            <button onclick="localStorage.clear(); window.location.reload();" style="
-              background: transparent;
-              color: #D97706;
-              border: 1px solid #D97706;
-              padding: 0.75rem 1.5rem;
-              border-radius: 0.375rem;
-              cursor: pointer;
-              font-weight: 500;
-            ">
-              Vider le cache
-            </button>
-            <a href="mailto:nicolas.c@lacremerie.fr?subject=Problème technique site" style="
-              background: transparent;
-              color: #9CA3AF;
-              border: 1px solid #4B5563;
-              padding: 0.75rem 1.5rem;
-              border-radius: 0.375rem;
-              text-decoration: none;
-              font-weight: 500;
-              display: inline-block;
-            ">
-              Contacter le support
-            </a>
-          </div>
+          <button onclick="window.location.reload()" style="
+            background: #D97706;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 500;
+          ">
+            Réessayer
+          </button>
         </div>
       </div>
     `;
   }
-}
-
-// Rendu simple et direct
-try {
-  // Diagnostic initial
-  const initialDiagnosis = diagnoseApplicationState();
-  
-  const rootElement = document.getElementById('root');
-  if (rootElement) {
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
-    console.log('✅ Application React montée avec succès');
-    
-    // Marquer l'application comme prête
-    setTimeout(() => {
-      document.body.classList.add('app-loaded');
-      console.log('🎉 Application complètement chargée');
-    }, 500);
-  } else {
-    console.error('❌ Élément root non trouvé');
-    throw new Error('Root element not found');
-  }
-} catch (error) {
-  console.error('❌ Erreur critique lors du montage:', error);
-  attemptRecovery(error);
 }
