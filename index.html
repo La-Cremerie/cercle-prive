@@ -29,38 +29,50 @@
   </head>
   <body>
     <style>
-      /* Loader optimisé HTTPS - Disparition automatique */
+      /* Solution anti-FOUC - Loader optimisé avec fallback */
       #initial-loader {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: #111827;
+        background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         z-index: 9999;
-        transition: opacity 0.5s ease-out;
+        transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        visibility: visible;
       }
       
       .loader-title {
         color: #D97706;
-        font-size: 1.5rem;
+        font-size: 2rem;
         font-weight: 300;
-        letter-spacing: 0.1em;
-        margin-bottom: 1rem;
+        letter-spacing: 0.2em;
+        margin-bottom: 2rem;
         font-family: system-ui, -apple-system, sans-serif;
+        animation: fadeInTitle 1s ease-out;
       }
       
       .loader-spinner {
-        width: 2rem;
-        height: 2rem;
+        width: 3rem;
+        height: 3rem;
         border: 3px solid #374151;
         border-top: 3px solid #D97706;
         border-radius: 50%;
         animation: spin 1s linear infinite;
+      }
+      
+      .loader-subtitle {
+        color: #9CA3AF;
+        font-size: 0.875rem;
+        font-weight: 300;
+        letter-spacing: 0.05em;
+        margin-top: 1rem;
+        font-family: system-ui, -apple-system, sans-serif;
+        animation: fadeInSubtitle 1.5s ease-out;
       }
       
       @keyframes spin {
@@ -68,60 +80,127 @@
         100% { transform: rotate(360deg); }
       }
       
-      /* Masquer automatiquement le loader */
+      @keyframes fadeInTitle {
+        0% { opacity: 0; transform: translateY(-20px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes fadeInSubtitle {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      
+      /* Masquer le loader quand React est chargé */
       .react-loaded #initial-loader {
         opacity: 0;
+        visibility: hidden;
         pointer-events: none;
       }
       
-      /* Fallback si React ne charge pas */
+      /* Prévention FOUC - Masquer le contenu jusqu'au chargement */
+      #root {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      
+      .react-loaded #root {
+        opacity: 1;
+      }
+      
+      /* Fallback d'urgence si React ne charge pas en 5 secondes */
       body:not(.react-loaded) #initial-loader {
-        animation: fadeOut 0.5s ease-out 3s forwards;
+        animation: emergencyFadeOut 1s ease-out 5s forwards;
       }
       
-      @keyframes fadeOut {
-        to { opacity: 0; pointer-events: none; }
+      body:not(.react-loaded) #root {
+        animation: emergencyShow 1s ease-out 5s forwards;
       }
       
-      /* Fallback si React ne charge pas */
-      body:not(.react-loaded) #initial-loader {
-        animation: fadeOut 0.5s ease-out 3s forwards;
+      @keyframes emergencyFadeOut {
+        to { 
+          opacity: 0; 
+          visibility: hidden;
+          pointer-events: none; 
+        }
       }
       
-      @keyframes fadeOut {
-        to { opacity: 0; pointer-events: none; }
+      @keyframes emergencyShow {
+        to { opacity: 1; }
+      }
+      
+      /* Optimisation critique - Éviter le flash de contenu */
+      body {
+        background-color: #111827;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      
+      .react-loaded body {
+        overflow: auto;
       }
     </style>
     
-    <!-- Loader initial ultra-simplifié -->
+    <!-- Loader anti-FOUC avec fallback robuste -->
     <div id="initial-loader">
       <h1 class="loader-title">CERCLE PRIVÉ</h1>
       <div class="loader-spinner"></div>
+      <p class="loader-subtitle">Chargement de l'excellence immobilière</p>
     </div>
     
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
     <script>
-      // Timeout de sécurité HTTPS - Version robuste
-      setTimeout(function() {
-        document.body.classList.add('react-loaded');
-        // Supprimer le loader après activation
-        var loader = document.getElementById('initial-loader');
-        if (loader) {
-          loader.style.display = 'none';
-        }
-      }, 3000); // 3 secondes max pour HTTPS
+      // Solution anti-FOUC robuste avec multiple fallbacks
+      var isReactLoaded = false;
+      var loaderHidden = false;
       
-      // Fallback d'urgence si React ne charge pas
+      function hideLoader() {
+        if (loaderHidden) return;
+        loaderHidden = true;
+        
+        document.body.classList.add('react-loaded');
+        
+        // Masquer le loader avec animation
+        setTimeout(function() {
+          var loader = document.getElementById('initial-loader');
+          if (loader) {
+            loader.style.display = 'none';
+          }
+        }, 800); // Attendre la fin de l'animation
+      }
+      
+      // Fallback principal - 3 secondes
       setTimeout(function() {
-        if (!document.body.classList.contains('react-loaded')) {
-          console.warn('React non chargé - Fallback d\'urgence');
+        if (!isReactLoaded) {
+          console.log('Fallback 3s - Masquage du loader');
+          hideLoader();
+        }
+      }, 3000);
+      
+      // Fallback d'urgence - 5 secondes
+      setTimeout(function() {
+        if (!isReactLoaded) {
+          console.warn('Fallback d\'urgence 5s - Forçage de l\'affichage');
           document.body.classList.add('react-loaded');
           var loader = document.getElementById('initial-loader');
           if (loader) {
             loader.style.display = 'none';
           }
         }
-      }, 8000); // Fallback à 8 secondes
+      }, 5000);
+      
+      // Écouter le signal de React
+      window.addEventListener('reactReady', function() {
+        isReactLoaded = true;
+        hideLoader();
+      });
+      
+      // Préchargement des ressources critiques
+      var link = document.createElement('link');
+      link.rel = 'preload';
+      link.href = '/src/main.tsx';
+      link.as = 'script';
+      document.head.appendChild(link);
     </script>

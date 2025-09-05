@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-// Fonction de rendu robuste avec gestion d'erreur
+// Fonction de rendu anti-FOUC avec signalisation
 const renderApp = () => {
   try {
     const root = ReactDOM.createRoot(document.getElementById('root')!);
@@ -13,48 +13,32 @@ const renderApp = () => {
       </React.StrictMode>
     );
     
-    // Marquer React comme chargé
-    document.body.classList.add('react-loaded');
+    // Signal immédiat que React est prêt
+    window.dispatchEvent(new Event('reactReady'));
     
-    // Supprimer le loader initial
-    const loader = document.getElementById('initial-loader');
-    if (loader) {
-      setTimeout(() => {
-        loader.style.opacity = '0';
-        setTimeout(() => {
-          loader.style.display = 'none';
-        }, 500);
-      }, 100);
-    }
+    console.log('✅ React app rendu avec succès');
     
   } catch (error) {
     console.error('Erreur lors du rendu React:', error);
     
-    // Fallback d'urgence
-    document.body.classList.add('react-loaded');
-    const loader = document.getElementById('initial-loader');
-    if (loader) {
-      loader.innerHTML = '<div style="color: #D97706; text-align: center; padding: 2rem;">Chargement en cours...</div>';
-    }
-    
-    // Retry après 2 secondes
+    // En cas d'erreur, masquer quand même le loader
     setTimeout(() => {
-      try {
-        renderApp();
-      } catch (retryError) {
-        console.error('Erreur lors du retry:', retryError);
-      }
-    }, 2000);
+      window.dispatchEvent(new Event('reactReady'));
+    }, 1000);
   }
 };
 
-// Attendre que le DOM soit prêt
+// Rendu immédiat pour éviter le FOUC
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', renderApp);
 } else {
   renderApp();
 }
 
-  // Service worker registration (après le rendu)
+// Service worker registration (optionnel)
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  // Enregistrement différé pour ne pas impacter le chargement
+  setTimeout(() => {
+    navigator.serviceWorker.register('/sw.js').catch(console.warn);
+  }, 2000);
 }

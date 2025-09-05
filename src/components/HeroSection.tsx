@@ -3,34 +3,37 @@ import { motion } from 'framer-motion';
 
 const HeroSection: React.FC = () => {
   const [backgroundImage, setBackgroundImage] = useState(() => {
-    // Image par défaut immédiate
     return 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920';
   });
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(true); // Commencer avec true pour éviter le flash
   const [heroContent, setHeroContent] = useState(() => {
     return {
       title: "l'excellence immobilière en toute discrétion"
     };
   });
 
-  // Préchargement d'image optimisé pour HTTPS
+  // Préchargement d'image optimisé anti-FOUC
   useEffect(() => {
-    let isMounted = true; // Éviter les setState sur composant démonté
+    let isMounted = true;
     
     const img = new Image();
     img.onload = () => {
       if (isMounted) setImageLoaded(true);
     };
     img.onerror = () => {
-      console.warn('Erreur chargement image, utilisation de l\'image par défaut');
-      if (isMounted) setImageLoaded(true); // Continuer même en cas d'erreur
+      console.warn('Erreur chargement image hero, fallback activé');
+      if (isMounted) {
+        // Utiliser une image de fallback
+        setBackgroundImage('https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1200');
+        setImageLoaded(true);
+      }
     };
     img.src = backgroundImage;
 
-    // Timeout de sécurité pour l'image - Plus court pour HTTPS
+    // Timeout de sécurité pour l'image
     const timeoutId = setTimeout(() => {
       if (isMounted) setImageLoaded(true);
-    }, 2000); // Réduit à 2 secondes
+    }, 1500);
 
     return () => {
       isMounted = false;
@@ -99,38 +102,36 @@ const HeroSection: React.FC = () => {
         className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url(${backgroundImage})`,
-          opacity: imageLoaded ? 1 : 0,
-          transition: 'opacity 0.5s ease-in-out'
+          opacity: imageLoaded ? 1 : 0.8,
+          transition: 'opacity 0.8s ease-in-out'
         }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
       </div>
 
-      {/* Fallback background si image ne charge pas */}
-      {!imageLoaded && (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900"></div>
-      )}
+      {/* Background de fallback permanent pour éviter le flash */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 -z-10"></div>
 
       {/* Content */}
       <motion.div 
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.3 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
         className="relative z-10 text-center px-4 max-w-4xl mx-auto"
       >
         <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-8 leading-tight"
         >
           {heroContent.title}
         </motion.h1>
         
         <motion.a 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.7 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
           href="mailto:nicolas.c@lacremerie.fr"
           className="inline-block border border-white text-white px-8 py-3 text-sm font-light tracking-wider hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105"
         >

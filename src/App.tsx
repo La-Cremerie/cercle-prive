@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle } from 'lucide-react';
 
 // Import direct des composants essentiels
 import Navigation from './components/Navigation';
@@ -21,6 +21,7 @@ const Chatbot = isDevelopment ? React.lazy(() => import('./components/Chatbot'))
 
 function App() {
   const [isLoadingApp, setIsLoadingApp] = useState(true);
+  const [isContentReady, setIsContentReady] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -28,6 +29,9 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        // Précharger les ressources critiques
+        await preloadCriticalResources();
+        
         let adminLoggedIn = false;
         
         try {
@@ -38,33 +42,111 @@ function App() {
         }
         
         if (isDevelopment) setIsAdminLoggedIn(adminLoggedIn);
+        
+        // Marquer le contenu comme prêt
+        setIsContentReady(true);
+        
+        // Délai minimal pour éviter le flash
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
       } catch (err) {
         console.error('Initialization error:', err);
         // Ne pas bloquer l'application en cas d'erreur
         if (isDevelopment) setIsAdminLoggedIn(false);
+        setIsContentReady(true); // Afficher quand même en cas d'erreur
       } finally {
         setIsLoadingApp(false);
+        
+        // Signal que React est complètement prêt
+        setTimeout(() => {
+          window.dispatchEvent(new Event('reactReady'));
+        }, 100);
       }
     };
 
-    // Initialisation avec timeout de sécurité
-    const timeoutId = setTimeout(initializeApp, 100);
-    
-    // Cleanup function
-    return () => clearTimeout(timeoutId);
+    initializeApp();
   }, []);
 
-  // Loading state
-  if (isLoadingApp) {
+  // Fonction de préchargement des ressources critiques
+  const preloadCriticalResources = async () => {
+    return new Promise<void>((resolve) => {
+      const criticalImages = [
+        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920',
+        'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800'
+      ];
+      
+      let loadedCount = 0;
+      const totalImages = criticalImages.length;
+      
+      if (totalImages === 0) {
+        resolve();
+        return;
+      }
+      
+      criticalImages.forEach(src => {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+          loadedCount++;
+          if (loadedCount === totalImages) {
+            resolve();
+          }
+        };
+        img.src = src;
+      });
+      
+      // Timeout pour ne pas bloquer indéfiniment
+      setTimeout(resolve, 2000);
+    });
+  };
+
+  // Effet pour gérer le chargement des images
+  useEffect(() => {
+    if (isContentReady) {
+      // Ajouter la classe 'loaded' aux images une fois qu'elles sont chargées
+      const images = document.querySelectorAll('img');
+      images.forEach(img => {
+        if (img.complete) {
+          img.classList.add('loaded');
+        } else {
+          img.onload = () => img.classList.add('loaded');
+        }
+      });
+    }
+  }, [isContentReady]);
+
+  // Loading state amélioré
+  if (isLoadingApp || !isContentReady) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 text-yellow-600 animate-spin mx-auto mb-4" />
-          <h2 className="text-lg font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+        <div className="text-center space-y-6">
+          <div className="relative">
+            <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto" />
+            <div className="absolute inset-0 w-12 h-12 border-2 border-yellow-600/20 rounded-full mx-auto"></div>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+            <p className="text-sm text-gray-400 font-light">Préparation de votre expérience</p>
+          </div>
+          <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+            <div className="w-2 h-2 bg-yellow-600 rounded-full animate-pulse"></div>
+            <span>Chargement des ressources</span>
+          </div>
         </div>
       </div>
     );
   }
+
+  // Vérification de l'état de chargement pour éviter le rendu prématuré
+  useEffect(() => {
+    if (!isLoadingApp && isContentReady) {
+      // Assurer que le DOM est prêt avant de signaler à l'HTML
+      const timer = setTimeout(() => {
+        document.body.classList.add('react-loaded');
+      }, 100);
+    
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const toggleAdmin = () => {
     if (!isDevelopment) return;
