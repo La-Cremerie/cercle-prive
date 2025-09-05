@@ -123,6 +123,8 @@ function App() {
         <RechercheSection />
         <PropertyGallery />
         <VendreSection />
+        <ContactSection />
+        <Footer />
         <Chatbot />
         <PWAInstallPrompt />
       </div>

@@ -325,20 +325,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
         <p className="text-xs text-gray-500 text-center mt-6 font-light">
           En vous inscrivant, vous acceptez de recevoir des informations sur nos biens immobiliers de prestige.
-          
-          {isLogin && (
-            <span className="block mt-2">
-              Pas encore de compte ?{' '}
-              <button
-                type="button"
-                onClick={() => setIsLogin(false)}
-                className="text-yellow-600 hover:text-yellow-700 underline"
-              >
-                S'inscrire ici
-              </button>
-            </span>
-          )}
         </p>
+        
+        {isLogin && (
+          <p className="text-xs text-gray-500 text-center mt-4">
+            Pas encore de compte ?{' '}
+            <button
+              type="button"
+              onClick={() => setIsLogin(false)}
+              className="text-yellow-600 hover:text-yellow-700 underline"
+            >
+              S'inscrire ici
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
