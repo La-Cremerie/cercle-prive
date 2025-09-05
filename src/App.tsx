@@ -127,7 +127,6 @@ function App() {
         <RechercheSection />
         <PropertyGallery />
         <VendreSection />
-        <ContactSection />
         <Footer />
         {/* Chatbot only in development */}
         {import.meta.env.DEV && (
