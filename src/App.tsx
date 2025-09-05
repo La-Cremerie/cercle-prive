@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Calculator, GitCompare as Compare, Bell } from 'lucide-react';
 import AdminLogin from './components/AdminLogin';
 import AdminPanel from './components/AdminPanel';
+import RentabilityCalculator from './components/RentabilityCalculator';
+import PropertyComparator from './components/PropertyComparator';
+import PropertyAlerts from './components/PropertyAlerts';
 import { Toaster } from 'react-hot-toast';
 
 // Composant de connexion simplifié
@@ -123,6 +127,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [showComparator, setShowComparator] = useState(false);
+  const [showAlerts, setShowAlerts] = useState(false);
 
   useEffect(() => {
     // Vérifier si l'utilisateur est déjà connecté
@@ -336,18 +343,21 @@ function App() {
                   name: "Villa Horizon",
                   location: "Cannes, Côte d'Azur",
                   price: "4 500 000 €",
+                  yield: "180 000 € / an",
                   image: "https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800"
                 },
                 {
                   name: "Villa Azure",
                   location: "Saint-Tropez",
                   price: "6 200 000 €",
+                  yield: "248 000 € / an",
                   image: "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800"
                 },
                 {
                   name: "Penthouse Élégance",
                   location: "Monaco, Monte-Carlo",
                   price: "12 800 000 €",
+                  yield: "512 000 € / an",
                   image: "https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800"
                 }
               ].map((property, index) => (
@@ -361,9 +371,46 @@ function App() {
                     <h3 className="text-xl font-light text-gray-900 mb-2">{property.name}</h3>
                     <p className="text-gray-600 mb-4">{property.location}</p>
                     <div className="text-xl font-medium text-yellow-600">{property.price}</div>
+                    <div className="text-sm text-green-600 font-medium mb-4">
+                      Rendement : {property.yield}
+                    </div>
+                    <a
+                      href="mailto:nicolas.c@lacremerie.fr"
+                      className="block w-full text-center bg-yellow-600 text-white py-2 px-4 rounded-md hover:bg-yellow-700 transition-colors"
+                    >
+                      Plus d'informations
+                    </a>
                   </div>
                 </div>
               ))}
+            </div>
+            
+            {/* Outils immobiliers */}
+            <div className="mt-16 text-center">
+              <h3 className="text-2xl font-light text-gray-900 mb-8">Outils d'Investissement</h3>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => setShowCalculator(true)}
+                  className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                >
+                  <Calculator className="w-5 h-5" />
+                  <span>Calculer la rentabilité</span>
+                </button>
+                <button
+                  onClick={() => setShowComparator(true)}
+                  className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  <Compare className="w-5 h-5" />
+                  <span>Comparer les biens</span>
+                </button>
+                <button
+                  onClick={() => setShowAlerts(true)}
+                  className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                >
+                  <Bell className="w-5 h-5" />
+                  <span>Créer une alerte</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -392,6 +439,19 @@ function App() {
           </div>
         </section>
       </div>
+      
+      {/* Modals pour les outils immobiliers */}
+      {showCalculator && (
+        <RentabilityCalculator onClose={() => setShowCalculator(false)} />
+      )}
+      
+      {showComparator && (
+        <PropertyComparator onClose={() => setShowComparator(false)} />
+      )}
+      
+      {showAlerts && (
+        <PropertyAlerts onClose={() => setShowAlerts(false)} />
+      )}
       <Toaster position="top-right" />
     </>
   );
