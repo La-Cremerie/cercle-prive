@@ -168,7 +168,6 @@ function App() {
         <PropertyGallery />
         <VendreSection />
         <ContactSection />
-        <Footer />
         <Chatbot />
         <PWAInstallPrompt />
       </div>
