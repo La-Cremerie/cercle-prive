@@ -217,6 +217,16 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
   };
 
 
+  const handleActivate = async (adminId: string) => {
+    try {
+      await AdminService.activateAdmin(adminId);
+      toast.success('Administrateur réactivé');
+      loadAdmins();
+    } catch (error) {
+      toast.error('Erreur lors de la réactivation');
+    }
+  };
+
   const getRoleColor = (role: AdminUser['role']) => {
     switch (role) {
       case 'super_admin': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
