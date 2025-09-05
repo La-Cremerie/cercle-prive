@@ -110,7 +110,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         }
 
         // Nouvel utilisateur - procéder à l'inscription
-        const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
+        const userData: NewUserRegistration = {
           nom: formData.nom,
           prenom: formData.prenom,
           telephone: formData.telephone,
