@@ -79,9 +79,15 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'es2015',
     minify: 'terser',
-    sourcemap: false,
+    sourcemap: true, // Activer les sourcemaps pour le debug
     // Configuration robuste pour éviter les erreurs de build
     rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          utils: ['framer-motion', 'lucide-react']
+        }
+      },
       onwarn(warning, warn) {
         // Ignorer les warnings non-critiques
         if (warning.code === 'THIS_IS_UNDEFINED') return;

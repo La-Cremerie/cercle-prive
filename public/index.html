@@ -40,7 +40,7 @@
         left: 0;
       /* Assurer que le root est visible */
       #root { min-height: 100vh; background: #111827; }
-        display: flex;
+        transition: opacity 0.5s ease-out;
         flex-direction: column;
         align-items: center;
         justify-content: center;
@@ -110,6 +110,15 @@
       .emergency-btn.secondary:hover {
         background: #D97706;
         color: white;
+        margin-bottom: 1rem;
+      }
+      
+      .loader-message {
+        color: #9CA3AF;
+        font-size: 0.8rem;
+        text-align: center;
+        max-width: 300px;
+        line-height: 1.4;
       }
       
       @keyframes spin {
@@ -117,8 +126,8 @@
         100% { transform: rotate(360deg); }
       }
       
-      /* Masquer le loader seulement quand l'app est vraiment prête */
-        0% { opacity: 0; transform: translateY(20px); }
+      /* Masquer le loader quand l'app est chargée */
+      .app-loaded #initial-loader {
         100% { opacity: 1; transform: translateY(0); }
       }
       
@@ -128,9 +137,9 @@
         pointer-events: none;
       }
       
-      /* Styles de base pour éviter FOUC */
-      #root {
-        min-height: 100vh;
+      /* Timeout de sécurité plus long */
+      body:not(.app-loaded) #initial-loader {
+        animation: autoHide 0.5s ease-out 8s forwards;
         background: #111827;
       }
       
@@ -158,6 +167,20 @@
         font-size: 12px;
         animation: bounce 2s infinite;
       }
+      
+      /* Assurer que le body est visible */
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: #111827;
+      }
+      
+      /* Assurer que le root est visible */
+      #root {
+        min-height: 100vh;
+        background: #111827;
+      }
     </style>
   </head>
   <body>
@@ -183,13 +206,72 @@
           Signaler le problème
         </button>
       </div>
+      <p class="loader-message">
+        Chargement de votre espace immobilier de prestige...
+      </p>
     </div>
     
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
     <script>
-      // Installation PWA manuelle
+      // Diagnostic et récupération automatique
+      (function() {
+        console.log('🔧 Diagnostic de chargement démarré');
+        
+        let timeoutId;
+        let checkCount = 0;
+        const maxChecks = 20; // 10 secondes max
+        
+        function checkAppLoaded() {
+          checkCount++;
+          const rootEl = document.getElementById('root');
+          const hasContent = rootEl && rootEl.children.length > 0;
+          
+          console.log(`🔍 Vérification ${checkCount}/${maxChecks}:`, {
+            hasContent,
+            rootChildren: rootEl?.children.length || 0
+          });
+          
+          if (hasContent) {
+            console.log('✅ Contenu détecté - Masquage du loader');
+            document.body.classList.add('app-loaded');
+            clearTimeout(timeoutId);
+            return;
+          }
+          
+          if (checkCount >= maxChecks) {
+            console.warn('⚠️ Timeout atteint - Masquage forcé du loader');
+            document.body.classList.add('app-loaded');
+            return;
+          }
+          
+          // Continuer à vérifier
+          timeoutId = setTimeout(checkAppLoaded, 500);
+        }
+        
+        // Démarrer la vérification après un délai initial
+        setTimeout(checkAppLoaded, 1000);
+        
+        // Timeout de sécurité absolu
+        setTimeout(() => {
+          console.log('🚨 Timeout de sécurité absolu');
+          document.body.classList.add('app-loaded');
+        }, 10000);
+        
+      })();
+      
+      // Gestion des erreurs globales
+      window.addEventListener('error', function(e) {
+        console.error('❌ Erreur globale:', e.error?.message || e.message);
+      });
+      
+      window.addEventListener('unhandledrejection', function(e) {
+        console.error('❌ Promise rejetée:', e.reason);
+      });
+    </script>
+  </body>
+</html>
       function installPWAManually() {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const isAndroid = /Android/.test(navigator.userAgent);
