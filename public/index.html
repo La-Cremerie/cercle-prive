@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#D97706" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CERCLE PRIVÉ" />
+    <meta name="description" content="L'excellence immobilière en toute discrétion - Biens de prestige en off-market" />
+    <meta name="language" content="fr" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://images.pexels.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- HTTPS Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https: wss:;">
+    
+    <title>CERCLE PRIVÉ - Immobilier de Prestige</title>
+    
+    <style>
+      /* Fallback CSS critique pour éviter la page blanche */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #111827;
+        color: white;
+        overflow-x: hidden;
+      }
+      
+      /* Loader de secours ultra-robuste */
+      #emergency-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        transition: opacity 0.5s ease-out;
+      }
+      
+      .emergency-title {
+        color: #D97706;
+        font-size: 2rem;
+        font-weight: 300;
+        letter-spacing: 0.2em;
+        margin-bottom: 2rem;
+        text-align: center;
+        animation: fadeInUp 1s ease-out;
+      }
+      
+      .emergency-spinner {
+        width: 3rem;
+        height: 3rem;
+        border: 3px solid #374151;
+        border-top: 3px solid #D97706;
+        border-radius: 50%;
+        animation: spin 1.5s linear infinite;
+        margin-bottom: 1rem;
+      }
+      
+      .emergency-message {
+        color: #9CA3AF;
+        font-size: 0.9rem;
+        text-align: center;
+        max-width: 400px;
+        line-height: 1.5;
+        margin-bottom: 2rem;
+      }
+      
+      .emergency-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .emergency-btn {
+        background: #D97706;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: background 0.3s ease;
+      }
+      
+      .emergency-btn:hover {
+        background: #B45309;
+      }
+      
+      .emergency-btn.secondary {
+        background: transparent;
+        border: 1px solid #D97706;
+        color: #D97706;
+      }
+      
+      .emergency-btn.secondary:hover {
+        background: #D97706;
+        color: white;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      @keyframes fadeInUp {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      
+      /* Masquer le loader quand l'app est prête */
+      .app-loaded #emergency-loader {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      /* Styles de base pour éviter FOUC */
+      #root {
+        min-height: 100vh;
+        background: #111827;
+      }
+      
+      /* Optimisations de performance */
+      * {
+        box-sizing: border-box;
+      }
+      
+      img {
+        max-width: 100%;
+        height: auto;
+        image-rendering: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loader de secours ultra-robuste -->
+    <div id="emergency-loader">
+      <h1 class="emergency-title">CERCLE PRIVÉ</h1>
+      <div class="emergency-spinner"></div>
+      <p class="emergency-message">
+        Chargement de votre espace immobilier de prestige...<br>
+        Si cette page persiste, veuillez utiliser les options ci-dessous.
+      </p>
+      <div class="emergency-actions">
+        <button class="emergency-btn" onclick="window.location.reload()">
+          Actualiser la page
+        </button>
+        <button class="emergency-btn secondary" onclick="localStorage.clear(); window.location.reload();">
+          Vider le cache
+        </button>
+        <button class="emergency-btn secondary" onclick="window.location.href='mailto:nicolas.c@lacremerie.fr?subject=Problème technique site'">
+          Signaler le problème
+        </button>
+      </div>
+    </div>
+    
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+      // Diagnostic et récupération automatique ultra-robuste
+      (function() {
+        console.log('🔧 Diagnostic automatique démarré');
+        
+        let loadingTimeout;
+        let emergencyTimeout;
+        let retryCount = 0;
+        const maxRetries = 3;
+        
+        // Fonction de diagnostic
+        function diagnoseAndRecover() {
+          console.log('🔍 Diagnostic en cours...');
+          
+          // Vérifier si React est chargé
+          const checkReactLoaded = () => {
+            return window.React || document.querySelector('[data-reactroot]') || document.querySelector('#root').children.length > 0;
+          };
+          
+          // Vérifier les erreurs JavaScript
+          const hasJSErrors = window.jsErrorCount > 0;
+          
+          // Vérifier la connectivité réseau
+          const isOnline = navigator.onLine;
+          
+          console.log('📊 État du diagnostic:', {
+            reactLoaded: checkReactLoaded(),
+            hasJSErrors,
+            isOnline,
+            retryCount
+          });
+          
+          return {
+            reactLoaded: checkReactLoaded(),
+            hasJSErrors,
+            isOnline
+          };
+        }
+        
+        // Fonction de récupération
+        function attemptRecovery() {
+          const diagnosis = diagnoseAndRecover();
+          
+          if (!diagnosis.isOnline) {
+            console.warn('🌐 Problème de connectivité détecté');
+            updateEmergencyMessage('Problème de connexion internet détecté. Vérifiez votre connexion.');
+            return;
+          }
+          
+          if (!diagnosis.reactLoaded && retryCount < maxRetries) {
+            retryCount++;
+            console.log(`🔄 Tentative de récupération ${retryCount}/${maxRetries}`);
+            
+            // Nettoyer et recharger
+            if (retryCount === 2) {
+              console.log('🧹 Nettoyage du cache...');
+              try {
+                localStorage.clear();
+                sessionStorage.clear();
+              } catch (e) {
+                console.warn('Erreur nettoyage cache:', e);
+              }
+            }
+            
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+            
+            updateEmergencyMessage(`Récupération en cours... (${retryCount}/${maxRetries})`);
+            return;
+          }
+          
+          if (retryCount >= maxRetries) {
+            console.error('🚨 Échec de récupération automatique');
+            showEmergencyOptions();
+            return;
+          }
+        }
+        
+        // Mettre à jour le message d'urgence
+        function updateEmergencyMessage(message) {
+          const messageEl = document.querySelector('.emergency-message');
+          if (messageEl) {
+            messageEl.textContent = message;
+          }
+        }
+        
+        // Afficher les options d'urgence
+        function showEmergencyOptions() {
+          updateEmergencyMessage('Problème technique détecté. Utilisez les options ci-dessous pour résoudre le problème.');
+          
+          const actionsEl = document.querySelector('.emergency-actions');
+          if (actionsEl) {
+            actionsEl.style.display = 'flex';
+          }
+        }
+        
+        // Masquer le loader quand l'app est prête
+        function hideLoader() {
+          console.log('✅ Application chargée avec succès');
+          document.body.classList.add('app-loaded');
+          
+          setTimeout(() => {
+            const loader = document.getElementById('emergency-loader');
+            if (loader) {
+              loader.style.display = 'none';
+            }
+          }, 500);
+        }
+        
+        // Compteur d'erreurs JavaScript
+        window.jsErrorCount = 0;
+        window.addEventListener('error', function(e) {
+          window.jsErrorCount++;
+          console.error('❌ Erreur JS:', e.error?.message || e.message);
+        });
+        
+        window.addEventListener('unhandledrejection', function(e) {
+          window.jsErrorCount++;
+          console.error('❌ Promise rejetée:', e.reason);
+        });
+        
+        // Timeout principal de sécurité
+        loadingTimeout = setTimeout(() => {
+          console.warn('⏰ Timeout de chargement atteint');
+          attemptRecovery();
+        }, 5000);
+        
+        // Timeout d'urgence absolu
+        emergencyTimeout = setTimeout(() => {
+          console.error('🚨 Timeout d\'urgence - Affichage des options');
+          showEmergencyOptions();
+        }, 15000);
+        
+        // Détecter le chargement réussi
+        window.addEventListener('load', function() {
+          clearTimeout(loadingTimeout);
+          clearTimeout(emergencyTimeout);
+          
+          // Vérifier si React est monté
+          setTimeout(() => {
+            const diagnosis = diagnoseAndRecover();
+            if (diagnosis.reactLoaded) {
+              hideLoader();
+            } else {
+              console.warn('⚠️ React non détecté après load');
+              attemptRecovery();
+            }
+          }, 1000);
+        });
+        
+        // Détecter le montage de React
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length > 0) {
+              const rootEl = document.getElementById('root');
+              if (rootEl && rootEl.children.length > 0) {
+                clearTimeout(loadingTimeout);
+                clearTimeout(emergencyTimeout);
+                hideLoader();
+                observer.disconnect();
+              }
+            }
+          });
+        });
+        
+        observer.observe(document.getElementById('root'), {
+          childList: true,
+          subtree: true
+        });
+        
+        // Diagnostic initial
+        console.log('🚀 Système de diagnostic initialisé');
+        
+      })();
+    </script>
+  </body>
+</html>
