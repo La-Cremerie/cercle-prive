@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Heart, MapPin, Bed, Bath, Square, Eye, X, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart, MapPin, Bed, Bath, Square, Eye, X, Plus, Calculator, Bell } from 'lucide-react';
+import { GitCompare as Compare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Property } from '../types/property';
 import PropertyComparator from './PropertyComparator';
@@ -451,16 +452,6 @@ const PropertyGallery: React.FC = () => {
                       <span>{favorites.has(selectedProperty.id) ? 'Retiré des favoris' : 'Ajouter aux favoris'}</span>
                     </button>
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Ajouter à la comparaison (sera géré par le composant PropertyComparator)
-                      }}
-                      className="p-2 rounded-full bg-white/80 text-gray-600 hover:bg-white backdrop-blur-sm transition-colors"
-                      title="Ajouter à la comparaison"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                    
                     <a
                       href="mailto:nicolas.c@lacremerie.fr?subject=Demande d'information - Villa Horizon"
                       className="flex-1 bg-yellow-600 text-white px-6 py-3 rounded-md hover:bg-yellow-700 transition-colors text-center font-medium"
@@ -474,8 +465,55 @@ const PropertyGallery: React.FC = () => {
           )}
         </AnimatePresence>
 
+        {/* Outils supplémentaires */}
+        <div className="mt-16 text-center">
+          <div className="flex justify-center space-x-4">
+            <button
+              onClick={() => setShowComparator(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Compare className="w-5 h-5" />
+              <span>Comparer les biens</span>
+            </button>
+            <button
+              onClick={() => setShowCalculator(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              <Calculator className="w-5 h-5" />
+              <span>Calculer la rentabilité</span>
+            </button>
+            <button
+              onClick={() => setShowAlerts(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            >
+              <Bell className="w-5 h-5" />
+              <span>Créer une alerte</span>
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Modals */}
+      {showComparator && (
+        <PropertyComparator
+          properties={properties}
+          onClose={() => setShowComparator(false)}
+        />
+      )}
+      
+      {showCalculator && (
+        <RentabilityCalculator
+          onClose={() => setShowCalculator(false)}
+        />
+      )}
+      
+      {showAlerts && (
+        <PropertyAlerts
+          onClose={() => setShowAlerts(false)}
+        />
+      )}
     </section>
   );
 };
+
 export default PropertyGallery;
