@@ -21,13 +21,8 @@
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json" />
     
-    <!-- Preload critical resources -->
-    <link rel="preconnect" href="https://images.pexels.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    
     <!-- HTTPS Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https: wss:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https: wss:; manifest-src 'self';">
     
     <title>CERCLE PRIVÉ - Immobilier de Prestige</title>
     
@@ -153,6 +148,20 @@
         height: auto;
         image-rendering: auto;
       }
+      
+      /* PWA Install button styles */
+      .pwa-install-available {
+        position: relative;
+      }
+      
+      .pwa-install-available::after {
+        content: "📱";
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        font-size: 12px;
+        animation: bounce 2s infinite;
+      }
     </style>
   </head>
   <body>
@@ -162,7 +171,7 @@
       <div class="emergency-spinner"></div>
       <p class="emergency-message">
         Chargement de votre espace immobilier de prestige...<br>
-        Si cette page persiste, veuillez utiliser les options ci-dessous.
+        Application web progressive en cours de chargement...
       </p>
       <div class="emergency-actions">
         <button class="emergency-btn" onclick="window.location.reload()">
@@ -170,6 +179,9 @@
         </button>
         <button class="emergency-btn secondary" onclick="localStorage.clear(); window.location.reload();">
           Vider le cache
+        </button>
+        <button class="emergency-btn secondary" onclick="installPWAManually()">
+          Installer l'app
         </button>
         <button class="emergency-btn secondary" onclick="window.location.href='mailto:nicolas.c@lacremerie.fr?subject=Problème technique site'">
           Signaler le problème
@@ -181,18 +193,45 @@
     <script type="module" src="/src/main.tsx"></script>
     
     <script>
+      // Installation PWA manuelle
+      function installPWAManually() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        if (isIOS) {
+          alert('Pour installer sur iOS :\n1. Appuyez sur le bouton Partager\n2. Sélectionnez "Sur l\'écran d\'accueil"\n3. Confirmez l\'installation');
+        } else if (isAndroid) {
+          alert('Pour installer sur Android :\n1. Appuyez sur le menu (⋮)\n2. Sélectionnez "Ajouter à l\'écran d\'accueil"\n3. Confirmez l\'installation');
+        } else {
+          alert('Pour installer sur Desktop :\n1. Cliquez sur l\'icône d\'installation dans la barre d\'adresse\n2. Ou Menu → "Installer CERCLE PRIVÉ"');
+        }
+      }
+      
       // Diagnostic et récupération automatique ultra-robuste
       (function() {
-        console.log('🔧 Diagnostic automatique démarré');
+        console.log('🔧 PWA: Diagnostic automatique démarré');
         
         let loadingTimeout;
         let emergencyTimeout;
         let retryCount = 0;
         const maxRetries = 3;
         
+        // Enregistrer le Service Worker
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+              .then(function(registration) {
+                console.log('SW: Enregistrement réussi', registration.scope);
+              })
+              .catch(function(error) {
+                console.log('SW: Échec enregistrement', error);
+              });
+          });
+        }
+        
         // Fonction de diagnostic
         function diagnoseAndRecover() {
-          console.log('🔍 Diagnostic en cours...');
+          console.log('🔍 PWA: Diagnostic en cours...');
           
           // Vérifier si React est chargé
           const checkReactLoaded = () => {
@@ -205,7 +244,7 @@
           // Vérifier la connectivité réseau
           const isOnline = navigator.onLine;
           
-          console.log('📊 État du diagnostic:', {
+          console.log('📊 PWA: État du diagnostic:', {
             reactLoaded: checkReactLoaded(),
             hasJSErrors,
             isOnline,
@@ -224,18 +263,18 @@
           const diagnosis = diagnoseAndRecover();
           
           if (!diagnosis.isOnline) {
-            console.warn('🌐 Problème de connectivité détecté');
+            console.warn('🌐 PWA: Problème de connectivité détecté');
             updateEmergencyMessage('Problème de connexion internet détecté. Vérifiez votre connexion.');
             return;
           }
           
           if (!diagnosis.reactLoaded && retryCount < maxRetries) {
             retryCount++;
-            console.log(`🔄 Tentative de récupération ${retryCount}/${maxRetries}`);
+            console.log(`🔄 PWA: Tentative de récupération ${retryCount}/${maxRetries}`);
             
             // Nettoyer et recharger
             if (retryCount === 2) {
-              console.log('🧹 Nettoyage du cache...');
+              console.log('🧹 PWA: Nettoyage du cache...');
               try {
                 localStorage.clear();
                 sessionStorage.clear();
@@ -253,7 +292,7 @@
           }
           
           if (retryCount >= maxRetries) {
-            console.error('🚨 Échec de récupération automatique');
+            console.error('🚨 PWA: Échec de récupération automatique');
             showEmergencyOptions();
             return;
           }
@@ -279,7 +318,7 @@
         
         // Masquer le loader quand l'app est prête
         function hideLoader() {
-          console.log('✅ Application chargée avec succès');
+          console.log('✅ PWA: Application chargée avec succès');
           document.body.classList.add('app-loaded');
           
           setTimeout(() => {
@@ -294,23 +333,23 @@
         window.jsErrorCount = 0;
         window.addEventListener('error', function(e) {
           window.jsErrorCount++;
-          console.error('❌ Erreur JS:', e.error?.message || e.message);
+          console.error('❌ PWA: Erreur JS:', e.error?.message || e.message);
         });
         
         window.addEventListener('unhandledrejection', function(e) {
           window.jsErrorCount++;
-          console.error('❌ Promise rejetée:', e.reason);
+          console.error('❌ PWA: Promise rejetée:', e.reason);
         });
         
         // Timeout principal de sécurité
         loadingTimeout = setTimeout(() => {
-          console.warn('⏰ Timeout de chargement atteint');
+          console.warn('⏰ PWA: Timeout de chargement atteint');
           attemptRecovery();
         }, 5000);
         
         // Timeout d'urgence absolu
         emergencyTimeout = setTimeout(() => {
-          console.error('🚨 Timeout d\'urgence - Affichage des options');
+          console.error('🚨 PWA: Timeout d\'urgence - Affichage des options');
           showEmergencyOptions();
         }, 15000);
         
@@ -325,7 +364,7 @@
             if (diagnosis.reactLoaded) {
               hideLoader();
             } else {
-              console.warn('⚠️ React non détecté après load');
+              console.warn('⚠️ PWA: React non détecté après load');
               attemptRecovery();
             }
           }, 1000);
@@ -352,7 +391,7 @@
         });
         
         // Diagnostic initial
-        console.log('🚀 Système de diagnostic initialisé');
+        console.log('🚀 PWA: Système de diagnostic initialisé');
         
       })();
     </script>

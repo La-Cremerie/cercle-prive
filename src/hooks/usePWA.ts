@@ -13,6 +13,7 @@ export const usePWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
 
   useEffect(() => {
     // Vérifier si l'app est déjà installée
@@ -22,7 +23,18 @@ export const usePWA = () => {
       setIsInstalled(isStandalone || isInWebAppiOS);
     };
 
+    // Vérifier si l'installation est possible
+    const checkInstallability = () => {
+      // Vérifier les critères PWA
+      const hasManifest = document.querySelector('link[rel="manifest"]');
+      const hasServiceWorker = 'serviceWorker' in navigator;
+      const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost';
+      
+      setCanInstall(!!(hasManifest && hasServiceWorker && isHTTPS));
+    };
+
     checkIfInstalled();
+    checkInstallability();
 
     // Écouter l'événement beforeinstallprompt
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -33,39 +45,58 @@ export const usePWA = () => {
 
     // Écouter l'installation de l'app
     const handleAppInstalled = () => {
+      console.log('PWA installée avec succès');
       setIsInstalled(true);
       setIsInstallable(false);
       setDeferredPrompt(null);
+      localStorage.setItem('pwa-installed', 'true');
     };
+
+    // Forcer l'affichage du prompt après un délai
+    const forcePromptTimer = setTimeout(() => {
+      if (!isInstalled && canInstall && !deferredPrompt) {
+        setIsInstallable(true);
+        console.log('PWA: Prompt forcé après timeout');
+      }
+    }, 5000);
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
+      clearTimeout(forcePromptTimer);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, []);
+  }, [canInstall, isInstalled]);
 
   const installApp = async () => {
     if (!deferredPrompt) return;
 
     try {
+      console.log('PWA: Tentative d\'installation...');
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       
+      console.log('PWA: Choix utilisateur:', outcome);
       if (outcome === 'accepted') {
+        console.log('PWA: Installation acceptée');
         setIsInstallable(false);
         setDeferredPrompt(null);
+      } else {
+        console.log('PWA: Installation refusée');
       }
     } catch (error) {
       console.error('Erreur lors de l\'installation:', error);
+      // Fallback: proposer l'installation manuelle
+      alert('Pour installer l\'application :\n\n• Sur Android : Menu → "Ajouter à l\'écran d\'accueil"\n• Sur iOS : Partager → "Sur l\'écran d\'accueil"\n• Sur Desktop : Menu navigateur → "Installer CERCLE PRIVÉ"');
     }
   };
 
   return {
     isInstallable,
     isInstalled,
-    installApp
+    installApp,
+    canInstall
   };
 };

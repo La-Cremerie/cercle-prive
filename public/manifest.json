@@ -1,6 +1,6 @@
 {
-  "name": "OFF MARKET - Immobilier de Prestige",
-  "short_name": "OFF MARKET",
+  "name": "CERCLE PRIVÉ - Immobilier de Prestige",
+  "short_name": "CERCLE PRIVÉ",
   "description": "L'excellence immobilière en toute discrétion - Biens de prestige en off-market",
   "start_url": "/",
   "display": "standalone",
@@ -9,18 +9,32 @@
   "orientation": "portrait-primary",
   "categories": ["business", "lifestyle"],
   "lang": "fr",
+  "scope": "/",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "screenshots": [
