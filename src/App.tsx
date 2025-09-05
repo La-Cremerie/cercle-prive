@@ -4,7 +4,7 @@ import Chatbot from './components/Chatbot';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import ThemeToggle from './components/ThemeToggle';
 import AdminLogin from './components/AdminLogin';
-import AdminPanel from './components/AdminPanel';
+import AdvancedAdminPanel from './components/AdvancedAdminPanel';
 import RentabilityCalculator from './components/RentabilityCalculator';
 import PropertyComparator from './components/PropertyComparator';
 import PropertyAlerts from './components/PropertyAlerts';
@@ -177,7 +177,7 @@ function App() {
 
   // Si admin connecté, afficher le panel admin
   if (isAdminLoggedIn) {
-    return <AdminPanel onLogout={handleAdminLogout} />;
+    return <AdvancedAdminPanel onLogout={handleAdminLogout} />;
   }
 
   // Si demande de connexion admin, afficher le formulaire admin
