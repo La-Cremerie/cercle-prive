@@ -363,144 +363,143 @@ const PresentationImageManager: React.FC = () => {
             </div>
 
             <button
+              type="button"
               onClick={addImageFromUrl}
               className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
             >
               <Link className="w-4 h-4" />
-              <span>Ajouter depuis URL</span>
+              <span>Ajouter l'image</span>
             </button>
           </div>
         )}
 
         {uploadMethod === 'file' && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Sélectionner un fichier
-              </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                Taille maximale : 100KB (pour les images plus grandes, utilisez un lien URL)
-              </p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100"
-              />
-            </div>
+          <div className="space-y-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center justify-center space-x-3 px-4 py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-yellow-500 transition-colors"
+            >
+              <Upload className="w-8 h-8 text-gray-400" />
+              <div className="text-center">
+                <p className="text-gray-600 dark:text-gray-400 font-medium">
+                  Cliquez pour sélectionner une image
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-500">
+                  JPG, PNG, WebP (max 100KB)
+                </p>
+              </div>
+            </button>
           </div>
         )}
 
         {uploadMethod === 'drive' && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Google Drive
-              </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                Partagez votre image sur Google Drive et collez le lien de partage
-              </p>
-              <button
-                onClick={handleGoogleDriveUpload}
-                className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                <Image className="w-4 h-4" />
-                <span>Ajouter depuis Google Drive</span>
-              </button>
+          <div className="space-y-3">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                Comment obtenir un lien Google Drive :
+              </h4>
+              <ol className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                <li>1. Uploadez votre image sur Google Drive</li>
+                <li>2. Clic droit → "Obtenir le lien"</li>
+                <li>3. Changez les permissions en "Visible par tous"</li>
+                <li>4. Copiez le lien et collez-le ci-dessous</li>
+              </ol>
             </div>
+            <button
+              type="button"
+              onClick={handleGoogleDriveUpload}
+              className="w-full flex items-center justify-center space-x-3 px-4 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Image className="w-5 h-5" />
+              <span>Ajouter depuis Google Drive</span>
+            </button>
           </div>
         )}
       </div>
 
-      {/* Liste des images */}
+      {/* Images existantes */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-            Images {activeCategory === 'hero' ? 'Page d\'accueil' : 'Section Concept'} ({currentImages.length})
-          </h3>
-          <button
-            onClick={saveImages}
-            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-          >
-            <Save className="w-4 h-4" />
-            <span>Sauvegarder</span>
-          </button>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
+          Images {activeCategory === 'hero' ? 'de la page d\'accueil' : 'de la section concept'}
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {getCurrentImages().map((image) => (
+            <div key={image.id} className="relative group">
+              <img
+                src={image.url}
+                alt={image.name}
+                className="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+              />
+              
+              {/* Overlay avec actions */}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-2">
+                <button
+                  onClick={() => setActiveImage(image.id)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                    image.isActive
+                      ? 'bg-green-500 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {image.isActive ? 'Active' : 'Activer'}
+                </button>
+                <button
+                  onClick={() => deleteImage(image.id)}
+                  className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-xs font-medium"
+                >
+                  Supprimer
+                </button>
+              </div>
+              
+              {/* Badge actif */}
+              {image.isActive && (
+                <div className="absolute top-2 left-2 px-2 py-1 bg-green-500 text-white text-xs rounded-full">
+                  Active
+                </div>
+              )}
+              
+              {/* Type d'image */}
+              <div className="absolute top-2 right-2 flex items-center space-x-1 px-2 py-1 bg-black/70 text-white text-xs rounded-full">
+                {getTypeIcon(image.type)}
+                <span>{getTypeLabel(image.type)}</span>
+              </div>
+              
+              {/* Nom de l'image */}
+              <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 rounded-b-lg">
+                <p className="text-xs truncate">{image.name}</p>
+              </div>
+            </div>
+          ))}
         </div>
-
-        {currentImages.length === 0 ? (
+        
+        {getCurrentImages().length === 0 && (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             Aucune image ajoutée pour cette catégorie
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentImages.map((image) => (
-              <div
-                key={image.id}
-                className={`relative group rounded-lg overflow-hidden border-2 transition-colors ${
-                  image.isActive
-                    ? 'border-yellow-500 ring-2 ring-yellow-200'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                }`}
-              >
-                <div className="aspect-video relative">
-                  <img
-                    src={image.url}
-                    alt={image.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400';
-                    }}
-                  />
-                  
-                  {/* Overlay avec actions */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
-                    {!image.isActive && (
-                      <button
-                        onClick={() => setActiveImage(image.id)}
-                        className="px-3 py-1 bg-yellow-600 text-white rounded-md text-sm hover:bg-yellow-700 transition-colors"
-                      >
-                        Activer
-                      </button>
-                    )}
-                    <button
-                      onClick={() => deleteImage(image.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  {/* Badge actif */}
-                  {image.isActive && (
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-yellow-600 text-white text-xs rounded-md font-medium">
-                      Active
-                    </div>
-                  )}
-                  
-                  {/* Badge type */}
-                  <div className="absolute top-2 right-2 flex items-center space-x-1 px-2 py-1 bg-black/70 text-white text-xs rounded-md">
-                    {getTypeIcon(image.type)}
-                    <span>{getTypeLabel(image.type)}</span>
-                  </div>
-                </div>
-                
-                <div className="p-3">
-                  <h4 className="font-medium text-gray-900 dark:text-white text-sm truncate">
-                    {image.name}
-                  </h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
-                    {image.url.length > 50 ? `${image.url.substring(0, 50)}...` : image.url}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
         )}
       </div>
+
+      {/* Actions globales */}
+      <div className="flex justify-end space-x-4">
+        <button
+          onClick={saveImages}
+          className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+        >
+          <Save className="w-5 h-5" />
+          <span>Sauvegarder les modifications</span>
+        </button>
+      </div>
     </div>
-  )
-}
-  )
-}
+  );
+};
+
+export default PresentationImageManager;
