@@ -161,37 +161,6 @@ const PropertyComparator: React.FC<PropertyComparatorProps> = ({ properties, onC
           )}
         </div>
 
-      {/* Optimisations implémentées */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
-          Optimisations Implémentées
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {optimizationTips.map((tip, index) => (
-            <div key={index} className="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
-              <div className="flex-shrink-0">
-                {tip.icon}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-gray-900 dark:text-white">
-                    {tip.title}
-                  </h4>
-                  {tip.implemented ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                  ) : (
-                    <XCircle className="w-5 h-5 text-gray-400" />
-                  )}
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {tip.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
       </div>
     </div>
   );
