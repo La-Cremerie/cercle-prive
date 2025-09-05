@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://monsite.fr/sitemap.xml
+
+# Bloquer les dossiers sensibles
+Disallow: /css/
+Disallow: /js/
+Disallow: /.htaccess
+Disallow: /README.md
+
+# Optimisation pour les moteurs de recherche
+Crawl-delay: 1

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Découvrez notre portfolio de projets web réalisés : sites vitrine, e-commerce, applications web. Exemples concrets de notre expertise.">
+    <meta name="keywords" content="portfolio web, projets réalisés, exemples sites web, références clients">
+    <title>Portfolio - Nos Réalisations Web | MonSite</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    
+    <header class="header" role="banner">
+        <nav class="nav" role="navigation">
+            <div class="nav-container">
+                <a href="../index.html" class="nav-logo">MonSite</a>
+                <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="../index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="about.html" class="nav-link">À propos</a></li>
+                    <li><a href="services.html" class="nav-link">Services</a></li>
+                    <li><a href="portfolio.html" class="nav-link active">Portfolio</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" role="main">
+        <section class="page-header" aria-labelledby="page-title">
+            <div class="container">
+                <h1 id="page-title">Notre Portfolio</h1>
+                <p class="page-subtitle">Découvrez nos réalisations et l'impact de nos solutions web sur le succès de nos clients</p>
+            </div>
+        </section>
+
+        <!-- Portfolio Filter -->
+        <section class="portfolio-filter" aria-labelledby="filter-title">
+            <div class="container">
+                <h2 id="filter-title" class="sr-only">Filtrer les projets</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Tous les projets</button>
+                    <button class="filter-btn" data-filter="vitrine">Sites Vitrine</button>
+                    <button class="filter-btn" data-filter="ecommerce">E-commerce</button>
+                    <button class="filter-btn" data-filter="webapp">Applications Web</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Grid -->
+        <section class="portfolio-grid" aria-labelledby="projects-title">
+            <div class="container">
+                <h2 id="projects-title" class="sr-only">Nos projets réalisés</h2>
+                
+                <div class="projects-grid">
+                    <article class="project-card" data-category="vitrine">
+                        <div class="project-image">
+                            <picture>
+                                <img src="https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop" 
+                                     alt="Site vitrine moderne pour restaurant gastronomique" 
+                                     loading="lazy"
+                                     width="600" 
+                                     height="400">
+                            </picture>
+                            <div class="project-overlay">
+                                <a href="#" class="project-link" aria-label="Voir le projet Restaurant Le Gourmet">Voir le projet</a>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Restaurant Le Gourmet</h3>
+                            <p class="project-category">Site Vitrine</p>
+                            <p>Site élégant pour restaurant gastronomique avec réservation en ligne et menu interactif.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">HTML5</span>
+                                <span class="tech-tag">CSS3</span>
+                                <span class="tech-tag">JavaScript</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card" data-category="ecommerce">
+                        <div class="project-image">
+                            <picture>
+                                <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop" 
+                                     alt="Boutique e-commerce moderne pour mode et accessoires" 
+                                     loading="lazy"
+                                     width="600" 
+                                     height="400">
+                            </picture>
+                            <div class="project-overlay">
+                                <a href="#" class="project-link" aria-label="Voir le projet Boutique Mode">Voir le projet</a>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Boutique Mode</h3>
+                            <p class="project-category">E-commerce</p>
+                            <p>Plateforme e-commerce complète avec gestion des stocks, paiements sécurisés et interface d'administration.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">React</span>
+                                <span class="tech-tag">Node.js</span>
+                                <span class="tech-tag">Stripe</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card" data-category="webapp">
+                        <div class="project-image">
+                            <picture>
+                                <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop" 
+                                     alt="Application web de gestion de projet collaborative" 
+                                     loading="lazy"
+                                     width="600" 
+                                     height="400">
+                            </picture>
+                            <div class="project-overlay">
+                                <a href="#" class="project-link" aria-label="Voir le projet TaskFlow">Voir le projet</a>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>TaskFlow</h3>
+                            <p class="project-category">Application Web</p>
+                            <p>Application de gestion de projet collaborative avec tableau de bord en temps réel et notifications.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Vue.js</span>
+                                <span class="tech-tag">Firebase</span>
+                                <span class="tech-tag">PWA</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card" data-category="vitrine">
+                        <div class="project-image">
+                            <picture>
+                                <img src="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop" 
+                                     alt="Site vitrine professionnel pour cabinet d'avocats" 
+                                     loading="lazy"
+                                     width="600" 
+                                     height="400">
+                            </picture>
+                            <div class="project-overlay">
+                                <a href="#" class="project-link" aria-label="Voir le projet Cabinet Juridique">Voir le projet</a>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Cabinet Juridique</h3>
+                            <p class="project-category">Site Vitrine</p>
+                            <p>Site professionnel pour cabinet d'avocats avec prise de rendez-vous en ligne et blog juridique.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">HTML5</span>
+                                <span class="tech-tag">SCSS</span>
+                                <span class="tech-tag">PHP</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card" data-category="ecommerce">
+                        <div class="project-image">
+                            <picture>
+                                <img src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop" 
+                                     alt="Marketplace en ligne pour produits artisanaux" 
+                                     loading="lazy"
+                                     width="600" 
+                                     height="400">
+                            </picture>
+                            <div class="project-overlay">
+                                <a href="#" class="project-link" aria-label="Voir le projet ArtisanMarket">Voir le projet</a>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3>ArtisanMarket</h3>
+                            <p class="project-category">E-commerce</p>
+                            <p>Marketplace dédiée aux artisans locaux avec système de commandes et livraison géolocalisée.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Laravel</span>
+                                <span class="tech-tag">MySQL</span>
+                                <span class="tech-tag">API</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="testimonials" aria-labelledby="testimonials-title">
+            <div class="container">
+                <h2 id="testimonials-title" class="section-title">Ce Que Disent Nos Clients</h2>
+                <div class="testimonials-grid">
+                    <blockquote class="testimonial">
+                        <p>"Une équipe exceptionnelle qui a su comprendre nos besoins et livrer un site web au-delà de nos attentes. Professionnalisme et créativité au rendez-vous."</p>
+                        <cite>
+                            <strong>Marie Dubois</strong>
+                            <span>Directrice Marketing, TechCorp</span>
+                        </cite>
+                    </blockquote>
+                    
+                    <blockquote class="testimonial">
+                        <p>"Grâce à MonSite, notre boutique en ligne a vu ses ventes augmenter de 300% en 6 mois. Une solution e-commerce parfaitement adaptée à nos besoins."</p>
+                        <cite>
+                            <strong>Pierre Leroy</strong>
+                            <span>Fondateur, Boutique Éco</span>
+                        </cite>
+                    </blockquote>
+                    
+                    <blockquote class="testimonial">
+                        <p>"Support technique réactif et équipe à l'écoute. Notre site fonctionne parfaitement depuis 2 ans sans aucun problème technique."</p>
+                        <cite>
+                            <strong>Sophie Martin</strong>
+                            <span>CEO, StartupInnovante</span>
+                        </cite>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MonSite</h3>
+                    <p>Solutions web professionnelles depuis 2020</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook" class="social-link">📘</a>
+                        <a href="#" aria-label="Twitter" class="social-link">🐦</a>
+                        <a href="#" aria-label="LinkedIn" class="social-link">💼</a>
+                        <a href="#" aria-label="Instagram" class="social-link">📷</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="services.html">Développement Web</a></li>
+                        <li><a href="services.html">Design UX/UI</a></li>
+                        <li><a href="services.html">E-commerce</a></li>
+                        <li><a href="services.html">Maintenance</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Entreprise</h4>
+                    <ul>
+                        <li><a href="about.html">À propos</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <address>
+                        <p>📧 contact@monsite.fr</p>
+                        <p>📞 +33 1 23 45 67 89</p>
+                        <p>📍 123 Rue de la Tech, 75001 Paris</p>
+                    </address>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MonSite. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>
