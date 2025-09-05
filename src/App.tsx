@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import LoginForm from './components/LoginForm';
-import AdminLogin from './components/AdminLogin';
-import AdminPanel from './components/AdminPanel';
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
 import NotreAdnSection from './components/NotreAdnSection';
@@ -14,18 +12,29 @@ import VendreSection from './components/VendreSection';
 import Chatbot from './components/Chatbot';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 
+// Import admin components only in development
+const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
+const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
+
+// Check if we're in development mode
+const isDevelopment = import.meta.env.DEV;
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Admin states only in development
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Always start with login page - remove auto-login check
-    const adminLoggedIn = localStorage.getItem('adminLoggedIn');
-    if (adminLoggedIn === 'true') {
-      setIsAdminLoggedIn(true);
+    // Check admin login only in development
+    if (isDevelopment) {
+      const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+      if (adminLoggedIn === 'true') {
+        setIsAdminLoggedIn(true);
+      }
     }
     setIsLoading(false);
   }, []);
@@ -35,6 +44,12 @@ function App() {
   };
 
   const toggleAdmin = () => {
+    // Admin access only in development
+    if (!isDevelopment) {
+      console.log('Admin panel not available in production');
+      return;
+    }
+    
     if (isAdminLoggedIn) {
       setShowAdmin(!showAdmin);
     } else {
@@ -43,17 +58,20 @@ function App() {
   };
 
   const handleAdminLoginSuccess = () => {
+    if (!isDevelopment) return;
     setIsAdminLoggedIn(true);
     setShowAdminLogin(false);
     setShowAdmin(true);
   };
 
   const handleAdminLogout = () => {
+    if (!isDevelopment) return;
     setIsAdminLoggedIn(false);
     setShowAdmin(false);
   };
 
   const handleBackFromAdminLogin = () => {
+    if (!isDevelopment) return;
     setShowAdminLogin(false);
   };
 
@@ -69,31 +87,35 @@ function App() {
     return <LoginForm onLoginSuccess={handleLoginSuccess} />;
   }
 
-  if (showAdminLogin) {
+  if (isDevelopment && showAdminLogin) {
     return (
-      <>
-        <AdminLogin 
-          onLoginSuccess={handleAdminLoginSuccess}
-          onBack={handleBackFromAdminLogin}
-        />
-        <Toaster position="top-right" />
-      </>
+      <React.Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white">Chargement...</div></div>}>
+        <>
+          <AdminLogin 
+            onLoginSuccess={handleAdminLoginSuccess}
+            onBack={handleBackFromAdminLogin}
+          />
+          <Toaster position="top-right" />
+        </>
+      </React.Suspense>
     );
   }
 
-  if (showAdmin) {
+  if (isDevelopment && showAdmin) {
     return (
-      <>
-        <AdminPanel onLogout={handleAdminLogout} />
-        <Toaster position="top-right" />
-      </>
+      <React.Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white">Chargement...</div></div>}>
+        <>
+          <AdminPanel onLogout={handleAdminLogout} />
+          <Toaster position="top-right" />
+        </>
+      </React.Suspense>
     );
   }
 
   return (
     <>
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-        <Navigation onAdminClick={toggleAdmin} />
+        <Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
         <HeroSection />
         <NotreAdnSection />
         <ServicesSection />

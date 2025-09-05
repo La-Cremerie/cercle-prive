@@ -51,7 +51,7 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
             
             <ThemeToggle />
             
-            {onAdminClick && (
+            {onAdminClick && import.meta.env.DEV && (
               <button
                 onClick={handleAdminClick}
                 className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
@@ -116,7 +116,7 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
               >
                 VENDRE
               </a>
-              {onAdminClick && (
+              {onAdminClick && import.meta.env.DEV && (
                 <button
                   onClick={() => {
                     handleAdminClick();

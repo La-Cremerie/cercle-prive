@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
@@ -53,4 +53,26 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
-});
+  build: {
+    rollupOptions: {
+      external: mode === 'production' ? [
+        // Exclure les composants admin en production
+        './src/components/AdminLogin',
+        './src/components/AdminPanel',
+        './src/components/AdminUserManagement',
+        './src/components/CRMSystem',
+        './src/components/StatsCharts',
+        './src/components/AdvancedAnalytics',
+        './src/components/EmailSettings',
+        './src/components/PropertyManagement',
+        './src/components/PresentationImageManager',
+        './src/components/ContentManager',
+        './src/components/DesignCustomizer',
+        './src/components/AppointmentBooking',
+        './src/components/LeadScoring',
+        './src/components/SEOManager',
+        './src/components/PerformanceOptimizer'
+      ] : []
+    }
+  }
+}));
