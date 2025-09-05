@@ -305,6 +305,7 @@ const PropertyGallery: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                </motion.div>
                 </div>
               </motion.div>
             ))}
