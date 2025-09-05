@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Menu, X, Settings, Bell } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
-import ThemeToggle from './ThemeToggle';
+// Import ThemeToggle only in development
+const ThemeToggle = React.lazy(() => import('./ThemeToggle'));
 
 interface NavigationProps {
   onAdminClick?: () => void;
@@ -49,7 +50,12 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
               VENDRE
             </a>
             
-            <ThemeToggle />
+            {/* Theme toggle only in development */}
+            {import.meta.env.DEV && (
+              <React.Suspense fallback={null}>
+                <ThemeToggle />
+              </React.Suspense>
+            )}
             
             {onAdminClick && import.meta.env.DEV && (
               <button

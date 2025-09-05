@@ -9,10 +9,12 @@ import OffMarketSection from './components/OffMarketSection';
 import RechercheSection from './components/RechercheSection';
 import PropertyGallery from './components/PropertyGallery';
 import VendreSection from './components/VendreSection';
-import Chatbot from './components/Chatbot';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
+
+// Import Chatbot only in development
+const Chatbot = React.lazy(() => import('./components/Chatbot'));
 
 // Import admin components only in development
 const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
@@ -127,7 +129,12 @@ function App() {
         <VendreSection />
         <ContactSection />
         <Footer />
-        <Chatbot />
+        {/* Chatbot only in development */}
+        {import.meta.env.DEV && (
+          <React.Suspense fallback={null}>
+            <Chatbot />
+          </React.Suspense>
+        )}
         <PWAInstallPrompt />
       </div>
       <Toaster position="top-right" />
