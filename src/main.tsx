@@ -2,8 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-// Import i18n seulement si nécessaire
-// import './i18n';
+import './i18n';
 
 // Service worker simplifié
 if ('serviceWorker' in navigator) {
@@ -19,12 +18,22 @@ if ('serviceWorker' in navigator) {
 }
 
 // Optimisation du rendu initial
-createRoot(document.getElementById('root')!).render(
-  <App />
-);
+const root = createRoot(document.getElementById('root')!);
+
+// Gestion d'erreur globale pour éviter les pages blanches
+window.addEventListener('error', (event) => {
+  console.error('Erreur globale:', event.error);
+  // En cas d'erreur critique, afficher un message d'erreur au lieu d'une page blanche
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Promise rejetée:', event.reason);
+  // Empêcher que les promesses rejetées cassent l'app
+  event.preventDefault();
+});
+
+root.render(<App />);
 
 // Masquer le loader initial immédiatement
 requestAnimationFrame(() => {
   document.body.classList.add('react-loaded');
-}
-)

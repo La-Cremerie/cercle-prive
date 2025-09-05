@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 // Import direct du LoginForm pour éviter le lazy loading
 const LoginForm = React.lazy(() => import('./components/LoginForm'));
@@ -76,34 +77,44 @@ function App() {
         .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
         .map(result => result.value);
 
+      // Vérifier que tous les composants essentiels sont chargés
+      if (successfulImports.length < 9) {
+        console.error('Certains composants n\'ont pas pu être chargés');
+        // Forcer un rechargement si des composants manquent
+        window.location.reload();
+        return;
+      }
+
       // Chargement conditionnel des composants admin
       let adminImports: any[] = [];
       if (isDevelopment) {
-        const adminImportResults = await Promise.allSettled([
-          import('./components/Chatbot'),
-          import('./components/AdminLogin'),
-          import('./components/AdminPanel')
-        ]);
-        
-        adminImports = adminImportResults
-          .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
-          .map(result => result.value);
+        try {
+          const adminImportResults = await Promise.allSettled([
+            import('./components/Chatbot'),
+            import('./components/AdminLogin'),
+            import('./components/AdminPanel')
+          ]);
+          
+          adminImports = adminImportResults
+            .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
+            .map(result => result.value);
+        } catch (error) {
+          console.warn('Composants admin non disponibles:', error);
+        }
       }
 
       // Construire l'objet des composants
-      const components: any = {};
-      
-      if (successfulImports.length >= 9) {
-        components.Navigation = successfulImports[0].default;
-        components.HeroSection = successfulImports[1].default;
-        components.NotreAdnSection = successfulImports[2].default;
-        components.ServicesSection = successfulImports[3].default;
-        components.OffMarketSection = successfulImports[4].default;
-        components.RechercheSection = successfulImports[5].default;
-        components.PropertyGallery = successfulImports[6].default;
-        components.VendreSection = successfulImports[7].default;
-        components.PWAInstallPrompt = successfulImports[8].default;
-      }
+      const components: any = {
+        Navigation: successfulImports[0].default,
+        HeroSection: successfulImports[1].default,
+        NotreAdnSection: successfulImports[2].default,
+        ServicesSection: successfulImports[3].default,
+        OffMarketSection: successfulImports[4].default,
+        RechercheSection: successfulImports[5].default,
+        PropertyGallery: successfulImports[6].default,
+        VendreSection: successfulImports[7].default,
+        PWAInstallPrompt: successfulImports[8].default
+      };
       
       // Ajouter les composants admin si disponibles
       if (isDevelopment && adminImports.length >= 3) {
@@ -116,8 +127,10 @@ function App() {
       setMainSiteLoaded(true);
     } catch (error) {
       console.error('Erreur lors du chargement du site:', error);
-      // En cas d'erreur, afficher au moins le login
-      setMainSiteLoaded(false);
+      // En cas d'erreur critique, forcer un rechargement
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
   };
 
@@ -161,16 +174,13 @@ function App() {
   // Écran de chargement initial ultra-rapide
   if (isInitializing) {
     return (
-      <React.Suspense fallback={
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
-          </div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+          <p className="text-gray-400 text-sm mt-2">Initialisation...</p>
         </div>
-      }>
-        <div />
-      </React.Suspense>
+      </div>
     );
   }
 
@@ -180,8 +190,9 @@ function App() {
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
             <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
+            <p className="text-gray-400 text-sm mt-2">Chargement du formulaire...</p>
           </div>
         </div>
       }>
@@ -198,7 +209,7 @@ function App() {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <Loader2 className="w-16 h-16 text-yellow-600 animate-spin mx-auto mb-4" />
           <h2 className="text-xl font-light text-white mb-2 tracking-wider">
             CERCLE PRIVÉ
           </h2>
@@ -214,7 +225,7 @@ function App() {
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
             <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
           </div>
         </div>
@@ -236,7 +247,7 @@ function App() {
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <Loader2 className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
             <h2 className="text-xl font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
           </div>
         </div>
@@ -251,7 +262,17 @@ function App() {
 
   // Afficher le site principal
   return (
-    <>
+    <React.Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-16 h-16 text-yellow-600 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-light text-white mb-2 tracking-wider">
+            CERCLE PRIVÉ
+          </h2>
+          <p className="text-gray-400 font-light">Chargement du site...</p>
+        </div>
+      </div>
+    }>
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
         <MainSiteComponents.Navigation onAdminClick={isDevelopment ? toggleAdmin : undefined} />
         <MainSiteComponents.HeroSection />
@@ -268,7 +289,7 @@ function App() {
         <MainSiteComponents.PWAInstallPrompt />
       </div>
       <Toaster position="top-right" />
-    </>
+    </React.Suspense>
   );
 }
 

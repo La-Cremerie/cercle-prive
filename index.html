@@ -77,12 +77,24 @@
     <script>
       // Optimisation du chargement initial
       window.addEventListener('DOMContentLoaded', function() {
-        // Précharger les polices critiques
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap';
-        link.as = 'style';
-        document.head.appendChild(link);
+        // Gestion d'erreur pour éviter les pages blanches
+        window.addEventListener('error', function(e) {
+          console.error('Erreur de chargement:', e);
+          // Afficher un message d'erreur au lieu d'une page blanche
+          if (document.getElementById('root').innerHTML === '') {
+            document.getElementById('root').innerHTML = `
+              <div style="min-height: 100vh; background: #111827; display: flex; align-items: center; justify-content: center; color: white; text-align: center; font-family: system-ui;">
+                <div>
+                  <h1 style="color: #D97706; font-size: 1.5rem; margin-bottom: 1rem;">CERCLE PRIVÉ</h1>
+                  <p>Erreur de chargement. Veuillez rafraîchir la page.</p>
+                  <button onclick="window.location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #D97706; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
+                    Rafraîchir
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+        });
       });
     </script>
   </body>
