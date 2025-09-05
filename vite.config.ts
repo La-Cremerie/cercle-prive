@@ -44,7 +44,6 @@ export default defineConfig(({ mode }) => ({
     port: 4173,
     strictPort: true,
     host: true
-    }
   },
   server: {
     port: 5173,
