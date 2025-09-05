@@ -1,60 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import LoginForm from './components/LoginForm';
-import AdminLogin from './components/AdminLogin';
-import AdminPanel from './components/AdminPanel';
-import Navigation from './components/Navigation';
-import HeroSection from './components/HeroSection';
-import NotreAdnSection from './components/NotreAdnSection';
-import ServicesSection from './components/ServicesSection';
-import OffMarketSection from './components/OffMarketSection';
-import RechercheSection from './components/RechercheSection';
-import PropertyGallery from './components/PropertyGallery';
-import VendreSection from './components/VendreSection';
-import Chatbot from './components/Chatbot';
-import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Always start with login page - remove auto-login check
-    const adminLoggedIn = localStorage.getItem('adminLoggedIn');
-    if (adminLoggedIn === 'true') {
-      setIsAdminLoggedIn(true);
+    // Check if user is already logged in
+    const userLoggedIn = localStorage.getItem('userLoggedIn');
+    if (userLoggedIn === 'true') {
+      setIsLoggedIn(true);
     }
     setIsLoading(false);
   }, []);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-  };
-
-  const toggleAdmin = () => {
-    if (isAdminLoggedIn) {
-      setShowAdmin(!showAdmin);
-    } else {
-      setShowAdminLogin(true);
-    }
-  };
-
-  const handleAdminLoginSuccess = () => {
-    setIsAdminLoggedIn(true);
-    setShowAdminLogin(false);
-    setShowAdmin(true);
-  };
-
-  const handleAdminLogout = () => {
-    setIsAdminLoggedIn(false);
-    setShowAdmin(false);
-  };
-
-  const handleBackFromAdminLogin = () => {
-    setShowAdminLogin(false);
   };
 
   if (isLoading) {
@@ -69,43 +31,62 @@ function App() {
     return <LoginForm onLoginSuccess={handleLoginSuccess} />;
   }
 
-  if (showAdminLogin) {
-    return (
-      <>
-        <AdminLogin 
-          onLoginSuccess={handleAdminLoginSuccess}
-          onBack={handleBackFromAdminLogin}
-        />
-        <Toaster position="top-right" />
-      </>
-    );
-  }
-
-  if (showAdmin) {
-    return (
-      <>
-        <AdminPanel onLogout={handleAdminLogout} />
-        <Toaster position="top-right" />
-      </>
-    );
-  }
-
   return (
-    <>
-      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-        <Navigation onAdminClick={toggleAdmin} />
-        <HeroSection />
-        <NotreAdnSection />
-        <ServicesSection />
-        <OffMarketSection />
-        <RechercheSection />
-        <PropertyGallery />
-        <VendreSection />
-        <Chatbot />
-        <PWAInstallPrompt />
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center">
+          <h1 className="text-4xl font-light text-yellow-600 tracking-wide mb-8">
+            CERCLE PRIVÉ
+          </h1>
+          <div className="w-24 h-px bg-yellow-600 mx-auto mb-8"></div>
+          <p className="text-lg text-gray-700 dark:text-gray-300 font-light leading-relaxed max-w-3xl mx-auto mb-12">
+            Bienvenue dans votre espace dédié à l'immobilier de prestige en off-market. 
+            Découvrez nos biens d'exception sélectionnés avec soin pour votre patrimoine.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
+              <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-4">
+                Concept
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 font-light">
+                L'excellence immobilière en toute discrétion
+              </p>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
+              <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-4">
+                Services
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 font-light">
+                Accompagnement personnalisé pour vos projets
+              </p>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
+              <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-4">
+                Contact
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 font-light">
+                <a href="mailto:nicolas.c@lacremerie.fr" className="text-yellow-600 hover:text-yellow-700">
+                  nicolas.c@lacremerie.fr
+                </a>
+              </p>
+            </div>
+          </div>
+          
+          <div className="mt-16">
+            <a
+              href="mailto:nicolas.c@lacremerie.fr"
+              className="inline-block border border-yellow-600 text-yellow-600 px-8 py-3 text-sm font-light tracking-wider hover:bg-yellow-600 hover:text-white transition-all duration-300"
+            >
+              Entrer en relation
+            </a>
+          </div>
+        </div>
       </div>
       <Toaster position="top-right" />
-    </>
+    </div>
   );
 }
 
