@@ -345,4 +345,157 @@ const PresentationImageManager: React.FC = () => {
                 value={newImageUrl}
                 onChange={(e) => setNewImageUrl(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="https://images.pexels.com/photos
+                placeholder="https://images.pexels.com/photos/..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Nom de l'image
+              </label>
+              <input
+                type="text"
+                value={newImageName}
+                onChange={(e) => setNewImageName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Nom descriptif de l'image"
+              />
+            </div>
+            <button
+              onClick={addImageFromUrl}
+              className="w-full bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <Link className="w-4 h-4" />
+              <span>Ajouter depuis URL</span>
+            </button>
+          </div>
+        )}
+
+        {uploadMethod === 'file' && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Sélectionner un fichier
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                Maximum 100KB pour l'upload direct
+              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100"
+              />
+            </div>
+          </div>
+        )}
+
+        {uploadMethod === 'drive' && (
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+                Ajoutez une image depuis Google Drive en utilisant un lien de partage public.
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                Assurez-vous que votre image Google Drive est partagée publiquement
+              </p>
+            </div>
+            <button
+              onClick={handleGoogleDriveUpload}
+              className="w-full bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <Image className="w-4 h-4" />
+              <span>Ajouter depuis Google Drive</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Liste des images */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            Images {activeCategory === 'hero' ? 'Page d\'accueil' : 'Section Concept'} ({currentImages.length})
+          </h3>
+          <button
+            onClick={saveImages}
+            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center space-x-2"
+          >
+            <Save className="w-4 h-4" />
+            <span>Sauvegarder</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {currentImages.map((image) => (
+            <motion.div
+              key={image.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={`relative group rounded-lg overflow-hidden border-2 transition-all ${
+                image.isActive
+                  ? 'border-yellow-500 shadow-lg'
+                  : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+              }`}
+            >
+              {/* Image */}
+              <div className="aspect-video bg-gray-100 dark:bg-gray-700">
+                <img
+                  src={image.url}
+                  alt={image.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=400';
+                  }}
+                />
+              </div>
+
+              {/* Overlay actif */}
+              {image.isActive && (
+                <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded-md text-xs font-medium">
+                  Active
+                </div>
+              )}
+
+              {/* Informations */}
+              <div className="p-4 bg-white dark:bg-gray-800">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium text-gray-900 dark:text-white truncate">
+                    {image.name}
+                  </h4>
+                  <div className="flex items-center space-x-1 text-gray-500 dark:text-gray-400">
+                    {getTypeIcon(image.type)}
+                    <span className="text-xs">{getTypeLabel(image.type)}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex space-x-2">
+                  {!image.isActive && (
+                    <button
+                      onClick={() => setActiveImage(image.id)}
+                      className="flex-1 bg-yellow-600 text-white px-3 py-2 rounded-md hover:bg-yellow-700 transition-colors text-sm flex items-center justify-center space-x-1"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>Activer</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => deleteImage(image.id)}
+                    className="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center justify-center"
+                    title="Supprimer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PresentationImageManager;
