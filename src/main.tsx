@@ -126,10 +126,5 @@ try {
   if (loader) {
     loader.style.display = 'none';
   }
-}
-          Recharger la page
-        </button>
-      </div>
-    `;
   }
 }
