@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
 import LoginForm from './components/LoginForm';
 
 // Composants principaux
@@ -20,35 +19,54 @@ import Footer from './components/Footer';
 import ContactSection from './components/ContactSection';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [appReady, setAppReady] = useState(false);
 
-  // Initialisation simple
+  // Initialisation ultra-simple et robuste
   useEffect(() => {
-    // Vérifier les connexions
-    const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-    const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
-    
-    setIsUserLoggedIn(userLoggedIn);
-    setIsAdminLoggedIn(adminLoggedIn);
-    
-    // Masquer le loader après un délai court
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Vérifier les connexions de manière sécurisée
+      const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+      const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+      
+      setIsUserLoggedIn(userLoggedIn);
+      setIsAdminLoggedIn(adminLoggedIn);
+      setAppReady(true);
+      
+      // Masquer le loader HTML
       document.body.classList.add('app-ready');
-    }, 1000);
+      const loader = document.getElementById('emergency-loader');
+      if (loader) {
+        loader.style.display = 'none';
+      }
+    } catch (error) {
+      console.warn('Erreur initialisation:', error);
+      // En cas d'erreur, continuer quand même
+      setAppReady(true);
+      document.body.classList.add('app-ready');
+    }
   }, []);
 
   const handleLoginSuccess = () => {
     setIsUserLoggedIn(true);
   };
 
-  // Loading state simple
-  if (isLoading) {
-    return null; // Le loader HTML s'occupe de l'affichage
+  // Attendre que l'app soit prête
+  if (!appReady) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-light text-yellow-600 tracking-wider mb-4">
+            CERCLE PRIVÉ
+          </h1>
+          <div className="w-8 h-8 border-2 border-gray-600 border-t-yellow-600 rounded-full animate-spin mx-auto"></div>
+        </div>
+      </div>
+    );
   }
 
   const toggleAdmin = () => {

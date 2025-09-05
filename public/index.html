@@ -27,7 +27,7 @@
     <title>CERCLE PRIVÉ - Immobilier de Prestige</title>
     
     <style>
-      /* Fallback CSS critique pour éviter la page blanche */
+      /* CSS critique pour éviter la page blanche - Version ultra-robuste */
       body {
         margin: 0;
         padding: 0;
@@ -35,22 +35,18 @@
         background: #111827;
         color: white;
         overflow-x: hidden;
-      }
-      
-      /* Loader de secours ultra-robuste */
-      #emergency-loader {
-        position: fixed;
+        visibility: hidden;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+      /* Assurer que le root est visible */
+      #root { min-height: 100vh; background: #111827; }
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         z-index: 10000;
         transition: opacity 0.5s ease-out;
+        visibility: visible !important;
       }
       
       .emergency-title {
@@ -121,7 +117,7 @@
         100% { transform: rotate(360deg); }
       }
       
-      @keyframes fadeInUp {
+      /* Masquer le loader seulement quand l'app est vraiment prête */
         0% { opacity: 0; transform: translateY(20px); }
         100% { opacity: 1; transform: translateY(0); }
       }
