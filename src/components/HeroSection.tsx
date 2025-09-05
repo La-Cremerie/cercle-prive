@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { Loader2 } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   const [backgroundImage, setBackgroundImage] = useState(() => {
