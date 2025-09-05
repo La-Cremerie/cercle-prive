@@ -4,8 +4,6 @@ import App from './App';
 import './index.css';
 import { ErrorBoundaryManager } from './utils/errorBoundary';
 import { PerformanceOptimizer } from './utils/performance';
-import { ErrorBoundaryManager } from './utils/errorBoundary';
-import { PerformanceOptimizer } from './utils/performance';
 
 // Diagnostic et récupération automatique
 console.log('🔧 Main.tsx - Initialisation du diagnostic');
