@@ -1,226 +1,127 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solutions web professionnelles et créatives. Développement de sites web modernes, responsive et optimisés pour votre entreprise.">
-    <meta name="keywords" content="développement web, site internet, responsive design, solutions digitales">
-    <meta name="author" content="MonSite Web">
-    <meta name="robots" content="index, follow">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- Open Graph -->
-    <meta property="og:title" content="MonSite - Solutions Web Professionnelles">
-    <meta property="og:description" content="Créateur de sites web modernes et performants">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://monsite.com">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#D97706" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="OFF MARKET" />
+    <meta name="description" content="L'excellence immobilière en toute discrétion - Biens de prestige en off-market" />
+    <meta name="language" content="fr" />
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
     
-    <title>MonSite - Solutions Web Professionnelles | Accueil</title>
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- HTTPS Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains">
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <!-- Skip to main content for accessibility -->
-    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    <title>CERCLE PRIVÉ - Site Immobilier de Luxe</title>
+  </head>
+  <body>
+    <style>
+      /* Loader optimisé HTTPS - Disparition automatique */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #111827;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+      }
+      
+      .loader-title {
+        color: #D97706;
+        font-size: 1.5rem;
+        font-weight: 300;
+        letter-spacing: 0.1em;
+        margin-bottom: 1rem;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      
+      .loader-spinner {
+        width: 2rem;
+        height: 2rem;
+        border: 3px solid #374151;
+        border-top: 3px solid #D97706;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Masquer automatiquement le loader */
+      .react-loaded #initial-loader {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      /* Fallback si React ne charge pas */
+      body:not(.react-loaded) #initial-loader {
+        animation: fadeOut 0.5s ease-out 3s forwards;
+      }
+      
+      @keyframes fadeOut {
+        to { opacity: 0; pointer-events: none; }
+      }
+      
+      /* Fallback si React ne charge pas */
+      body:not(.react-loaded) #initial-loader {
+        animation: fadeOut 0.5s ease-out 3s forwards;
+      }
+      
+      @keyframes fadeOut {
+        to { opacity: 0; pointer-events: none; }
+      }
+    </style>
     
-    <!-- Header -->
-    <header class="header" role="banner">
-        <nav class="nav" role="navigation" aria-label="Navigation principale">
-            <div class="nav-container">
-                <a href="index.html" class="nav-logo" aria-label="Retour à l'accueil">
-                    <span>MonSite</span>
-                </a>
-                
-                <button class="nav-toggle" aria-label="Ouvrir le menu de navigation" aria-expanded="false">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                </button>
-                
-                <ul class="nav-menu" role="menubar">
-                    <li role="none"><a href="index.html" class="nav-link active" role="menuitem">Accueil</a></li>
-                    <li role="none"><a href="pages/about.html" class="nav-link" role="menuitem">À propos</a></li>
-                    <li role="none"><a href="pages/services.html" class="nav-link" role="menuitem">Services</a></li>
-                    <li role="none"><a href="pages/portfolio.html" class="nav-link" role="menuitem">Portfolio</a></li>
-                    <li role="none"><a href="pages/contact.html" class="nav-link" role="menuitem">Contact</a></li>
-                </ul>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main id="main-content" role="main">
-        <!-- Hero Section -->
-        <section class="hero" aria-labelledby="hero-title">
-            <div class="container">
-                <div class="hero-content">
-                    <h1 id="hero-title" class="hero-title">
-                        Solutions Web <span class="highlight">Professionnelles</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Nous créons des sites web modernes, performants et sur-mesure pour faire grandir votre entreprise
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="pages/services.html" class="btn btn-primary">Découvrir nos services</a>
-                        <a href="pages/contact.html" class="btn btn-secondary">Nous contacter</a>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <picture>
-                        <source srcset="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop" media="(min-width: 768px)">
-                        <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop" 
-                             alt="Équipe de développeurs travaillant sur des projets web innovants" 
-                             loading="eager"
-                             width="600" 
-                             height="400">
-                    </picture>
-                </div>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section class="features" aria-labelledby="features-title">
-            <div class="container">
-                <h2 id="features-title" class="section-title">Pourquoi Nous Choisir ?</h2>
-                <p class="section-subtitle">Des solutions adaptées à vos besoins avec une expertise reconnue</p>
-                
-                <div class="features-grid">
-                    <article class="feature-card">
-                        <div class="feature-icon" aria-hidden="true">🚀</div>
-                        <h3>Performance Optimale</h3>
-                        <p>Sites web ultra-rapides optimisés pour le référencement et l'expérience utilisateur. Temps de chargement garantis sous 3 secondes.</p>
-                    </article>
-                    
-                    <article class="feature-card">
-                        <div class="feature-icon" aria-hidden="true">📱</div>
-                        <h3>Design Responsive</h3>
-                        <p>Interfaces parfaitement adaptées à tous les écrans : mobile, tablette et desktop. Design mobile-first pour une expérience optimale.</p>
-                    </article>
-                    
-                    <article class="feature-card">
-                        <div class="feature-icon" aria-hidden="true">🎨</div>
-                        <h3>Design Sur-Mesure</h3>
-                        <p>Créations uniques qui reflètent votre identité de marque. Interface intuitive et moderne pour captiver vos visiteurs.</p>
-                    </article>
-                    
-                    <article class="feature-card">
-                        <div class="feature-icon" aria-hidden="true">🔒</div>
-                        <h3>Sécurité Renforcée</h3>
-                        <p>Protection avancée contre les menaces web. Certificats SSL, sauvegardes automatiques et mises à jour de sécurité.</p>
-                    </article>
-                    
-                    <article class="feature-card">
-                        <div class="feature-icon" aria-hidden="true">📈</div>
-                        <h3>SEO Optimisé</h3>
-                        <p>Référencement naturel intégré dès la conception. Structure optimisée pour améliorer votre visibilité sur Google.</p>
-                    </article>
-                    
-                    <article class="feature-card">
-                        <div class="feature-icon" aria-hidden="true">🛠️</div>
-                        <h3>Support Continu</h3>
-                        <p>Accompagnement personnalisé et maintenance technique. Support réactif pour assurer la pérennité de votre site.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- Stats Section -->
-        <section class="stats" aria-labelledby="stats-title">
-            <div class="container">
-                <h2 id="stats-title" class="section-title">Nos Résultats en Chiffres</h2>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number" data-target="150">0</div>
-                        <div class="stat-label">Projets Réalisés</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" data-target="98">0</div>
-                        <div class="stat-label">% Clients Satisfaits</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" data-target="24">0</div>
-                        <div class="stat-label">Heures Support/Mois</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" data-target="4">0</div>
-                        <div class="stat-label">Années d'Expérience</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="cta" aria-labelledby="cta-title">
-            <div class="container">
-                <div class="cta-content">
-                    <h2 id="cta-title">Prêt à Démarrer Votre Projet ?</h2>
-                    <p>Contactez-nous dès aujourd'hui pour une consultation gratuite et découvrez comment nous pouvons transformer votre présence en ligne.</p>
-                    <a href="pages/contact.html" class="btn btn-primary">Commencer Maintenant</a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer" role="contentinfo">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>MonSite</h3>
-                    <p>Solutions web professionnelles depuis 2020. Nous transformons vos idées en expériences digitales exceptionnelles.</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="Suivez-nous sur Facebook" class="social-link">📘</a>
-                        <a href="#" aria-label="Suivez-nous sur Twitter" class="social-link">🐦</a>
-                        <a href="#" aria-label="Suivez-nous sur LinkedIn" class="social-link">💼</a>
-                        <a href="#" aria-label="Suivez-nous sur Instagram" class="social-link">📷</a>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Services</h4>
-                    <ul>
-                        <li><a href="pages/services.html">Développement Web</a></li>
-                        <li><a href="pages/services.html">Design UX/UI</a></li>
-                        <li><a href="pages/services.html">E-commerce</a></li>
-                        <li><a href="pages/services.html">Maintenance</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Entreprise</h4>
-                    <ul>
-                        <li><a href="pages/about.html">À propos</a></li>
-                        <li><a href="pages/portfolio.html">Portfolio</a></li>
-                        <li><a href="pages/contact.html">Contact</a></li>
-                        <li><a href="pages/blog.html">Blog</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <address>
-                        <p>📧 contact@monsite.fr</p>
-                        <p>📞 +33 1 23 45 67 89</p>
-                        <p>📍 123 Rue de la Tech, 75001 Paris</p>
-                    </address>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 MonSite. Tous droits réservés. | <a href="pages/privacy.html">Politique de confidentialité</a> | <a href="pages/terms.html">Mentions légales</a></p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JavaScript -->
-    <script src="js/script.js"></script>
-</body>
-</html>
+    <!-- Loader initial ultra-simplifié -->
+    <div id="initial-loader">
+      <h1 class="loader-title">CERCLE PRIVÉ</h1>
+      <div class="loader-spinner"></div>
+    </div>
+    
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+      // Timeout de sécurité HTTPS - Version robuste
+      setTimeout(function() {
+        document.body.classList.add('react-loaded');
+        // Supprimer le loader après activation
+        var loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.display = 'none';
+        }
+      }, 3000); // 3 secondes max pour HTTPS
+      
+      // Fallback d'urgence si React ne charge pas
+      setTimeout(function() {
+        if (!document.body.classList.contains('react-loaded')) {
+          console.warn('React non chargé - Fallback d\'urgence');
+          document.body.classList.add('react-loaded');
+          var loader = document.getElementById('initial-loader');
+          if (loader) {
+            loader.style.display = 'none';
+          }
+        }
+      }, 8000); // Fallback à 8 secondes
+    </script>
