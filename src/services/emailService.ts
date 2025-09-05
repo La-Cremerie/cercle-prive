@@ -10,14 +10,14 @@ export class EmailService {
       adminNotification: true,
       emailTemplate: `Bonjour {prenom} {nom},
 
-Merci pour votre inscription sur OFF MARKET.
+Merci pour votre inscription sur CERCLE PRIVÉ.
 
 Nous sommes ravis de vous compter parmi nos clients privilégiés. Vous recevrez prochainement des informations exclusives sur nos biens immobiliers de prestige en off-market.
 
 Notre équipe vous contactera sous peu pour discuter de vos projets immobiliers.
 
 Cordialement,
-L'équipe OFF MARKET
+L'équipe CERCLE PRIVÉ
 
 ---
 Ce message a été envoyé automatiquement. Pour toute question, contactez-nous à nicolas.c@lacremerie.fr`
@@ -43,7 +43,6 @@ Ce message a été envoyé automatiquement. Pour toute question, contactez-nous 
       // Simulation d'envoi d'email (en production, utilisez un service comme SendGrid, Mailgun, etc.)
       const emailContent = this.replaceTemplateVariables(settings.emailTemplate, user);
       
-      // Ici vous intégreriez votre service d'email réel
       console.log('Envoi email de bienvenue à:', user.email);
       console.log('Contenu:', emailContent);
       
@@ -67,9 +66,9 @@ Ce message a été envoyé automatiquement. Pour toute question, contactez-nous 
     try {
       // Email de notification pour l'admin
       const adminEmail = 'nicolas.c@lacremerie.fr';
-      const subject = `OFF MARKET - Nouvelle inscription - ${user.prenom} ${user.nom}`;
+      const subject = `CERCLE PRIVÉ - Nouvelle inscription - ${user.prenom} ${user.nom}`;
       const content = `
-Nouvelle inscription sur le site OFF MARKET :
+Nouvelle inscription sur le site CERCLE PRIVÉ :
 
 Nom : ${user.nom}
 Prénom : ${user.prenom}
