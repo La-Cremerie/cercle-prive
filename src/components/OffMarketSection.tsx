@@ -104,7 +104,7 @@ const OffMarketSection: React.FC = () => {
                   <div>
                     <p className="text-gray-300 font-light leading-relaxed flex items-start">
                       <span className="w-2 h-2 bg-amber-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      Pas de traces visibles sur les plateformes, ce qui évite qu'un bien soit "brûlé" s\'il reste trop longtemps en ligne.
+                      Pas de traces visibles sur les plateformes, ce qui évite qu'un bien soit "brûlé" s'il reste trop longtemps en ligne.
                     </p>
                   </div>
                 </div>

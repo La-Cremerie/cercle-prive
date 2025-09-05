@@ -58,7 +58,7 @@ const NotreAdnSection: React.FC = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
-                  Travaux et ameublement pensés pour la valorisation
+                  Travaux et ameublement conçus pour la valorisation
                 </li>
                 <li className="flex items-start">
                   <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>

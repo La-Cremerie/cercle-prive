@@ -436,7 +436,7 @@ const RechercheSection: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                      Est-ce que vous allez faire un prêt pour cet achat ?
+                      Allez-vous faire un prêt pour cet achat ?
                     </label>
                     <div className="space-y-2">
                       <label className="flex items-center space-x-2">

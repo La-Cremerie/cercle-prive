@@ -283,7 +283,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   Panel d'Administration
                 </h1>
                 <p className="text-sm text-gray-600 font-light">
-                  Gestion des inscriptions et statistiques
+                  Gestion des inscriptions et des statistiques
                 </p>
               </div>
             </div>
