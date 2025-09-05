@@ -13,12 +13,11 @@ import PropertyGallery from './components/PropertyGallery';
 import VendreSection from './components/VendreSection';
 import ContactSection from './components/ContactSection';
 import LoginForm from './components/LoginForm';
-import AdminLogin from './components/AdminLogin';
 import Chatbot from './components/Chatbot';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 // Simple Admin Panel Component
-const SimpleAdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
+const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [users, setUsers] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('users');
   const [isLoading, setIsLoading] = useState(true);
@@ -361,7 +360,7 @@ function App() {
   if (isAdminLoggedIn) {
     return (
       <>
-        <SimpleAdminPanel onLogout={handleAdminLogout} />
+        <AdminPanel onLogout={handleAdminLogout} />
         <Toaster position="top-right" />
       </>
     );
