@@ -1,22 +1,72 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
+import LoginForm from './components/LoginForm';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Vérifier si l'utilisateur est déjà connecté
+    const userLoggedIn = localStorage.getItem('userLoggedIn');
+    setIsLoggedIn(userLoggedIn === 'true');
+    setIsLoading(false);
+  }, []);
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userLoggedIn');
+    localStorage.removeItem('userData');
+    setIsLoggedIn(false);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="font-light">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <>
+        <LoginForm onLoginSuccess={handleLoginSuccess} />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <>
+      <div className="min-h-screen bg-gray-900 text-white">
       {/* Navigation */}
-      <nav className="bg-black/20 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
+        <nav className="bg-black/20 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <h1 className="text-xl font-light tracking-wider">CERCLE PRIVÉ</h1>
-            <div className="hidden md:flex space-x-8">
+            <div className="hidden md:flex items-center space-x-8">
               <a href="#concept" className="text-sm font-light hover:text-yellow-500 transition-colors">CONCEPT</a>
               <a href="#services" className="text-sm font-light hover:text-yellow-500 transition-colors">SERVICES</a>
               <a href="#biens" className="text-sm font-light hover:text-yellow-500 transition-colors">BIENS</a>
               <a href="#contact" className="text-sm font-light hover:text-yellow-500 transition-colors">CONTACT</a>
+              <button
+                onClick={handleLogout}
+                className="text-sm font-light text-red-400 hover:text-red-300 transition-colors"
+              >
+                DÉCONNEXION
+              </button>
             </div>
           </div>
         </div>
-      </nav>
+        </nav>
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center">
@@ -190,6 +240,8 @@ function App() {
         </div>
       </section>
     </div>
+      <Toaster position="top-right" />
+    </>
   );
 }
 

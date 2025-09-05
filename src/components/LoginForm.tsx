@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { User, Phone, Mail, UserCheck, Eye, EyeOff } from 'lucide-react';
 import { UserService } from '../services/userService';
 import { EmailService } from '../services/emailService';
-import { useTranslation } from 'react-i18next';
 import type { NewUserRegistration } from '../types/database';
 import toast from 'react-hot-toast';
 
@@ -18,7 +17,6 @@ interface FormData {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
-  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     nom: '',
     prenom: '',
@@ -176,14 +174,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           </p>
         </div>
 
-        <div className="flex mb-6 bg-white/5 rounded-lg p-1">
+        <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
           <button
             type="button"
             onClick={() => setIsLogin(false)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
               !isLogin
-                ? 'bg-white text-slate-900 shadow-lg'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             Inscription
@@ -193,8 +191,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             onClick={() => setIsLogin(true)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
               isLogin
-                ? 'bg-white text-slate-900 shadow-lg'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             Connexion
@@ -320,12 +318,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             disabled={isLoading}
             className="w-full bg-yellow-600 text-white py-3 px-4 rounded-md hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Inscription en cours...' : 'Accéder au site'}
+            {isLoading ? (isLogin ? 'Connexion...' : 'Inscription...') : (isLogin ? 'Se connecter' : 'Accéder au site')}
           </button>
         </form>
 
         <p className="text-xs text-gray-500 text-center mt-6 font-light">
           En vous inscrivant, vous acceptez de recevoir des informations sur nos biens immobiliers de prestige.
+          
+          {!isLogin && (
+            <span className="block mt-2">
+              Déjà membre ?{' '}
+              <button
+                type="button"
+                onClick={() => setIsLogin(true)}
+                className="text-yellow-600 hover:text-yellow-700 underline"
+              >
+                Se connecter ici
+              </button>
+            </span>
+          )}
           
           {isLogin && (
             <span className="block mt-2">
