@@ -1,3 +1,106 @@
+    try {
+      await AdminService.deactivateAdmin(adminId);
+      toast.success('Administrateur désactivé');
+      loadAdmins();
+    } catch (error) {
+      toast.error('Erreur lors de la désactivation');
+    }
+  };
+
+  const handleDelete = async (adminId: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet administrateur ?')) {
+      try {
+        await AdminService.deleteAdmin(adminId);
+        toast.success('Administrateur supprimé');
+        loadAdmins();
+      } catch (error) {
+        toast.error('Erreur lors de la suppression');
+      }
+    }
+  };
+
+  const handleEdit = (admin: AdminUser) => {
+    setEditingAdmin(admin);
+    setFormData({
+      email: admin.email,
+      password: '',
+      nom: admin.nom,
+      prenom: admin.prenom,
+      role: admin.role
+    });
+    
+    // Charger les permissions existantes
+    const adminPermissions = permissions[admin.id] || [];
+    const permissionsMap: Partial<Record<AdminModule, { read: boolean; write: boolean; delete: boolean }>> = {};
+    
+    adminPermissions.forEach(perm => {
+      permissionsMap[perm.module as AdminModule] = {
+        read: perm.can_read,
+        write: perm.can_write,
+        delete: perm.can_delete
+      };
+    });
+    
+    setSelectedPermissions(permissionsMap);
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.email || !formData.nom || !formData.prenom) {
+      toast.error('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+
+    if (!editingAdmin && !formData.password) {
+      toast.error('Le mot de passe est requis pour un nouvel administrateur');
+      return;
+    }
+
+    try {
+      if (editingAdmin) {
+        // Mise à jour des permissions uniquement
+        await AdminService.updateAdminPermissions(editingAdmin.id, selectedPermissions);
+        toast.success('Permissions mises à jour');
+      } else {
+        // Création d'un nouvel admin
+        await AdminService.createAdmin({
+          email: formData.email,
+          password: formData.password,
+          nom: formData.nom,
+          prenom: formData.prenom,
+          role: formData.role,
+          permissions: selectedPermissions,
+          createdBy: currentUser.id
+        });
+        toast.success('Administrateur créé (en attente de validation)');
+      }
+      
+      setShowForm(false);
+      resetForm();
+      loadAdmins();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'opération';
+      toast.error(errorMessage);
+    }
+  };
+
+  const handlePermissionChange = (
+    module: AdminModule,
+    action: 'read' | 'write' | 'delete',
+    value: boolean
+  ) => {
+    setSelectedPermissions(prev => ({
+      ...prev,
+      [module]: {
+        read: prev[module]?.read || false,
+        write: prev[module]?.write || false,
+        delete: prev[module]?.delete || false,
+        ...prev[module],
+        [action]: value
+      }
+    }));
 import React, { useState, useEffect } from 'react';
 import { Users, Plus, Edit, Trash2, Shield, Eye, EyeOff, Save, X, UserCheck, UserX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -102,6 +205,8 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
         [action]: value
       }
     }));
+  };
+
   const getRoleColor = (role: AdminUser['role']) => {
     switch (role) {
       case 'super_admin': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
@@ -127,6 +232,65 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
     }
   };
 
+  const handleEdit = (admin: AdminUser) => {
+    setEditingAdmin(admin);
+    setFormData({
+      email: admin.email,
+      password: '',
+      nom: admin.nom,
+      prenom: admin.prenom,
+      role: admin.role
+    });
+    
+    // Charger les permissions existantes
+    const adminPermissions = permissions[admin.id] || [];
+    const permissionsMap: Partial<Record<AdminModule, { read: boolean; write: boolean; delete: boolean }>> = {};
+    
+    adminPermissions.forEach(permission => {
+      if (!permissionsMap[permission.module]) {
+        permissionsMap[permission.module] = { read: false, write: false, delete: false };
+      }
+      permissionsMap[permission.module]![permission.action] = true;
+    });
+    
+    setSelectedPermissions(permissionsMap);
+    setShowForm(true);
+  };
+
+  const handleDeactivate = async (adminId: string) => {
+    try {
+      await AdminService.deactivateAdmin(adminId);
+      toast.success('Administrateur désactivé');
+      loadAdmins();
+    } catch (error) {
+      toast.error('Erreur lors de la désactivation');
+    }
+  };
+
+  const handleDelete = async (adminId: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet administrateur ?')) {
+      try {
+        await AdminService.deleteAdmin(adminId);
+        toast.success('Administrateur supprimé');
+        loadAdmins();
+      } catch (error) {
+        toast.error('Erreur lors de la suppression');
+      }
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      if (editingAdmin) {
+        // Mise à jour des permissions
+        await AdminService.updateAdminPermissions(editingAdmin.id, selectedPermissions);
+        toast.success('Permissions mises à jour');
+      } else {
+        // Création d'un nouvel admin
+        await AdminService.createAdmin(formData, selectedPermissions);
+        toast.success('Administrateur créé');
   if (currentUser.role !== 'super_admin') {
     return (
       <div className="text-center py-12">
@@ -420,109 +584,5 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
                           formData.role === role.name
                             ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
                             : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+  const handleDeactivate = async (adminId: string) => {
                         }`}
-                      >
-                        <input
-                          type="radio"
-                          name="role"
-                          value={role.name}
-                          checked={formData.role === role.name}
-                          onChange={() => handleRoleChange(role.name as AdminUser['role'])}
-                          className="sr-only"
-                        />
-                        <div className={`text-sm font-medium mb-2 ${getRoleColor(role.name as AdminUser['role'])} inline-block px-2 py-1 rounded`}>
-                          {role.label}
-                        </div>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {role.description}
-                        </p>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Permissions détaillées */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                    Permissions par module
-                  </label>
-                  <div className="space-y-4">
-                    {modules.map((module) => (
-                      <div key={module.key} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                              {module.label}
-                            </h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {module.description}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-3 gap-4">
-                          <label className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              checked={selectedPermissions[module.key]?.read || false}
-                              onChange={(e) => handlePermissionChange(module.key, 'read', e.target.checked)}
-                              className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
-                            />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">Lecture</span>
-                          </label>
-                          
-                          <label className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              checked={selectedPermissions[module.key]?.write || false}
-                              onChange={(e) => handlePermissionChange(module.key, 'write', e.target.checked)}
-                              className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
-                            />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">Écriture</span>
-                          </label>
-                          
-                          <label className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              checked={selectedPermissions[module.key]?.delete || false}
-                              onChange={(e) => handlePermissionChange(module.key, 'delete', e.target.checked)}
-                              className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
-                            />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">Suppression</span>
-                          </label>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Boutons d'action */}
-                <div className="flex space-x-4 pt-6">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowForm(false);
-                      resetForm();
-                    }}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>{editingAdmin ? 'Mettre à jour' : 'Créer'}</span>
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-export default AdminUserManagement;
