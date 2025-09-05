@@ -164,7 +164,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-light text-gray-900 tracking-wider">
-            OFF MARKET
+            CERCLE PRIVÉ
           </h1>
           <p className="text-sm text-gray-600 font-light mt-2">
             Bienvenue dans votre espace dédié à l'immobilier en toute discrétion
