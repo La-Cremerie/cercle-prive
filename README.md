@@ -63,11 +63,11 @@ Site web statique moderne, responsive et optimisé pour les performances. Conçu
 # Ouvrir index.html dans un navigateur
 # Ou utiliser un serveur local :
 
-# Avec Python
-python -m http.server 8000
-
 # Avec Node.js (http-server)
 npx http-server
+
+# Avec Node.js (serveur simple)
+npx serve .
 
 # Avec PHP
 php -S localhost:8000
