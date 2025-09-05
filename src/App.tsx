@@ -207,6 +207,33 @@ function App() {
     }
   };
 
+  const handleLoginSuccess = () => {
+    setIsUserLoggedIn(true);
+  };
+
+  const toggleAdmin = () => {
+    if (isAdminLoggedIn) {
+      setShowAdmin(!showAdmin);
+    } else {
+      setShowAdminLogin(true);
+    }
+  };
+
+  const handleAdminLoginSuccess = () => {
+    setIsAdminLoggedIn(true);
+    setShowAdminLogin(false);
+    setShowAdmin(true);
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminLoggedIn(false);
+    setShowAdmin(false);
+  };
+
+  const handleBackFromAdminLogin = () => {
+    setShowAdminLogin(false);
+  };
+
   try {
     // Formulaire de connexion
     if (!isUserLoggedIn) {
@@ -371,247 +398,6 @@ function App() {
     setErrorMessage(error instanceof Error ? error.message : 'Erreur de rendu critique');
     return null;
   }
-
-  // Fonctions de gestion (déplacées ici pour éviter les erreurs de scope)
-  function handleLoginSuccess() {
-    setIsUserLoggedIn(true);
-  }
-
-  function toggleAdmin() {
-    if (isAdminLoggedIn) {
-      setShowAdmin(!showAdmin);
-    } else {
-      setShowAdminLogin(true);
-    }
-  }
-
-  function handleAdminLoginSuccess() {
-    setIsAdminLoggedIn(true);
-    setShowAdminLogin(false);
-    setShowAdmin(true);
-  }
-
-  function handleAdminLogout() {
-    setIsAdminLoggedIn(false);
-    setShowAdmin(false);
-  }
-
-  function handleBackFromAdminLogin() {
-    setShowAdminLogin(false);
-  }
-}
-
-// Layout pour les pages avec navigation
-const PageLayout: React.FC<{ children: React.ReactNode; showAdmin?: boolean; onAdminClick?: () => void }> = ({ 
-  children, 
-  showAdmin = false, 
-  onAdminClick 
-}) => (
-  <div className="min-h-screen bg-white dark:bg-gray-900">
-    <Navigation onAdminClick={onAdminClick} />
-    <main>{children}</main>
-    <Footer />
-    {showAdmin && <Chatbot />}
-    <PWAInstallPrompt />
-  </div>
-);
-
-export default App;
-      
-      // Mesurer les performances
-      setTimeout(() => {
-        performanceOptimizer.measureWebVitals();
-        console.log('📊 Métriques collectées');
-      }, 1000);
-    }, 800);
-  }, []);
-
-  const handleLoginSuccess = () => {
-    setIsUserLoggedIn(true);
-  };
-
-  const toggleAdmin = () => {
-    if (isAdminLoggedIn) {
-      setShowAdmin(!showAdmin);
-    } else {
-      setShowAdminLogin(true);
-    }
-  };
-
-  const handleAdminLoginSuccess = () => {
-    setIsAdminLoggedIn(true);
-    setShowAdminLogin(false);
-    setShowAdmin(true);
-  };
-
-  const handleAdminLogout = () => {
-    setIsAdminLoggedIn(false);
-    setShowAdmin(false);
-  };
-
-  const handleBackFromAdminLogin = () => {
-    setShowAdminLogin(false);
-  };
-
-  // Loading state
-  if (isLoading) {
-    return null;
-  }
-
-  // Formulaire de connexion
-  if (!isUserLoggedIn) {
-    return (
-      <>
-        <LoginForm onLoginSuccess={handleLoginSuccess} />
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#1F2937',
-              color: '#F9FAFB',
-              border: '1px solid #374151'
-            }
-          }}
-        />
-      </>
-    );
-  }
-
-  // Admin panel
-  if (showAdmin && import.meta.env.DEV) {
-    return (
-      <>
-        <AdminPanel onLogout={handleAdminLogout} />
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#1F2937',
-              color: '#F9FAFB',
-              border: '1px solid #374151'
-            }
-          }}
-        />
-      </>
-    );
-  }
-
-  // Admin login
-  if (showAdminLogin && import.meta.env.DEV) {
-    return (
-      <>
-        <AdminLogin 
-          onLoginSuccess={handleAdminLoginSuccess}
-          onBack={handleBackFromAdminLogin}
-        />
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#1F2937',
-              color: '#F9FAFB',
-              border: '1px solid #374151'
-            }
-          }}
-        />
-      </>
-    );
-  }
-
-  // Application principale avec routage
-  return (
-    <Router>
-      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-        <Routes>
-          {/* Page d'accueil */}
-          <Route path="/" element={
-            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
-              <Navigation onAdminClick={toggleAdmin} />
-              <HeroSection />
-              <NotreAdnSection />
-              <ServicesSection />
-              <OffMarketSection />
-              <RechercheSection />
-              <PropertyGallery />
-              <VendreSection />
-              <ContactSection />
-              <Footer />
-              {import.meta.env.DEV && <Chatbot />}
-              <PWAInstallPrompt />
-            </PageLayout>
-          } />
-          
-          {/* Pages statiques converties */}
-          <Route path="/about" element={
-            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
-              <About />
-            </PageLayout>
-          } />
-          
-          <Route path="/services" element={
-            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
-              <Services />
-            </PageLayout>
-          } />
-          
-          <Route path="/portfolio" element={
-            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
-              <Portfolio />
-            </PageLayout>
-          } />
-          
-          <Route path="/blog" element={
-            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
-              <Blog />
-            </PageLayout>
-          } />
-          
-          <Route path="/contact" element={
-            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
-              <Contact />
-            </PageLayout>
-          } />
-          
-          {/* Page 404 */}
-          <Route path="/404" element={
-            <PageLayout showAdmin={import.meta.env.DEV} onAdminClick={toggleAdmin}>
-              <NotFound />
-            </PageLayout>
-          } />
-          
-          {/* Redirection pour toutes les autres routes */}
-          <Route path="*" element={<Navigate to="/404" replace />} />
-        </Routes>
-
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#1F2937',
-              color: '#F9FAFB',
-              border: '1px solid #374151'
-            },
-            success: {
-              iconTheme: {
-                primary: '#10B981',
-                secondary: '#F9FAFB'
-              }
-            },
-            error: {
-              iconTheme: {
-                primary: '#EF4444',
-                secondary: '#F9FAFB'
-              }
-            }
-          }}
-        />
-      </div>
-    </Router>
-  );
 }
 
 export default App;
