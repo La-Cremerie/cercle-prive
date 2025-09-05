@@ -87,6 +87,7 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
     }
   };
 
+  // Single handleActivate function - no duplicates
   const handleActivate = async (adminId: string) => {
     try {
       await AdminService.activateAdmin(adminId);

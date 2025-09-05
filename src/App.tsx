@@ -15,8 +15,6 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import AdminLogin from './components/AdminLogin';
 import AdminPanel from './components/AdminPanel';
 import Chatbot from './components/Chatbot';
-import Footer from './components/Footer';
-import ContactSection from './components/ContactSection';
 
 // Fallback de chargement
 const LoadingFallback = () => (

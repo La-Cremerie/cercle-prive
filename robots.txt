@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://monsite.fr/sitemap.xml
+Sitemap: https://cercle-prive.luxe/sitemap.xml
 
 # Bloquer les dossiers sensibles
 Disallow: /css/
