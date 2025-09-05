@@ -1,127 +1,115 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#D97706" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="OFF MARKET" />
-    <meta name="description" content="L'excellence immobilière en toute discrétion - Biens de prestige en off-market" />
-    <meta name="language" content="fr" />
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="/icon-192.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
-    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
-    
-    <!-- Manifest -->
-    <link rel="manifest" href="/manifest.json" />
-    
-    <!-- HTTPS Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains">
-    
-    <title>CERCLE PRIVÉ - Site Immobilier de Luxe</title>
-  </head>
-  <body>
-    <style>
-      /* Loader optimisé HTTPS - Disparition automatique */
-      #initial-loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #111827;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease-out;
-      }
-      
-      .loader-title {
-        color: #D97706;
-        font-size: 1.5rem;
-        font-weight: 300;
-        letter-spacing: 0.1em;
-        margin-bottom: 1rem;
-        font-family: system-ui, -apple-system, sans-serif;
-      }
-      
-      .loader-spinner {
-        width: 2rem;
-        height: 2rem;
-        border: 3px solid #374151;
-        border-top: 3px solid #D97706;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-      
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      
-      /* Masquer automatiquement le loader */
-      .react-loaded #initial-loader {
-        opacity: 0;
-        pointer-events: none;
-      }
-      
-      /* Fallback si React ne charge pas */
-      body:not(.react-loaded) #initial-loader {
-        animation: fadeOut 0.5s ease-out 3s forwards;
-      }
-      
-      @keyframes fadeOut {
-        to { opacity: 0; pointer-events: none; }
-      }
-      
-      /* Fallback si React ne charge pas */
-      body:not(.react-loaded) #initial-loader {
-        animation: fadeOut 0.5s ease-out 3s forwards;
-      }
-      
-      @keyframes fadeOut {
-        to { opacity: 0; pointer-events: none; }
-      }
-    </style>
-    
-    <!-- Loader initial ultra-simplifié -->
-    <div id="initial-loader">
-      <h1 class="loader-title">CERCLE PRIVÉ</h1>
-      <div class="loader-spinner"></div>
-    </div>
-    
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    
-    <script>
-      // Timeout de sécurité HTTPS - Version robuste
-      setTimeout(function() {
-        document.body.classList.add('react-loaded');
-        // Supprimer le loader après activation
-        var loader = document.getElementById('initial-loader');
-        if (loader) {
-          loader.style.display = 'none';
-        }
-      }, 3000); // 3 secondes max pour HTTPS
-      
-      // Fallback d'urgence si React ne charge pas
-      setTimeout(function() {
-        if (!document.body.classList.contains('react-loaded')) {
-          console.warn('React non chargé - Fallback d\'urgence');
-          document.body.classList.add('react-loaded');
-          var loader = document.getElementById('initial-loader');
-          if (loader) {
-            loader.style.display = 'none';
-          }
-        }
-      }, 8000); // Fallback à 8 secondes
-    </script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Site web professionnel - Accueil">
+    <title>Mon Site Web - Accueil</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-container">
+                <a href="index.html" class="nav-logo">MonSite</a>
+                <button class="nav-toggle" aria-label="Ouvrir le menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link active">Accueil</a></li>
+                    <li><a href="about.html" class="nav-link">À propos</a></li>
+                    <li><a href="services.html" class="nav-link">Services</a></li>
+                    <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Bienvenue sur Mon Site Web</h1>
+                    <p class="hero-subtitle">Solutions professionnelles et créatives pour votre entreprise</p>
+                    <div class="hero-buttons">
+                        <a href="services.html" class="btn btn-primary">Nos Services</a>
+                        <a href="contact.html" class="btn btn-secondary">Nous Contacter</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Nos Points Forts</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Performance</h3>
+                        <p>Sites web rapides et optimisés pour une expérience utilisateur exceptionnelle.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>Responsive</h3>
+                        <p>Design adaptatif qui fonctionne parfaitement sur tous les appareils.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3>Design Moderne</h3>
+                        <p>Interfaces élégantes et intuitives qui reflètent votre image de marque.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Prêt à commencer votre projet ?</h2>
+                    <p>Contactez-nous dès aujourd'hui pour discuter de vos besoins</p>
+                    <a href="contact.html" class="btn btn-primary">Démarrer un Projet</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MonSite</h3>
+                    <p>Solutions web professionnelles depuis 2024</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Liens Rapides</h4>
+                    <ul>
+                        <li><a href="about.html">À propos</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: contact@monsite.fr</p>
+                    <p>Tél: +33 1 23 45 67 89</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MonSite. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
