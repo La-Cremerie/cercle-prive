@@ -124,7 +124,7 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
     setShowForm(true);
   };
 
-  const handleDeactivate = async (adminId: string) => {
+  const handleDeactivateAdmin = async (adminId: string) => {
     try {
       await AdminService.deactivateAdmin(adminId);
       toast.success('Administrateur désactivé');
@@ -134,7 +134,7 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
     }
   };
 
-  const handleDelete = async (adminId: string) => {
+  const handleDeleteAdmin = async (adminId: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet administrateur ?')) {
       try {
         await AdminService.deleteAdmin(adminId);
@@ -353,7 +353,7 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
                           <>
                             {admin.is_active ? (
                               <button
-                                onClick={() => handleDeactivate(admin.id)}
+                                onClick={() => handleDeactivateAdmin(admin.id)}
                                 className="text-orange-600 hover:text-orange-700 transition-colors"
                                 title="Désactiver"
                               >
@@ -369,7 +369,7 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
                               </button>
                             )}
                             <button
-                              onClick={() => handleDelete(admin.id)}
+                              onClick={() => handleDeleteAdmin(admin.id)}
                               className="text-red-600 hover:text-red-700 transition-colors"
                               title="Supprimer"
                             >
