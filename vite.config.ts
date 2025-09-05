@@ -4,23 +4,11 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
-    react({
-      babel: {
-        plugins: [
-          // Optimisation pour le tree-shaking
-          ['babel-plugin-transform-imports', {
-            'lucide-react': {
-              transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
-              preventFullImport: true
-            }
-          }]
-        ]
-      }
-    })
+    react()
   ],
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-hot-toast'],
-    exclude: ['lucide-react']
+    exclude: []
   },
   build: {
     target: 'es2015',
@@ -39,9 +27,7 @@ export default defineConfig(({ mode }) => ({
           utils: ['date-fns', 'react-hot-toast']
         }
       },
-      external: mode === 'production' ? [
-        // Composants admin exclus en production
-      ] : []
+      external: []
     }
   },
   server: {
