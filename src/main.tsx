@@ -126,5 +126,4 @@ try {
   if (loader) {
     loader.style.display = 'none';
   }
-  }
 }
