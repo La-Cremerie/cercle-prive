@@ -26,3 +26,5 @@ createRoot(document.getElementById('root')!).render(
 // Masquer le loader initial immédiatement
 requestAnimationFrame(() => {
   document.body.classList.add('react-loaded');
+}
+)
