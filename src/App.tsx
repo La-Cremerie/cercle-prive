@@ -52,6 +52,34 @@ function App() {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Fonctions de gestion
+  const handleLoginSuccess = () => {
+    setIsUserLoggedIn(true);
+  };
+
+  const toggleAdmin = () => {
+    if (isAdminLoggedIn) {
+      setShowAdmin(!showAdmin);
+    } else {
+      setShowAdminLogin(true);
+    }
+  };
+
+  const handleAdminLoginSuccess = () => {
+    setIsAdminLoggedIn(true);
+    setShowAdminLogin(false);
+    setShowAdmin(true);
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminLoggedIn(false);
+    setShowAdmin(false);
+  };
+
+  const handleBackFromAdminLogin = () => {
+    setShowAdminLogin(false);
+  };
+
   // Initialisation avec diagnostic automatique
   useEffect(() => {
     const initializeApp = async () => {
@@ -157,7 +185,7 @@ function App() {
               Vider le cache et actualiser
             </button>
             <a
-              href="mailto:nicolas.c@lacremerie.fr?subject=Erreur technique critique&body=Erreur détectée: " + encodeURIComponent(errorMessage)
+              href={"mailto:nicolas.c@lacremerie.fr?subject=Erreur technique critique&body=Erreur détectée: " + encodeURIComponent(errorMessage)}
               className="block w-full bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 transition-colors font-medium text-center"
             >
               Contacter le support
@@ -205,33 +233,6 @@ function App() {
       setErrorMessage(error instanceof Error ? error.message : 'Erreur de rendu');
       return null;
     }
-  };
-
-  const handleLoginSuccess = () => {
-    setIsUserLoggedIn(true);
-  };
-
-  const toggleAdmin = () => {
-    if (isAdminLoggedIn) {
-      setShowAdmin(!showAdmin);
-    } else {
-      setShowAdminLogin(true);
-    }
-  };
-
-  const handleAdminLoginSuccess = () => {
-    setIsAdminLoggedIn(true);
-    setShowAdminLogin(false);
-    setShowAdmin(true);
-  };
-
-  const handleAdminLogout = () => {
-    setIsAdminLoggedIn(false);
-    setShowAdmin(false);
-  };
-
-  const handleBackFromAdminLogin = () => {
-    setShowAdminLogin(false);
   };
 
   try {

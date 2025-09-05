@@ -21,6 +21,7 @@ import AdminUserManagement from './AdminUserManagement';
 import LeadScoring from './LeadScoring';
 import SEOManager from './SEOManager';
 import PerformanceOptimizer from './PerformanceOptimizer';
+import DiagnosticPanel from './DiagnosticPanel';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -357,6 +358,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     case 'lead_scoring': return <TrendingUp className="w-4 h-4" />;
                     case 'seo': return <Search className="w-4 h-4" />;
                     case 'performance': return <Settings className="w-4 h-4" />;
+                    case 'diagnostic': return <Activity className="w-4 h-4" />;
                     default: return <Settings className="w-4 h-4" />;
                   }
                 };
@@ -683,6 +685,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
         {activeTab === 'performance' && canAccessModule('analytics') && (
           <PerformanceOptimizer />
+        )}
+
+        {activeTab === 'diagnostic' && canAccessModule('analytics') && (
+          <DiagnosticPanel />
         )}
 
         {/* Message d'accès refusé */}
