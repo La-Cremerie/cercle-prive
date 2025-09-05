@@ -16,22 +16,27 @@ const HeroSection: React.FC = () => {
 
   // Préchargement d'image optimisé pour HTTPS
   useEffect(() => {
+    let isMounted = true; // Éviter les setState sur composant démonté
+    
     const img = new Image();
     img.onload = () => {
-      setImageLoaded(true);
+      if (isMounted) setImageLoaded(true);
     };
     img.onerror = () => {
       console.warn('Erreur chargement image, utilisation de l\'image par défaut');
-      setImageLoaded(true); // Continuer même en cas d'erreur
+      if (isMounted) setImageLoaded(true); // Continuer même en cas d'erreur
     };
     img.src = backgroundImage;
 
-    // Timeout de sécurité pour l'image
+    // Timeout de sécurité pour l'image - Plus court pour HTTPS
     const timeoutId = setTimeout(() => {
-      setImageLoaded(true);
-    }, 3000);
+      if (isMounted) setImageLoaded(true);
+    }, 2000); // Réduit à 2 secondes
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, [backgroundImage]);
 
   // Charger le contenu personnalisé de manière asynchrone

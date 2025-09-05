@@ -102,8 +102,25 @@
     <script type="module" src="/src/main.tsx"></script>
     
     <script>
-      // Timeout de sécurité HTTPS optimisé
+      // Timeout de sécurité HTTPS - Version robuste
       setTimeout(function() {
         document.body.classList.add('react-loaded');
-      }, 2000); // 2 secondes max pour HTTPS
+        // Supprimer le loader après activation
+        var loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.display = 'none';
+        }
+      }, 3000); // 3 secondes max pour HTTPS
+      
+      // Fallback d'urgence si React ne charge pas
+      setTimeout(function() {
+        if (!document.body.classList.contains('react-loaded')) {
+          console.warn('React non chargé - Fallback d\'urgence');
+          document.body.classList.add('react-loaded');
+          var loader = document.getElementById('initial-loader');
+          if (loader) {
+            loader.style.display = 'none';
+          }
+        }
+      }, 8000); // Fallback à 8 secondes
     </script>

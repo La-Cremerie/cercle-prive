@@ -22,7 +22,7 @@ const Chatbot = isDevelopment ? React.lazy(() => import('./components/Chatbot'))
 // Composants admin uniquement en développement
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(false); // Pas d'initialisation bloquante
+  const [isInitializing, setIsInitializing] = useState(false);
   // Admin states only in development
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
@@ -31,17 +31,30 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-        const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+        // Vérifications localStorage avec gestion d'erreur robuste
+        let userLoggedIn = false;
+        let adminLoggedIn = false;
+        
+        try {
+          userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+          adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+        } catch (storageError) {
+          console.warn('Erreur localStorage (non-bloquante):', storageError);
+          // Continuer avec les valeurs par défaut
+        }
         
         setIsLoggedIn(userLoggedIn);
         if (isDevelopment) setIsAdminLoggedIn(adminLoggedIn);
       } catch (err) {
         console.error('Initialization error:', err);
+        // Ne pas bloquer l'application en cas d'erreur
+        setIsLoggedIn(false);
+        if (isDevelopment) setIsAdminLoggedIn(false);
       }
     };
 
-    initializeApp();
+    // Initialisation non-bloquante
+    setTimeout(initializeApp, 100);
   }, []);
 
   const toggleAdmin = () => {

@@ -6,34 +6,43 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react()
   ],
+  // Configuration robuste pour éviter les erreurs de parsing
   esbuild: {
-    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+    logOverride: { 
+      'this-is-undefined-in-esm': 'silent',
+      'empty-import-meta': 'silent'
+    },
+    target: 'es2020'
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-hot-toast'],
-    exclude: ['@vite/client', '@vite/env']
+    exclude: ['@vite/client', '@vite/env'],
+    force: true
   },
   build: {
     target: 'es2015',
     minify: 'terser',
     sourcemap: false,
+    // Configuration robuste pour éviter les erreurs de build
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Ignorer les warnings non-critiques
+        if (warning.code === 'THIS_IS_UNDEFINED') return;
+        if (warning.code === 'EVAL') return;
+        warn(warning);
+      }
+    },
     terserOptions: {
       compress: {
         drop_console: mode === 'production',
         drop_debugger: true,
-        pure_funcs: mode === 'production' ? ['console.log', 'console.warn'] : []
-      }
-    },
-    rollupOptions: {
-      output: {
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['lucide-react', 'framer-motion'],
-          utils: ['date-fns', 'react-hot-toast']
-        }
+        pure_funcs: mode === 'production' ? ['console.log', 'console.warn'] : [],
+        // Éviter les optimisations trop agressives qui peuvent causer des erreurs
+        unsafe: false,
+        unsafe_comps: false
+      },
+      mangle: {
+        safari10: true // Compatibilité Safari
       }
     },
     assetsInlineLimit: 4096,
@@ -42,22 +51,23 @@ export default defineConfig(({ mode }) => ({
   preview: {
     port: 4173,
     strictPort: true,
-    host: true
+    host: true,
+    https: false // Éviter les problèmes de certificat en preview
   },
   server: {
     port: 5173,
     strictPort: true,
     host: true,
     hmr: {
-      overlay: false,
+      overlay: false, // Éviter les overlays bloquants
       port: 24678
     },
-    // Configuration HTTPS pour le développement
-    https: false, // Laisser false pour éviter les problèmes de certificat en dev
+    https: false, // Éviter les problèmes de certificat en dev
     cors: true
   },
-  // Optimisations pour HTTPS
+  // Variables d'environnement sécurisées
   define: {
-    'process.env.NODE_ENV': JSON.stringify(mode)
+    'process.env.NODE_ENV': JSON.stringify(mode),
+    global: 'globalThis' // Polyfill pour certains environnements
   }
 }));
