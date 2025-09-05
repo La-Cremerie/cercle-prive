@@ -42,23 +42,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   const validateForm = (): boolean => {
     if (!formData.nom.trim()) {
-      setError(t('login.errors.nameRequired'));
+      setError('Le nom est requis');
       return false;
     }
     if (!formData.prenom.trim()) {
-      setError(t('login.errors.firstNameRequired'));
+      setError('Le prénom est requis');
       return false;
     }
     if (!formData.telephone.trim()) {
-      setError(t('login.errors.phoneRequired'));
+      setError('Le téléphone est requis');
       return false;
     }
     if (!formData.email.trim()) {
-      setError(t('login.errors.emailRequired'));
+      setError('L\'email est requis');
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError(t('login.errors.emailInvalid'));
+      setError('Format d\'email invalide');
       return false;
     }
     return true;
@@ -91,7 +91,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         const existingUser = await UserService.getUserByEmail(formData.email);
         
         if (existingUser) {
-          toast.success(t('login.success'));
+          toast.success('Inscription réussie ! Bienvenue dans le Cercle Privé.');
         }
 
         // Créer le compte Supabase Auth
@@ -123,7 +123,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         await EmailService.sendAdminNotification(registeredUser);
         
         setSuccess(true);
-        toast.success(t('login.success'));
+        toast.success('Inscription réussie ! Bienvenue dans le Cercle Privé.');
         
         // Redirect after a short delay
         setTimeout(() => {
