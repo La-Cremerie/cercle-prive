@@ -120,13 +120,18 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 5173,
     strictPort: true,
-    host: true,
+    host: '0.0.0.0',
     hmr: {
-      overlay: false, // Éviter les overlays bloquants
-      port: 24678
+      overlay: false,
+      port: 24678,
+      host: 'localhost'
     },
-    https: false, // Éviter les problèmes de certificat en dev
-    cors: true
+    https: false,
+    cors: true,
+    proxy: {},
+    fs: {
+      strict: false
+    }
   },
   // Variables d'environnement sécurisées
   define: {
