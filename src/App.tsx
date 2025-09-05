@@ -555,22 +555,39 @@ ${Object.entries(lastDiagnostic.resources).map(([resource, status]: [string, any
     try {
       // Vérification de base du localStorage
       if (typeof localStorage !== 'undefined') {
+        // Utiliser la méthode existante pour trouver les clés corrompues
+        const corruptedKeys = this.findCorruptedStorageKeys();
+        if (corruptedKeys.length > 0) {
+          corruptedKeys.forEach(key => {
+            try {
+              localStorage.removeItem(key);
+            } catch (error) {
+              console.warn(`Impossible de supprimer la clé: ${key}`);
+            }
+          });
+          fixes.push(`⚙️ Supprimé ${corruptedKeys.length} clé(s) corrompue(s)`);
+        }
+        
         // Nettoyer les clés temporaires
         const tempKeys = [];
         for (let i = 0; i < localStorage.length; i++) {
-        try {
-          const value = localStorage.getItem(key);
-          if (value) {
-            JSON.parse(value); // Test de validité JSON
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('temp_') || key.startsWith('cache_'))) {
+            tempKeys.push(key);
           }
-        } catch (error) {
-          localStorage.removeItem(key);
-          resetCount++;
         }
-      });
-      
-      if (resetCount > 0) {
-        fixes.push(`⚙️ Réinitialisé ${resetCount} paramètre(s) corrompu(s)`);
+        
+        tempKeys.forEach(key => {
+          try {
+            localStorage.removeItem(key);
+          } catch (error) {
+            console.warn(`Impossible de supprimer la clé temporaire: ${key}`);
+          }
+        });
+        
+        if (tempKeys.length > 0) {
+          fixes.push(`🧹 Supprimé ${tempKeys.length} clé(s) temporaire(s)`);
+        }
       }
     } catch (error) {
       fixes.push('❌ Impossible de vérifier les paramètres');
