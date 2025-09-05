@@ -95,7 +95,7 @@ const DiagnosticPanel: React.FC = () => {
   };
 
   // Vérifier la santé du localStorage
-  checkLocalStorageHealth() {
+  const checkLocalStorageHealth = () => {
     try {
       const totalSize = JSON.stringify(localStorage).length;
       const itemCount = localStorage.length;
@@ -128,10 +128,10 @@ const DiagnosticPanel: React.FC = () => {
         health: 'error'
       };
     }
-  }
+  };
 
   // Vérifier la santé du sessionStorage
-  checkSessionStorageHealth() {
+  const checkSessionStorageHealth = () => {
     try {
       sessionStorage.setItem('test', 'test');
       sessionStorage.removeItem('test');
@@ -139,10 +139,10 @@ const DiagnosticPanel: React.FC = () => {
     } catch (error) {
       return { available: false, error: error.message, health: 'error' };
     }
-  }
+  };
 
   // Vérifier la santé du cache
-  async checkCacheHealth() {
+  const checkCacheHealth = async () => {
     if ('caches' in window) {
       try {
         const cacheNames = await caches.keys();
@@ -169,10 +169,10 @@ const DiagnosticPanel: React.FC = () => {
       }
     }
     return { available: false, health: 'warning' };
-  }
+  };
 
   // Obtenir l'historique des erreurs
-  getErrorHistory() {
+  const getErrorHistory = () => {
     try {
       const errorLog = localStorage.getItem('errorLog');
       const errors = errorLog ? JSON.parse(errorLog) : [];
@@ -185,10 +185,10 @@ const DiagnosticPanel: React.FC = () => {
     } catch (error) {
       return { error: 'Impossible de lire l\'historique' };
     }
-  }
+  };
 
   // Catégoriser les erreurs
-  categorizeErrors(errors: any[]) {
+  const categorizeErrors = (errors: any[]) => {
     const categories: any = {};
     
     errors.forEach(error => {
@@ -197,10 +197,10 @@ const DiagnosticPanel: React.FC = () => {
     });
 
     return categories;
-  }
+  };
 
   // Générer des recommandations
-  generateRecommendations(codeAnalysis: any, bundleAnalysis: any, healthCheck: any) {
+  const generateRecommendations = (codeAnalysis: any, bundleAnalysis: any, healthCheck: any) => {
     const recommendations = [];
 
     // Recommandations basées sur la santé du stockage
@@ -244,7 +244,7 @@ const DiagnosticPanel: React.FC = () => {
     }
 
     return recommendations;
-  }
+  };
 
   // Exporter le rapport complet
   const exportReport = () => {
