@@ -146,6 +146,10 @@ function App() {
     });
   };
 
+  const handleLoginSuccess = () => {
+    setIsUserLoggedIn(true);
+  };
+
   // Loading state amélioré
   if (isLoadingApp || !isContentReady) {
     return (
@@ -160,6 +164,12 @@ function App() {
             <p className="text-sm text-gray-400 font-light">Préparation de votre expérience</p>
           </div>
           <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const toggleAdmin = () => {
     if (!isDevelopment) return;
     
