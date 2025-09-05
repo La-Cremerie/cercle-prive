@@ -25,7 +25,7 @@ const isDevelopment = import.meta.env.DEV;
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Admin states only in development
   const [showAdmin, setShowAdmin] = useState(false);
@@ -33,6 +33,12 @@ function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   useEffect(() => {
+    // Vérifier immédiatement si l'utilisateur est connecté
+    const userLoggedIn = localStorage.getItem('userLoggedIn');
+    if (userLoggedIn === 'true') {
+      setIsLoggedIn(true);
+    }
+    
     // Check admin login only in development
     if (isDevelopment) {
       const adminLoggedIn = localStorage.getItem('adminLoggedIn');
@@ -76,16 +82,8 @@ function App() {
 
   const handleBackFromAdminLogin = () => {
     if (!isDevelopment) return;
-    setShowAdminLogin(false);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-lg font-light">Chargement...</div>
-      </div>
-    );
-  }
 
   if (!isLoggedIn) {
     return <LoginForm onLoginSuccess={handleLoginSuccess} />;
