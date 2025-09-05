@@ -41,24 +41,32 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   };
 
   const validateForm = (): boolean => {
-    if (!formData.nom.trim()) {
-      setError('Le nom est requis');
-      return false;
+    // En mode connexion, seuls email et mot de passe sont requis
+    if (!isLogin) {
+      if (!formData.nom.trim()) {
+        setError('Le nom est requis');
+        return false;
+      }
+      if (!formData.prenom.trim()) {
+        setError('Le prénom est requis');
+        return false;
+      }
+      if (!formData.telephone.trim()) {
+        setError('Le téléphone est requis');
+        return false;
+      }
     }
-    if (!formData.prenom.trim()) {
-      setError('Le prénom est requis');
-      return false;
-    }
-    if (!formData.telephone.trim()) {
-      setError('Le téléphone est requis');
-      return false;
-    }
+    
     if (!formData.email.trim()) {
       setError('L\'email est requis');
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError('Format d\'email invalide');
+      return false;
+    }
+    if (!password.trim()) {
+      setError('Le mot de passe est requis');
       return false;
     }
     return true;
