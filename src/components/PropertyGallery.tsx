@@ -132,28 +132,6 @@ const PropertyGallery: React.FC = () => {
             ACHETER
           </h2>
           
-          {/* Outils avancés */}
-          <div className="flex justify-center space-x-4 mb-8">
-            <button
-              onClick={() => setShowCalculator(true)}
-              className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
-            >
-              Calculateur de Rentabilité
-            </button>
-            <button
-              onClick={() => setShowComparator(true)}
-              className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
-            >
-              Comparer les Biens
-            </button>
-            <button
-              onClick={() => setShowAlerts(true)}
-              className="px-4 py-2 bg-white border-2 border-yellow-600 text-yellow-600 rounded-md hover:bg-yellow-50 transition-colors text-sm"
-            >
-              Créer une Alerte
-            </button>
-          </div>
-          
           {/* Filtres */}
           <div className="flex justify-center space-x-4 mb-8">
             {[
