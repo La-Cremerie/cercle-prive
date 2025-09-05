@@ -325,6 +325,88 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
+  // Simple Admin Login Component
+  const AdminLogin: React.FC<{ onLoginSuccess: () => void; onBack: () => void }> = ({ onLoginSuccess, onBack }) => {
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setError(null);
+
+      setTimeout(() => {
+        if (password === 'lacremerie2025') {
+          localStorage.setItem('adminLoggedIn', 'true');
+          onLoginSuccess();
+        } else {
+          setError('Mot de passe incorrect');
+        }
+        setIsLoading(false);
+      }, 1000);
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-2xl p-8">
+          <div className="text-center mb-8">
+            <div className="text-4xl mb-4">🔐</div>
+            <h2 className="text-2xl font-light text-gray-900 mb-2">
+              Accès Administrateur
+            </h2>
+            <p className="text-gray-600 font-light">
+              Veuillez entrer votre mot de passe
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Mot de passe administrateur
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(null);
+                }}
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors"
+                placeholder="Entrez le mot de passe"
+                required
+              />
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                type="button"
+                onClick={onBack}
+                className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-200 transition-colors font-medium"
+              >
+                Retour
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading || !password}
+                className="flex-1 bg-yellow-600 text-white py-3 px-4 rounded-md hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Vérification...' : 'Accéder'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   useEffect(() => {
     const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
     const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
