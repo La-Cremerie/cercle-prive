@@ -22,12 +22,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const userLoggedIn = localStorage.getItem('userLoggedIn');
+    // Always start with login page - remove auto-login check
     const adminLoggedIn = localStorage.getItem('adminLoggedIn');
-    if (userLoggedIn === 'true') {
-      setIsLoggedIn(true);
-    }
     if (adminLoggedIn === 'true') {
       setIsAdminLoggedIn(true);
     }
