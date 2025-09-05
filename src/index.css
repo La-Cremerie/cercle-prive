@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Variables CSS */
+/* Variables CSS optimisées + Anti-FOUC */
 :root {
   --color-primary: #D97706;
   --color-secondary: #1F2937;
@@ -13,13 +13,47 @@
   --font-body: 'Inter';
 }
 
+/* Prévention FOUC critique */
+html {
+  background-color: #111827;
+}
+
+body {
+  background-color: #111827;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease;
+}
+
+/* Restaurer le fond normal une fois React chargé */
+.react-loaded body {
+  background-color: var(--color-background);
+}
+
+/* Optimisations de performance */
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  /* Éviter le flash d'images */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+img.loaded {
+  opacity: 1;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    -webkit-text-size-adjust: 100%;
+    /* Éviter le flash de police */
+    font-display: swap;
   }
   
   body {
@@ -27,36 +61,21 @@
     font-family: var(--font-body), sans-serif;
     color: var(--color-text);
     line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+    /* Transition douce vers le contenu */
+    opacity: 0;
+    animation: bodyFadeIn 0.5s ease-out 0.2s forwards;
+  }
+  
+  @keyframes bodyFadeIn {
+    to { opacity: 1; }
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading), sans-serif;
-    text-rendering: optimizeLegibility;
-  }
-  
-  /* Optimisations de performance */
-  img {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-  }
-  
-  /* Prévention du FOUC */
-  .fade-in-ready {
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
-  }
-  
-  /* Optimisations GPU */
-  .gpu-optimized {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
   }
 }
 
+/* Optimisation du rendu critique */
 @layer components {
   .glass-effect {
     @apply bg-white/10 backdrop-blur-sm border border-white/20;
@@ -66,6 +85,18 @@
     @apply bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent;
   }
   
+  /* Animations optimisées pour éviter les saccades */
+  .animate-spin {
+    animation: spin 1s linear infinite;
+    will-change: transform;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Classes utilitaires anti-FOUC */
   .fade-in {
     animation: fadeIn 0.5s ease-out;
   }
@@ -73,17 +104,5 @@
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* Optimisations de performance */
-  .performance-optimized {
-    contain: layout style paint;
-    will-change: transform;
-  }
-  
-  /* Préchargement des images critiques */
-  .preload-image {
-    content-visibility: auto;
-    contain-intrinsic-size: 1920px 1080px;
   }
 }
