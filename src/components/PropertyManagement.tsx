@@ -668,7 +668,8 @@ const PropertyManagement: React.FC = () => {
                       <input
                         type="radio"
                         name="visibility"
-                        checked={formData.isVisible === true}
+                        value="visible"
+                        checked={formData.isVisible !== false}
                         onChange={() => setFormData(prev => ({ ...prev, isVisible: true }))}
                         className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
                       />
@@ -678,6 +679,7 @@ const PropertyManagement: React.FC = () => {
                       <input
                         type="radio"
                         name="visibility"
+                        value="hidden"
                         checked={formData.isVisible === false}
                         onChange={() => setFormData(prev => ({ ...prev, isVisible: false }))}
                         className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
