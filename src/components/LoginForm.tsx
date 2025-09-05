@@ -137,11 +137,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       }
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t('login.errors.general');
+      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       setError(errorMessage);
       toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
     }
   };
 
