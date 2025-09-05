@@ -451,7 +451,6 @@ const PropertyGallery: React.FC = () => {
                       <Heart className={`w-5 h-5 ${favorites.has(selectedProperty.id) ? 'fill-current' : ''}`} />
                       <span>{favorites.has(selectedProperty.id) ? 'Retiré des favoris' : 'Ajouter aux favoris'}</span>
                     </button>
-                    <button
                     <a
                       href="mailto:nicolas.c@lacremerie.fr?subject=Demande d'information - Villa Horizon"
                       className="flex-1 bg-yellow-600 text-white px-6 py-3 rounded-md hover:bg-yellow-700 transition-colors text-center font-medium"
