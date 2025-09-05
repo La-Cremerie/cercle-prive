@@ -204,7 +204,6 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
       return;
     }
 
-
     if (window.confirm('Êtes-vous sûr de vouloir supprimer définitivement cet administrateur ?')) {
       try {
         await AdminService.deleteAdmin(adminId);
@@ -213,17 +212,6 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
       } catch (error) {
         toast.error('Erreur lors de la suppression');
       }
-    }
-  };
-
-
-  const handleActivate = async (adminId: string) => {
-    try {
-      await AdminService.activateAdmin(adminId);
-      toast.success('Administrateur réactivé');
-      loadAdmins();
-    } catch (error) {
-      toast.error('Erreur lors de la réactivation');
     }
   };
 
