@@ -150,3 +150,4 @@ try {
 } catch (error) {
   console.error('❌ Erreur critique lors du montage:', error);
   attemptRecovery(error);
+}
