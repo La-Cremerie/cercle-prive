@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { User, Phone, Mail, UserCheck, Eye, EyeOff } from 'lucide-react';
 import { UserService } from '../services/userService';
 import { EmailService } from '../services/emailService';
-import { supabase } from '../lib/supabase';
 import type { NewUserRegistration } from '../types/database';
 import toast from 'react-hot-toast';
 
@@ -136,7 +135,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       }
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t('login.errors.general');
+      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -181,8 +180,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             onClick={() => setIsLogin(false)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
               !isLogin
-                ? 'bg-white text-slate-900 shadow-lg'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-yellow-600 text-white shadow-lg'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             Inscription
@@ -192,8 +191,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             onClick={() => setIsLogin(true)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
               isLogin
-                ? 'bg-white text-slate-900 shadow-lg'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-yellow-600 text-white shadow-lg'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             Connexion
