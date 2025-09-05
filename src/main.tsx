@@ -3,8 +3,71 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-// Point d'entrée simplifié
-console.log('🔧 Main.tsx - Initialisation simplifiée');
+// Optimisations de performance globales
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('SW: Enregistré avec succès');
+        
+        // Nettoyage périodique du cache
+        setInterval(() => {
+          registration.active?.postMessage({ type: 'CLEAN_CACHE' });
+        }, 24 * 60 * 60 * 1000); // Tous les jours
+      })
+      .catch(error => {
+        console.warn('SW: Erreur enregistrement (non-bloquante):', error);
+      });
+  });
+}
+
+// Préchargement des ressources critiques
+const preloadCriticalResources = () => {
+  const criticalImages = [
+    'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ];
+  
+  criticalImages.forEach(src => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = src;
+    document.head.appendChild(link);
+  });
+};
+
+// Optimisations de performance
+const optimizePerformance = () => {
+  // Préchargement des ressources
+  preloadCriticalResources();
+  
+  // Optimisation des fonts
+  const fontLink = document.createElement('link');
+  fontLink.rel = 'preconnect';
+  fontLink.href = 'https://fonts.googleapis.com';
+  document.head.appendChild(fontLink);
+  
+  // Optimisation des images Pexels
+  const pexelsLink = document.createElement('link');
+  pexelsLink.rel = 'preconnect';
+  pexelsLink.href = 'https://images.pexels.com';
+  document.head.appendChild(pexelsLink);
+};
+
+// Gestion d'erreur globale pour HTTPS
+window.addEventListener('error', (e) => {
+  console.warn('Erreur globale capturée:', e.error);
+  // Ne pas bloquer le rendu pour les erreurs non-critiques
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+  console.warn('Promise rejetée:', e.reason);
+  // Ne pas bloquer le rendu pour les promesses rejetées
+  e.preventDefault();
+});
+
+// Optimisations au chargement
+optimizePerformance();
 
 // Rendu simple et direct
 try {
@@ -16,56 +79,25 @@ try {
         <App />
       </React.StrictMode>
     );
-    console.log('✅ Application React montée avec succès');
+    console.log('Application React montée avec succès');
     
     // Marquer l'application comme prête
     setTimeout(() => {
-      document.body.classList.add('app-loaded');
-      console.log('🎉 Application complètement chargée');
-    }, 500);
+      document.body.classList.add('fade-in-ready');
+    }, 100);
   } else {
-    console.error('❌ Élément root non trouvé');
-    throw new Error('Root element not found');
+    console.error('Élément root non trouvé');
   }
 } catch (error) {
-  console.error('❌ Erreur critique lors du montage:', error);
-  
-  // Interface d'erreur simple
-  const rootElement = document.getElementById('root');
-  if (rootElement) {
-    rootElement.innerHTML = `
-      <div style="
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
-        color: white;
-        font-family: system-ui, sans-serif;
-        text-align: center;
-        padding: 2rem;
-      ">
-        <div>
-          <h1 style="color: #D97706; font-size: 2rem; margin-bottom: 1rem; font-weight: 300;">
-            CERCLE PRIVÉ
-          </h1>
-          <p style="color: #9CA3AF; margin-bottom: 2rem; line-height: 1.6;">
-            Nous rencontrons un problème technique temporaire.<br>
-            Nos équipes travaillent à le résoudre rapidement.
-          </p>
-          <button onclick="window.location.reload()" style="
-            background: #D97706;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-weight: 500;
-          ">
-            Réessayer
-          </button>
-        </div>
+  console.error('Erreur lors du montage de l\'application:', error);
+  // Afficher un message d'erreur basique
+  document.body.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif;">
+      <div style="text-align: center; padding: 2rem;">
+        <h1 style="color: #D97706; margin-bottom: 1rem;">CERCLE PRIVÉ</h1>
+        <p style="color: #666;">Chargement en cours...</p>
+        <p style="color: #999; font-size: 0.8rem; margin-top: 1rem;">Si cette page persiste, veuillez actualiser.</p>
       </div>
-    `;
-  }
+    </div>
+  `;
 }

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contactez MonSite pour votre projet web. Devis gratuit, consultation personnalisée. Email, téléphone et formulaire de contact disponibles.">
+    <meta name="keywords" content="contact développeur web, devis site internet, consultation web gratuite">
+    <title>Contact - Parlons de Votre Projet Web | MonSite</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    
+    <header class="header" role="banner">
+        <nav class="nav" role="navigation">
+            <div class="nav-container">
+                <a href="../index.html" class="nav-logo">MonSite</a>
+                <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="../index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="about.html" class="nav-link">À propos</a></li>
+                    <li><a href="services.html" class="nav-link">Services</a></li>
+                    <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
+                    <li><a href="contact.html" class="nav-link active">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" role="main">
+        <section class="page-header" aria-labelledby="page-title">
+            <div class="container">
+                <h1 id="page-title">Contactez-Nous</h1>
+                <p class="page-subtitle">Prêt à démarrer votre projet ? Parlons-en ensemble</p>
+            </div>
+        </section>
+
+        <!-- Contact Content -->
+        <section class="contact-content">
+            <div class="container">
+                <div class="contact-grid">
+                    <!-- Contact Form -->
+                    <div class="contact-form-section">
+                        <h2>Envoyez-nous un Message</h2>
+                        <form class="contact-form" id="contactForm" novalidate>
+                            <div class="form-group">
+                                <label for="name">Nom complet *</label>
+                                <input type="text" id="name" name="name" required aria-describedby="name-error">
+                                <span class="error-message" id="name-error" role="alert"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Adresse email *</label>
+                                <input type="email" id="email" name="email" required aria-describedby="email-error">
+                                <span class="error-message" id="email-error" role="alert"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Téléphone</label>
+                                <input type="tel" id="phone" name="phone" aria-describedby="phone-help">
+                                <small id="phone-help" class="form-help">Optionnel - pour vous recontacter rapidement</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="subject">Sujet *</label>
+                                <select id="subject" name="subject" required aria-describedby="subject-error">
+                                    <option value="">Choisissez un sujet</option>
+                                    <option value="devis">Demande de devis</option>
+                                    <option value="info">Demande d'information</option>
+                                    <option value="support">Support technique</option>
+                                    <option value="partenariat">Partenariat</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                                <span class="error-message" id="subject-error" role="alert"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="budget">Budget estimé</label>
+                                <select id="budget" name="budget">
+                                    <option value="">Sélectionnez votre budget</option>
+                                    <option value="1000-3000">1 000€ - 3 000€</option>
+                                    <option value="3000-5000">3 000€ - 5 000€</option>
+                                    <option value="5000-10000">5 000€ - 10 000€</option>
+                                    <option value="10000+">Plus de 10 000€</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Votre message *</label>
+                                <textarea id="message" name="message" rows="6" required aria-describedby="message-error" placeholder="Décrivez votre projet, vos besoins et vos objectifs..."></textarea>
+                                <span class="error-message" id="message-error" role="alert"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="consent" name="consent" required>
+                                    <span class="checkmark"></span>
+                                    J'accepte d'être contacté concernant ma demande *
+                                </label>
+                                <span class="error-message" id="consent-error" role="alert"></span>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-full">
+                                <span class="btn-text">Envoyer le Message</span>
+                                <span class="btn-loading" style="display: none;">Envoi en cours...</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="contact-info-section">
+                        <h2>Informations de Contact</h2>
+                        
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <div class="contact-icon" aria-hidden="true">📧</div>
+                                <div class="contact-details">
+                                    <h3>Email</h3>
+                                    <a href="mailto:contact@monsite.fr">contact@monsite.fr</a>
+                                    <p>Réponse sous 24h garantie</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <div class="contact-icon" aria-hidden="true">📞</div>
+                                <div class="contact-details">
+                                    <h3>Téléphone</h3>
+                                    <a href="tel:+33123456789">+33 1 23 45 67 89</a>
+                                    <p>Lun-Ven : 9h-18h</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <div class="contact-icon" aria-hidden="true">📍</div>
+                                <div class="contact-details">
+                                    <h3>Adresse</h3>
+                                    <address>
+                                        123 Rue de la Tech<br>
+                                        75001 Paris, France
+                                    </address>
+                                    <p>Rendez-vous sur demande</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <div class="contact-icon" aria-hidden="true">⏰</div>
+                                <div class="contact-details">
+                                    <h3>Horaires</h3>
+                                    <p>Lundi - Vendredi<br>9h00 - 18h00</p>
+                                    <p>Support d'urgence disponible</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ Quick Links -->
+                        <div class="faq-links">
+                            <h3>Questions Fréquentes</h3>
+                            <ul>
+                                <li><a href="#faq-1">Quel est le délai de réalisation ?</a></li>
+                                <li><a href="#faq-2">Proposez-vous la maintenance ?</a></li>
+                                <li><a href="#faq-3">Travaillez-vous avec des PME ?</a></li>
+                                <li><a href="#faq-4">Quelles technologies utilisez-vous ?</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq" aria-labelledby="faq-title">
+            <div class="container">
+                <h2 id="faq-title" class="section-title">Questions Fréquemment Posées</h2>
+                <div class="faq-list">
+                    <details class="faq-item" id="faq-1">
+                        <summary>Quel est le délai moyen de réalisation d'un site web ?</summary>
+                        <p>Le délai varie selon la complexité du projet. Un site vitrine prend généralement 2-4 semaines, tandis qu'un e-commerce peut nécessiter 6-8 semaines. Nous établissons un planning détaillé dès le début du projet.</p>
+                    </details>
+                    
+                    <details class="faq-item" id="faq-2">
+                        <summary>Proposez-vous des services de maintenance ?</summary>
+                        <p>Oui, nous offrons des contrats de maintenance incluant mises à jour de sécurité, sauvegardes, monitoring et support technique. Plusieurs formules sont disponibles selon vos besoins.</p>
+                    </details>
+                    
+                    <details class="faq-item" id="faq-3">
+                        <summary>Travaillez-vous avec des petites entreprises ?</summary>
+                        <p>Absolument ! Nous accompagnons des entreprises de toutes tailles, des startups aux grandes entreprises. Nos solutions s'adaptent à votre budget et vos objectifs.</p>
+                    </details>
+                    
+                    <details class="faq-item" id="faq-4">
+                        <summary>Quelles technologies utilisez-vous ?</summary>
+                        <p>Nous utilisons les technologies les plus adaptées à chaque projet : HTML5, CSS3, JavaScript, React, Vue.js, Node.js, PHP, et bien d'autres selon vos besoins spécifiques.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MonSite</h3>
+                    <p>Solutions web professionnelles depuis 2020</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook" class="social-link">📘</a>
+                        <a href="#" aria-label="Twitter" class="social-link">🐦</a>
+                        <a href="#" aria-label="LinkedIn" class="social-link">💼</a>
+                        <a href="#" aria-label="Instagram" class="social-link">📷</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="services.html">Développement Web</a></li>
+                        <li><a href="services.html">Design UX/UI</a></li>
+                        <li><a href="services.html">E-commerce</a></li>
+                        <li><a href="services.html">Maintenance</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Entreprise</h4>
+                    <ul>
+                        <li><a href="about.html">À propos</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <address>
+                        <p>📧 contact@monsite.fr</p>
+                        <p>📞 +33 1 23 45 67 89</p>
+                        <p>📍 123 Rue de la Tech, 75001 Paris</p>
+                    </address>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MonSite. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

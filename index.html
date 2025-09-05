@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#D97706" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="CERCLE PRIVÉ" />
+    <meta name="apple-mobile-web-app-title" content="OFF MARKET" />
     <meta name="description" content="L'excellence immobilière en toute discrétion - Biens de prestige en off-market" />
     <meta name="language" content="fr" />
     
@@ -21,59 +21,103 @@
     <!-- Manifest -->
     <link rel="manifest" href="/manifest.json" />
     
-    <title>CERCLE PRIVÉ - Immobilier de Prestige</title>
+    <!-- HTTPS Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https: wss:;">
     
-    <style>
-      /* CSS de base pour éviter FOUC */
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: system-ui, -apple-system, sans-serif;
-        background: #111827;
-        color: white;
-        overflow-x: hidden;
-      }
-      
-      /* Loader simple et robuste */
-      #root {
-        min-height: 100vh;
-        background: #111827;
-      }
-      
-      /* Optimisations de performance */
-      * {
-        box-sizing: border-box;
-      }
-      
-      img {
-        max-width: 100%;
-        height: auto;
-        image-rendering: auto;
-      }
-    </style>
+    <title>CERCLE PRIVÉ - Site Immobilier de Luxe</title>
   </head>
   <body>
+    <style>
+      /* Loader minimal et robuste */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #111827;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease-out;
+      }
+      
+      .loader-title {
+        color: #D97706;
+        font-size: 1.5rem;
+        font-weight: 300;
+        letter-spacing: 0.1em;
+        margin-bottom: 1rem;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      
+      .loader-spinner {
+        width: 2rem;
+        height: 2rem;
+        border: 2px solid #374151;
+        border-top: 2px solid #D97706;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Masquer le loader automatiquement */
+      .app-ready #initial-loader {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      /* Timeout automatique */
+    </style>
+    
+    <!-- Loader minimal -->
+    <div id="initial-loader">
+      <h1 class="loader-title">CERCLE PRIVÉ</h1>
+      <div class="loader-spinner"></div>
+    </div>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
     <script>
-      // Timeout de sécurité simple - 3 secondes maximum
+      // Timeout de sécurité simple
       setTimeout(function() {
-        console.log('Timeout de sécurité - forçage du chargement');
-        document.body.classList.add('app-loaded');
-      }, 3000);
+        console.log('Loader timeout - forçage du chargement');
+        document.body.classList.add('app-ready');
+        var loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(function() {
+            loader.style.display = 'none';
+          }, 300);
+        }
+      }, 1500);
       
-      // Gestion d'erreur globale simple
+      // Gestion d'erreur globale pour HTTPS
       window.addEventListener('error', function(e) {
         console.warn('Erreur détectée:', e.error);
-        document.body.classList.add('app-loaded');
+        // Forcer l'affichage même en cas d'erreur
+        document.body.classList.add('app-ready');
+        var loader = document.getElementById('initial-loader');
+        if (loader) loader.style.display = 'none';
       });
       
       // Détection de chargement réussi
       window.addEventListener('load', function() {
         console.log('Page chargée avec succès');
-        document.body.classList.add('app-loaded');
+        document.body.classList.add('app-ready');
+        var loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(function() {
+            loader.style.display = 'none';
+          }, 300);
+        }
       });
     </script>
-  </body>
-</html>
