@@ -102,119 +102,6 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
         [action]: value
       }
     }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.email || !formData.nom || !formData.prenom) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-
-    if (!editingAdmin && !formData.password) {
-      toast.error('Le mot de passe est requis pour un nouvel administrateur');
-      return;
-    }
-
-    try {
-      if (editingAdmin) {
-        // Mise à jour des permissions seulement
-        await AdminService.updateAdminPermissions(editingAdmin.id, selectedPermissions);
-        toast.success('Permissions mises à jour avec succès');
-      } else {
-        // Création d'un nouvel admin
-        await AdminService.createAdmin({
-          email: formData.email,
-          password: formData.password,
-          nom: formData.nom,
-          prenom: formData.prenom,
-          role: formData.role,
-          permissions: selectedPermissions,
-          createdBy: currentUser.id
-        });
-        toast.success('Administrateur créé avec succès');
-      }
-
-      setShowForm(false);
-      resetForm();
-      loadAdmins();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'opération';
-      toast.error(errorMessage);
-    }
-  };
-
-  const handleEdit = (admin: AdminUser) => {
-    setEditingAdmin(admin);
-    setFormData({
-      email: admin.email,
-      password: '',
-      nom: admin.nom,
-      prenom: admin.prenom,
-      role: admin.role
-    });
-    
-    // Charger les permissions actuelles
-    const adminPermissions = permissions[admin.id] || [];
-    const permissionsMap: Partial<Record<AdminModule, { read: boolean; write: boolean; delete: boolean }>> = {};
-    
-    adminPermissions.forEach(perm => {
-      permissionsMap[perm.module] = {
-        read: perm.can_read,
-        write: perm.can_write,
-        delete: perm.can_delete
-      };
-    });
-    
-    setSelectedPermissions(permissionsMap);
-    setShowForm(true);
-  };
-
-  const handleDeactivate = async (adminId: string) => {
-    if (adminId === currentUser.id) {
-      toast.error('Vous ne pouvez pas vous désactiver vous-même');
-      return;
-    }
-
-    if (window.confirm('Êtes-vous sûr de vouloir désactiver cet administrateur ?')) {
-      try {
-        await AdminService.deactivateAdmin(adminId);
-        toast.success('Administrateur désactivé');
-        loadAdmins();
-      } catch (error) {
-        toast.error('Erreur lors de la désactivation');
-      }
-    }
-  };
-
-  const handleActivate = async (adminId: string) => {
-    try {
-      await AdminService.activateAdmin(adminId);
-      toast.success('Administrateur réactivé');
-      loadAdmins();
-    } catch (error) {
-      toast.error('Erreur lors de la réactivation');
-    }
-  };
-
-  const handleDelete = async (adminId: string) => {
-    if (adminId === currentUser.id) {
-      toast.error('Vous ne pouvez pas vous supprimer vous-même');
-      return;
-    }
-
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer définitivement cet administrateur ?')) {
-      try {
-        await AdminService.deleteAdmin(adminId);
-        toast.success('Administrateur supprimé');
-        loadAdmins();
-      } catch (error) {
-        toast.error('Erreur lors de la suppression');
-      }
-    }
-  };
-
   const getRoleColor = (role: AdminUser['role']) => {
     switch (role) {
       case 'super_admin': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
@@ -228,6 +115,16 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
   const getRoleLabel = (role: AdminUser['role']) => {
     const roleConfig = ADMIN_ROLES.find(r => r.name === role);
     return roleConfig?.label || role;
+  };
+
+  const handleActivate = async (adminId: string) => {
+    try {
+      await AdminService.activateAdmin(adminId);
+      toast.success('Administrateur réactivé');
+      loadAdmins();
+    } catch (error) {
+      toast.error('Erreur lors de la réactivation');
+    }
   };
 
   if (currentUser.role !== 'super_admin') {
