@@ -95,7 +95,7 @@ const DiagnosticPanel: React.FC = () => {
   };
 
   // Vérifier la santé du localStorage
-  private checkLocalStorageHealth() {
+  checkLocalStorageHealth() {
     try {
       const totalSize = JSON.stringify(localStorage).length;
       const itemCount = localStorage.length;
@@ -131,7 +131,7 @@ const DiagnosticPanel: React.FC = () => {
   }
 
   // Vérifier la santé du sessionStorage
-  private checkSessionStorageHealth() {
+  checkSessionStorageHealth() {
     try {
       sessionStorage.setItem('test', 'test');
       sessionStorage.removeItem('test');
@@ -142,7 +142,7 @@ const DiagnosticPanel: React.FC = () => {
   }
 
   // Vérifier la santé du cache
-  private async checkCacheHealth() {
+  async checkCacheHealth() {
     if ('caches' in window) {
       try {
         const cacheNames = await caches.keys();
@@ -172,7 +172,7 @@ const DiagnosticPanel: React.FC = () => {
   }
 
   // Obtenir l'historique des erreurs
-  private getErrorHistory() {
+  getErrorHistory() {
     try {
       const errorLog = localStorage.getItem('errorLog');
       const errors = errorLog ? JSON.parse(errorLog) : [];
@@ -188,7 +188,7 @@ const DiagnosticPanel: React.FC = () => {
   }
 
   // Catégoriser les erreurs
-  private categorizeErrors(errors: any[]) {
+  categorizeErrors(errors: any[]) {
     const categories: any = {};
     
     errors.forEach(error => {
@@ -200,7 +200,7 @@ const DiagnosticPanel: React.FC = () => {
   }
 
   // Générer des recommandations
-  private generateRecommendations(codeAnalysis: any, bundleAnalysis: any, healthCheck: any) {
+  generateRecommendations(codeAnalysis: any, bundleAnalysis: any, healthCheck: any) {
     const recommendations = [];
 
     // Recommandations basées sur la santé du stockage
