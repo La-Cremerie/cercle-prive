@@ -55,23 +55,8 @@ function App() {
     
     try {
       // Charger tous les composants principaux en parallèle
-      const [
-        Navigation,
-        HeroSection,
-        NotreAdnSection,
-        ServicesSection,
-        OffMarketSection,
-        RechercheSection,
-        PropertyGallery,
-        VendreSection,
-        PWAInstallPrompt,
-        // Composants conditionnels pour le développement
-        ...(isDevelopment ? [
-          import('./components/Chatbot'),
-          import('./components/AdminLogin'),
-          import('./components/AdminPanel')
-        ] : [])
-      ] = await Promise.all([
+      // Charger les composants principaux
+      const mainImports = await Promise.all([
         import('./components/Navigation'),
         import('./components/HeroSection'),
         import('./components/NotreAdnSection'),
@@ -80,29 +65,33 @@ function App() {
         import('./components/RechercheSection'),
         import('./components/PropertyGallery'),
         import('./components/VendreSection'),
-        import('./components/PWAInstallPrompt'),
-        // Composants conditionnels pour le développement
-        ...(isDevelopment ? [
+        import('./components/PWAInstallPrompt')
+      ]);
+
+      // Charger les composants admin conditionnellement
+      let adminImports: any[] = [];
+      if (isDevelopment) {
+        adminImports = await Promise.all([
           import('./components/Chatbot'),
           import('./components/AdminLogin'),
           import('./components/AdminPanel')
-        ] : [])
-      ]);
+        ]);
+      }
 
       setMainSiteComponents({
-        Navigation: Navigation.default,
-        HeroSection: HeroSection.default,
-        NotreAdnSection: NotreAdnSection.default,
-        ServicesSection: ServicesSection.default,
-        OffMarketSection: OffMarketSection.default,
-        RechercheSection: RechercheSection.default,
-        PropertyGallery: PropertyGallery.default,
-        VendreSection: VendreSection.default,
-        PWAInstallPrompt: PWAInstallPrompt.default,
-        ...(isDevelopment && {
-          Chatbot: (await import('./components/Chatbot')).default,
-          AdminLogin: (await import('./components/AdminLogin')).default,
-          AdminPanel: (await import('./components/AdminPanel')).default
+        Navigation: mainImports[0].default,
+        HeroSection: mainImports[1].default,
+        NotreAdnSection: mainImports[2].default,
+        ServicesSection: mainImports[3].default,
+        OffMarketSection: mainImports[4].default,
+        RechercheSection: mainImports[5].default,
+        PropertyGallery: mainImports[6].default,
+        VendreSection: mainImports[7].default,
+        PWAInstallPrompt: mainImports[8].default,
+        ...(isDevelopment && adminImports.length > 0 && {
+          Chatbot: adminImports[0].default,
+          AdminLogin: adminImports[1].default,
+          AdminPanel: adminImports[2].default
         })
       });
 
