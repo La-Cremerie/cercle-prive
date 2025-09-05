@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { User, Phone, Mail, UserCheck, Eye, EyeOff } from 'lucide-react';
 import { UserService } from '../services/userService';
-import { EmailService } from '../services/emailService';
 import type { NewUserRegistration } from '../types/database';
 import toast from 'react-hot-toast';
 
@@ -121,9 +120,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         localStorage.setItem('userLoggedIn', 'true');
         localStorage.setItem('userData', JSON.stringify(registeredUser));
         
-        // Envoyer les emails automatiques
-        await EmailService.sendWelcomeEmail(registeredUser);
-        await EmailService.sendAdminNotification(registeredUser);
+        // Envoyer les emails automatiques (simulation)
+        try {
+          const { EmailService } = await import('../services/emailService');
+          await EmailService.sendWelcomeEmail(registeredUser);
+          await EmailService.sendAdminNotification(registeredUser);
+        } catch (emailError) {
+          console.warn('Erreur lors de l\'envoi des emails:', emailError);
+          // Ne pas faire échouer l'inscription pour une erreur d'email
+        }
         
         setSuccess(true);
         toast.success('Inscription réussie ! Bienvenue dans le Cercle Privé.');
