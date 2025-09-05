@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
+import Chatbot from './components/Chatbot';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -345,6 +346,7 @@ function App() {
       </section>
 
       <Toaster position="top-right" />
+      <Chatbot />
     </div>
   );
 }
