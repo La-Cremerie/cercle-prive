@@ -3,6 +3,9 @@ import { Toaster } from 'react-hot-toast';
 import { Loader2, CheckCircle } from 'lucide-react';
 import LoginForm from './components/LoginForm';
 
+// Development mode check
+const isDevelopment = import.meta.env.DEV;
+
 // Import direct des composants essentiels
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
