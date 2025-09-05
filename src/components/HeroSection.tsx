@@ -139,46 +139,5 @@ const HeroSection: React.FC = () => {
     </section>
   );
 };
-        style={{
-          backgroundImage: `url(${backgroundImage})`,
-          opacity: imageLoaded ? 1 : 0.8,
-          transition: 'opacity 0.8s ease-in-out'
-        }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-      </div>
-
-      {/* Background de fallback permanent pour éviter le flash */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 -z-10"></div>
-
-      {/* Content */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="relative z-10 text-center px-4 max-w-4xl mx-auto"
-      >
-        <motion.h1 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-8 leading-tight"
-        >
-          {heroContent.title}
-        </motion.h1>
-        
-        <motion.a 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          href="mailto:nicolas.c@lacremerie.fr"
-          className="inline-block border border-white text-white px-8 py-3 text-sm font-light tracking-wider hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105"
-        >
-          Entrer en relation
-        </motion.a>
-      </motion.div>
-    </section>
-  );
-};
 
 export default HeroSection;
