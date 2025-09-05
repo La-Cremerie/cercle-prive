@@ -14,6 +14,7 @@ export const usePWA = () => {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [canInstall, setCanInstall] = useState(false);
+  const [autoPromptShown, setAutoPromptShown] = useState(false);
 
   useEffect(() => {
     // Vérifier si l'app est déjà installée
@@ -50,25 +51,31 @@ export const usePWA = () => {
       setIsInstallable(false);
       setDeferredPrompt(null);
       localStorage.setItem('pwa-installed', 'true');
+      localStorage.setItem('pwa-auto-prompt-shown', 'true');
     };
 
-    // Forcer l'affichage du prompt après un délai
-    const forcePromptTimer = setTimeout(() => {
-      if (!isInstalled && canInstall && !deferredPrompt) {
+    // Auto-prompt immédiat si pas encore montré
+    const autoPromptTimer = setTimeout(() => {
+      const alreadyShown = localStorage.getItem('pwa-auto-prompt-shown');
+      const dismissed = sessionStorage.getItem('pwa-prompt-dismissed');
+      
+      if (!isInstalled && !alreadyShown && !dismissed && !autoPromptShown) {
         setIsInstallable(true);
-        console.log('PWA: Prompt forcé après timeout');
+        setAutoPromptShown(true);
+        localStorage.setItem('pwa-auto-prompt-shown', 'true');
+        console.log('PWA: Auto-prompt déclenché');
       }
-    }, 5000);
+    }, 1500); // Prompt plus rapide
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
-      clearTimeout(forcePromptTimer);
+      clearTimeout(autoPromptTimer);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, [canInstall, isInstalled]);
+  }, [canInstall, isInstalled, autoPromptShown]);
 
   const installApp = async () => {
     if (!deferredPrompt) return;
@@ -97,6 +104,7 @@ export const usePWA = () => {
     isInstallable,
     isInstalled,
     installApp,
-    canInstall
+    canInstall,
+    autoPromptShown
   };
 };

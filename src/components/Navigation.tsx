@@ -63,6 +63,8 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
                 className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
               >
                 <Settings className="w-4 h-4" />
+                <span>ADMIN</span>
+                <span className="hidden md:inline">ADMIN</span>
                 {unreadCount > 0 && (
                   <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     {unreadCount}

@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePWA } from '../hooks/usePWA';
 
 const PWAInstallPrompt: React.FC = () => {
-  const { isInstallable, installApp, canInstall, isInstalled } = usePWA();
+  const { isInstallable, installApp, canInstall, isInstalled, autoPromptShown } = usePWA();
   const [showPrompt, setShowPrompt] = React.useState(false);
   const [showManualInstructions, setShowManualInstructions] = React.useState(false);
+  const [showWelcomePrompt, setShowWelcomePrompt] = React.useState(false);
 
   React.useEffect(() => {
     // Vérifier si déjà installé
@@ -14,20 +15,27 @@ const PWAInstallPrompt: React.FC = () => {
       return;
     }
 
-    // Vérifier si déjà dismissé
-    if (sessionStorage.getItem('pwa-prompt-dismissed')) {
+    // Vérifier si déjà dismissé pour cette session
+    const dismissed = sessionStorage.getItem('pwa-prompt-dismissed');
+    const alreadyShown = localStorage.getItem('pwa-auto-prompt-shown');
+    
+    if (dismissed) {
       return;
     }
 
-    if (isInstallable || canInstall) {
-      // Attendre un peu avant de montrer le prompt
+    // Auto-prompt immédiat pour nouveaux visiteurs
+    if (!alreadyShown && (isInstallable || canInstall)) {
       const timer = setTimeout(() => {
+        setShowWelcomePrompt(true);
         setShowPrompt(true);
-      }, 2000);
+      }, 800); // Très rapide pour auto-prompt
       
       return () => clearTimeout(timer);
+    } else if (isInstallable || canInstall) {
+      // Prompt normal pour visiteurs récurrents
+      setShowPrompt(true);
     }
-  }, [isInstallable, canInstall, isInstalled]);
+  }, [isInstallable, canInstall, isInstalled, autoPromptShown]);
 
   const handleInstall = async () => {
     try {
@@ -43,6 +51,7 @@ const PWAInstallPrompt: React.FC = () => {
   const handleDismiss = () => {
     setShowPrompt(false);
     setShowManualInstructions(false);
+    setShowWelcomePrompt(false);
     // Ne plus montrer pendant cette session
     sessionStorage.setItem('pwa-prompt-dismissed', 'true');
   };
@@ -59,6 +68,55 @@ const PWAInstallPrompt: React.FC = () => {
 
   return (
     <AnimatePresence>
+      {/* Prompt de bienvenue avec auto-installation */}
+      {showWelcomePrompt && showPrompt && (isInstallable || canInstall) && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-8 text-center shadow-2xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Smartphone className="w-10 h-10 text-white" />
+            </div>
+            
+            <h2 className="text-2xl font-light text-gray-900 dark:text-white mb-4">
+              Bienvenue sur CERCLE PRIVÉ
+            </h2>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+              Installez notre application pour un accès rapide à nos biens de prestige 
+              directement depuis votre écran d'accueil.
+            </p>
+            
+            <div className="space-y-3">
+              <button
+                onClick={handleInstall}
+                className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 font-medium shadow-lg"
+              >
+                <Download className="w-5 h-5" />
+                <span>Installer l'application</span>
+              </button>
+              
+              <button
+                onClick={handleManualInstall}
+                className="w-full px-6 py-3 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors font-medium"
+              >
+                Instructions d'installation
+              </button>
+              
+              <button
+                onClick={handleDismiss}
+                className="w-full px-6 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors text-sm"
+              >
+                Continuer sans installer
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+      
       {showManualInstructions && (
         <motion.div
           initial={{ opacity: 0, y: 100 }}
@@ -101,7 +159,7 @@ const PWAInstallPrompt: React.FC = () => {
         </motion.div>
       )}
       
-      {showPrompt && (isInstallable || canInstall) && (
+      {showPrompt && !showWelcomePrompt && (isInstallable || canInstall) && (
         <motion.div
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
