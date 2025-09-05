@@ -4,10 +4,25 @@ import { useTranslation } from 'react-i18next';
 
 const HeroSection: React.FC = () => {
   const [backgroundImage, setBackgroundImage] = useState('https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920');
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const [heroContent, setHeroContent] = useState({
     title: "l'excellence immobilière en toute discrétion"
   });
 
+  // Précharger l'image pour éviter le saut
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      setImageLoaded(true);
+      setImageError(false);
+    };
+    img.onerror = () => {
+      setImageError(true);
+      setImageLoaded(true);
+    };
+    img.src = backgroundImage;
+  }, [backgroundImage]);
   useEffect(() => {
     // Charger le contenu depuis localStorage
     const loadContent = () => {
@@ -18,7 +33,11 @@ const HeroSection: React.FC = () => {
           title: content.hero?.title || "l'excellence immobilière en toute discrétion"
         });
         if (content.hero?.backgroundImage) {
-          setBackgroundImage(content.hero.backgroundImage);
+          const newImage = content.hero.backgroundImage;
+          if (newImage !== backgroundImage) {
+            setImageLoaded(false);
+            setBackgroundImage(newImage);
+          }
         }
       }
     };
@@ -31,7 +50,8 @@ const HeroSection: React.FC = () => {
       if (stored) {
         const images = JSON.parse(stored);
         const activeImage = images.find((img: any) => img.isActive);
-        if (activeImage) {
+        if (activeImage && activeImage.url !== backgroundImage) {
+          setImageLoaded(false);
           setBackgroundImage(activeImage.url);
         }
       }
@@ -46,14 +66,19 @@ const HeroSection: React.FC = () => {
           title: event.detail.hero?.title || "l'excellence immobilière en toute discrétion"
         });
         if (event.detail.hero?.backgroundImage) {
-          setBackgroundImage(event.detail.hero.backgroundImage);
+          const newImage = event.detail.hero.backgroundImage;
+          if (newImage !== backgroundImage) {
+            setImageLoaded(false);
+            setBackgroundImage(newImage);
+          }
         }
       }
     };
 
     // Écouter les changements d'image de présentation
     const handleImageChange = (event: CustomEvent) => {
-      if (event.detail) {
+      if (event.detail && event.detail !== backgroundImage) {
+        setImageLoaded(false);
         setBackgroundImage(event.detail);
       }
     };
@@ -65,19 +90,35 @@ const HeroSection: React.FC = () => {
       window.removeEventListener('contentUpdated', handleContentChange as EventListener);
       window.removeEventListener('presentationImageChanged', handleImageChange as EventListener);
     };
-  }, []);
+  }, [backgroundImage]);
 
   const { t } = useTranslation();
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gray-900">
       {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat w-full h-full"
-        style={{
-          backgroundImage: `url(${backgroundImage})`
-        }}
-      >
+      <div className="absolute inset-0 w-full h-full">
+        {/* Image de fond avec transition */}
+        <div
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat w-full h-full transition-opacity duration-500 ${
+            imageLoaded && !imageError ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            backgroundImage: `url(${backgroundImage})`
+          }}
+        />
+        
+        {/* Image de fallback pendant le chargement */}
+        {(!imageLoaded || imageError) && (
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat w-full h-full"
+            style={{
+              backgroundImage: 'url(https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800)'
+            }}
+          />
+        )}
+        
+        {/* Overlay sombre */}
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
       </div>
 
