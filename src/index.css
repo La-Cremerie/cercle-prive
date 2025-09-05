@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Variables CSS optimisées + Anti-FOUC */
+/* Variables CSS */
 :root {
   --color-primary: #D97706;
   --color-secondary: #1F2937;
@@ -13,47 +13,11 @@
   --font-body: 'Inter';
 }
 
-/* Prévention FOUC critique */
-html {
-  background-color: #111827;
-}
-
-body {
-  background-color: #111827;
-  margin: 0;
-  padding: 0;
-  transition: background-color 0.3s ease;
-}
-
-/* Restaurer le fond normal une fois React chargé */
-.react-loaded body {
-  background-color: var(--color-background);
-}
-
-/* Optimisations de performance */
-* {
-  box-sizing: border-box;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  /* Éviter le flash d'images */
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-img.loaded {
-  opacity: 1;
-}
-
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Éviter le flash de police */
-    font-display: swap;
   }
   
   body {
@@ -61,13 +25,6 @@ img.loaded {
     font-family: var(--font-body), sans-serif;
     color: var(--color-text);
     line-height: 1.6;
-    /* Transition douce vers le contenu */
-    opacity: 0;
-    animation: bodyFadeIn 0.5s ease-out 0.2s forwards;
-  }
-  
-  @keyframes bodyFadeIn {
-    to { opacity: 1; }
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -75,7 +32,6 @@ img.loaded {
   }
 }
 
-/* Optimisation du rendu critique */
 @layer components {
   .glass-effect {
     @apply bg-white/10 backdrop-blur-sm border border-white/20;
@@ -85,18 +41,6 @@ img.loaded {
     @apply bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent;
   }
   
-  /* Animations optimisées pour éviter les saccades */
-  .animate-spin {
-    animation: spin 1s linear infinite;
-    will-change: transform;
-  }
-  
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  
-  /* Classes utilitaires anti-FOUC */
   .fade-in {
     animation: fadeIn 0.5s ease-out;
   }
