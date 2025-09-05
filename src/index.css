@@ -18,6 +18,8 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
   }
   
   body {
@@ -25,10 +27,33 @@
     font-family: var(--font-body), sans-serif;
     color: var(--color-text);
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading), sans-serif;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Optimisations de performance */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+  
+  /* Prévention du FOUC */
+  .fade-in-ready {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  /* Optimisations GPU */
+  .gpu-optimized {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
 }
 
@@ -48,5 +73,17 @@
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Optimisations de performance */
+  .performance-optimized {
+    contain: layout style paint;
+    will-change: transform;
+  }
+  
+  /* Préchargement des images critiques */
+  .preload-image {
+    content-visibility: auto;
+    contain-intrinsic-size: 1920px 1080px;
   }
 }

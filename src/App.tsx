@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import LoginForm from './components/LoginForm';
+import { PerformanceOptimizer } from './utils/performance';
+import { ErrorBoundaryManager } from './utils/errorBoundary';
 
 // Composants principaux
 import Navigation from './components/Navigation';
@@ -28,6 +30,12 @@ function App() {
 
   // Initialisation simple
   useEffect(() => {
+    // Initialiser les optimisations de performance
+    const performanceOptimizer = PerformanceOptimizer.getInstance();
+    const errorBoundary = ErrorBoundaryManager.getInstance();
+    
+    console.log('🚀 Initialisation des optimisations de performance');
+    
     // Vérifier les connexions
     const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
     const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -39,7 +47,18 @@ function App() {
     setTimeout(() => {
       setIsLoading(false);
       document.body.classList.add('app-ready');
+      
+      // Mesurer les performances après le chargement initial
+      setTimeout(() => {
+        performanceOptimizer.measureWebVitals();
+        console.log('📊 Métriques de performance collectées');
+      }, 1000);
     }, 1000);
+    
+    // Nettoyage au démontage
+    return () => {
+      console.log('🧹 Nettoyage des optimisations');
+    };
   }, []);
 
   const handleLoginSuccess = () => {
@@ -79,7 +98,17 @@ function App() {
     return (
       <>
         <LoginForm onLoginSuccess={handleLoginSuccess} />
-        <Toaster position="top-right" />
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#1F2937',
+              color: '#F9FAFB',
+              border: '1px solid #374151'
+            }
+          }}
+        />
       </>
     );
   }
@@ -89,7 +118,17 @@ function App() {
     return (
       <>
         <AdminPanel onLogout={handleAdminLogout} />
-        <Toaster position="top-right" />
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#1F2937',
+              color: '#F9FAFB',
+              border: '1px solid #374151'
+            }
+          }}
+        />
       </>
     );
   }
@@ -102,14 +141,24 @@ function App() {
           onLoginSuccess={handleAdminLoginSuccess}
           onBack={handleBackFromAdminLogin}
         />
-        <Toaster position="top-right" />
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#1F2937',
+              color: '#F9FAFB',
+              border: '1px solid #374151'
+            }
+          }}
+        />
       </>
     );
   }
 
   // Site principal
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors performance-optimized">
       <Navigation onAdminClick={toggleAdmin} />
       <HeroSection />
       <NotreAdnSection />
@@ -124,7 +173,29 @@ function App() {
       <Chatbot />
       
       <PWAInstallPrompt />
-      <Toaster position="top-right" />
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#1F2937',
+            color: '#F9FAFB',
+            border: '1px solid #374151'
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#F9FAFB'
+            }
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#F9FAFB'
+            }
+          }
+        }}
+      />
     </div>
   );
 }

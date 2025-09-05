@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 const HeroSection: React.FC = () => {
   const [backgroundImage, setBackgroundImage] = useState('');
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const [heroContent, setHeroContent] = useState(() => {
     return {
       title: "l'excellence immobilière en toute discrétion"
@@ -55,21 +56,41 @@ const HeroSection: React.FC = () => {
     if (!backgroundImage) return;
     
     let isMounted = true;
+    let retryCount = 0;
+    const maxRetries = 3;
     
-    const img = new Image();
-    img.onload = () => {
-      if (isMounted) {
-        console.log('Image chargée avec succès:', backgroundImage);
-        setImageLoaded(true);
-      }
+    const loadImageWithRetry = () => {
+      const img = new Image();
+      
+      img.onload = () => {
+        if (isMounted) {
+          console.log('Image chargée avec succès:', backgroundImage);
+          setImageLoaded(true);
+          setImageError(false);
+        }
+      };
+      
+      img.onerror = () => {
+        if (isMounted) {
+          retryCount++;
+          if (retryCount < maxRetries) {
+            console.warn(`Retry ${retryCount}/${maxRetries} pour image:`, backgroundImage);
+            setTimeout(loadImageWithRetry, 1000 * retryCount);
+          } else {
+            console.error('Échec définitif chargement image:', backgroundImage);
+            setImageError(true);
+            setImageLoaded(true);
+          }
+        }
+      };
+      
+      // Optimisations de chargement
+      img.crossOrigin = 'anonymous';
+      img.loading = 'eager';
+      img.src = backgroundImage;
     };
-    img.onerror = () => {
-      if (isMounted) {
-        console.warn('Erreur chargement image:', backgroundImage);
-        setImageLoaded(true);
-      }
-    };
-    img.src = backgroundImage;
+    
+    loadImageWithRetry();
 
     return () => {
       isMounted = false;
@@ -87,7 +108,8 @@ const HeroSection: React.FC = () => {
     const handleImageChange = (event: CustomEvent) => {
       if (event.detail) {
         setBackgroundImage(event.detail);
-        setImageLoaded(false); // Recharger la nouvelle image
+        setImageLoaded(false);
+        setImageError(false);
       }
     };
 
@@ -102,31 +124,37 @@ const HeroSection: React.FC = () => {
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gray-900">
-      {/* Background Image - Uniquement l'image admin sélectionnée */}
-      {backgroundImage && imageLoaded && (
+      {/* Background Image optimisée avec fallback */}
+      {backgroundImage && imageLoaded && !imageError && (
         <div 
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url(${backgroundImage})`
+            backgroundImage: `url(${backgroundImage})`,
+            imageRendering: 'crisp-edges',
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)'
           }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         </div>
       )}
 
-      {/* Fallback pendant le chargement */}
-      {(!backgroundImage || !imageLoaded) && (
+      {/* Fallback optimisé */}
+      {(!backgroundImage || !imageLoaded || imageError) && (
         <div 
-          className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800 to-gray-900"
+          className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800 via-gray-900 to-black"
         >
           <div className="absolute inset-0 bg-black bg-opacity-20"></div>
         </div>
       )}
 
-      {/* Loader d'image discret */}
-      {backgroundImage && !imageLoaded && (
+      {/* Loader d'image optimisé */}
+      {backgroundImage && !imageLoaded && !imageError && (
         <div className="absolute top-4 right-4 z-20">
-          <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          <div className="flex items-center space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-2">
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            <span className="text-white text-xs">Chargement...</span>
+          </div>
         </div>
       )}
 
@@ -142,6 +170,10 @@ const HeroSection: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-8 leading-tight"
+          style={{
+            textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+            willChange: 'transform'
+          }}
         >
           {heroContent.title}
         </motion.h1>
@@ -151,7 +183,10 @@ const HeroSection: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
           href="mailto:nicolas.c@lacremerie.fr"
-          className="inline-block border border-white text-white px-8 py-3 text-sm font-light tracking-wider hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105"
+          className="inline-block border border-white text-white px-8 py-3 text-sm font-light tracking-wider hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+          style={{
+            willChange: 'transform, background-color'
+          }}
         >
           Entrer en relation
         </motion.a>
