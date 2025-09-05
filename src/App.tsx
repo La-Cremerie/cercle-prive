@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Loader2, AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 // Import direct des composants essentiels (pas de lazy loading)
 import LoginForm from './components/LoginForm';
@@ -14,55 +14,39 @@ import PropertyGallery from './components/PropertyGallery';
 import VendreSection from './components/VendreSection';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 
-// Composants admin en lazy loading seulement en développement
-const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
-const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
-const Chatbot = React.lazy(() => import('./components/Chatbot'));
-
-// Check if we're in development mode
+// Composants admin uniquement en développement
 const isDevelopment = import.meta.env.DEV;
+const AdminLogin = isDevelopment ? React.lazy(() => import('./components/AdminLogin')) : null;
+const AdminPanel = isDevelopment ? React.lazy(() => import('./components/AdminPanel')) : null;
+const Chatbot = isDevelopment ? React.lazy(() => import('./components/Chatbot')) : null;
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false); // Pas d'initialisation bloquante
   
   // Admin states only in development
   const [showAdmin, setShowAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
-  // Initialisation ultra-rapide et sécurisée pour HTTPS
+  // Initialisation non-bloquante pour HTTPS
   useEffect(() => {
-    const initializeApp = () => {
+    // Vérification asynchrone non-bloquante
+    setTimeout(() => {
       try {
-        // Vérification synchrone et rapide
-        const userLoggedIn = localStorage.getItem('userLoggedIn');
-        const adminLoggedIn = isDevelopment ? localStorage.getItem('adminLoggedIn') : null;
+        const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+        const adminLoggedIn = isDevelopment && localStorage.getItem('adminLoggedIn') === 'true';
         
-        if (userLoggedIn === 'true') {
-          setIsLoggedIn(true);
-        }
-        
-        if (isDevelopment && adminLoggedIn === 'true') {
-          setIsAdminLoggedIn(true);
-        }
+        setIsLoggedIn(userLoggedIn);
+        if (isDevelopment) setIsAdminLoggedIn(adminLoggedIn);
       } catch (err) {
-        console.warn('Erreur localStorage (non critique):', err);
-        // Continuer même en cas d'erreur localStorage
+        console.warn('localStorage non disponible:', err);
       }
-      
-      // Terminer l'initialisation immédiatement
-      setIsInitializing(false);
-    };
-
-    // Initialisation immédiate
-    initializeApp();
+    }, 0);
   }, []);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    setError(null);
   };
 
   const toggleAdmin = () => {
@@ -93,37 +77,10 @@ function App() {
     setShowAdminLogin(false);
   };
 
-  // Écran de chargement minimal (très court)
+  // Pas d'écran de chargement bloquant
   if (isInitializing) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 text-yellow-600 animate-spin mx-auto mb-4" />
-          <h2 className="text-lg font-light text-white tracking-wider">CERCLE PRIVÉ</h2>
-        </div>
-      </div>
-    );
-  }
-
-  // Affichage d'erreur simplifié
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-lg font-light text-white mb-4 tracking-wider">
-            Problème technique
-          </h2>
-          <p className="text-gray-400 font-light mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="flex items-center justify-center space-x-2 px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors mx-auto"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>Recharger</span>
-          </button>
-        </div>
-      </div>
+      <div className="min-h-screen bg-gray-900"></div>
     );
   }
 
@@ -138,7 +95,7 @@ function App() {
   }
 
   // Admin login (développement uniquement)
-  if (isDevelopment && showAdminLogin) {
+  if (isDevelopment && showAdminLogin && AdminLogin) {
     return (
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -158,7 +115,7 @@ function App() {
   }
 
   // Admin panel (développement uniquement)
-  if (isDevelopment && showAdmin) {
+  if (isDevelopment && showAdmin && AdminPanel) {
     return (
       <React.Suspense fallback={
         <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -187,7 +144,7 @@ function App() {
       <VendreSection />
       
       {/* Chatbot uniquement en développement */}
-      {isDevelopment && (
+      {isDevelopment && Chatbot && (
         <React.Suspense fallback={null}>
           <Chatbot />
         </React.Suspense>

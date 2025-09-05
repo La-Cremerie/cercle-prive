@@ -28,7 +28,7 @@
   </head>
   <body>
     <style>
-      /* Loader ultra-simplifié pour HTTPS */
+      /* Loader optimisé HTTPS - Disparition automatique */
       #initial-loader {
         position: fixed;
         top: 0;
@@ -41,7 +41,7 @@
         align-items: center;
         justify-content: center;
         z-index: 9999;
-        transition: opacity 0.3s ease-out;
+        transition: opacity 0.5s ease-out;
       }
       
       .loader-title {
@@ -67,10 +67,19 @@
         100% { transform: rotate(360deg); }
       }
       
-      /* Masquer le loader quand React est chargé */
+      /* Masquer automatiquement le loader */
       .react-loaded #initial-loader {
         opacity: 0;
         pointer-events: none;
+      }
+      
+      /* Fallback si React ne charge pas */
+      body:not(.react-loaded) #initial-loader {
+        animation: fadeOut 0.5s ease-out 3s forwards;
+      }
+      
+      @keyframes fadeOut {
+        to { opacity: 0; pointer-events: none; }
       }
     </style>
     
@@ -84,14 +93,10 @@
     <script type="module" src="/src/main.tsx"></script>
     
     <script>
-      // Timeout de sécurité unique et simple
+      // Timeout de sécurité HTTPS optimisé
       setTimeout(function() {
-        const loader = document.getElementById('initial-loader');
-        if (loader && loader.style.opacity !== '0') {
-          console.warn('Timeout de sécurité activé');
-          document.body.classList.add('react-loaded');
-        }
-      }, 5000); // 5 secondes max
+        document.body.classList.add('react-loaded');
+      }, 2000); // 2 secondes max pour HTTPS
     </script>
   </body>
 </html>
