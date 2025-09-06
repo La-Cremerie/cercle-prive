@@ -49,4 +49,31 @@
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  
+  /* Mobile luxury dark navy background */
+  @media (max-width: 768px) {
+    body {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1a237e 50%, #1e3a8a 100%);
+      background-attachment: fixed;
+    }
+    
+    /* Ensure text contrast on mobile */
+    .mobile-text-contrast {
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Mobile card backgrounds for better readability */
+    .mobile-card-bg {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Navigation mobile styling */
+    .mobile-nav-bg {
+      background: rgba(13, 27, 42, 0.95);
+      backdrop-filter: blur(15px);
+    }
+  }
 }
