@@ -271,7 +271,7 @@ const PropertyManagement: React.FC = () => {
         setProperties(updatedProperties);
         localStorage.setItem('properties', JSON.stringify(updatedProperties));
         // Diffuser le changement en temps réel
-        await broadcastChange('properties', 'update', propertyData);
+        broadcastChange('properties', 'update', propertyData);
         toast.success('Bien modifié avec succès');
       } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
@@ -287,7 +287,7 @@ const PropertyManagement: React.FC = () => {
         setProperties(updatedProperties);
         localStorage.setItem('properties', JSON.stringify(updatedProperties));
         // Diffuser le changement en temps réel
-        await broadcastChange('properties', 'create', propertyData);
+        broadcastChange('properties', 'create', propertyData);
         toast.success('Nouveau bien ajouté avec succès');
       } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
