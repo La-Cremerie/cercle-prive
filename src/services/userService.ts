@@ -31,27 +31,6 @@ const saveLocalUsers = (users: UserRegistration[]) => {
 };
 
 export class UserService {
-  // Authenticate user with email and password
-  static async authenticateUser(email: string, password: string): Promise<UserRegistration> {
-    console.log('UserService.authenticateUser called with:', { email });
-    
-    // Get user by email first
-    const user = await this.getUserByEmail(email);
-    
-    if (!user) {
-      throw new Error('Invalid email or password');
-    }
-    
-    // For demo purposes, we'll accept any password for existing users
-    // In production, you would verify against a hashed password
-    if (!password || password.length < 1) {
-      throw new Error('Password is required');
-    }
-    
-    console.log('Authentication successful for user:', user.email);
-    return user;
-  }
-
   static async registerUser(userData: Omit<NewUserRegistration, 'id' | 'created_at'>): Promise<UserRegistration> {
     console.log('UserService.registerUser called with:', { email: userData.email });
     
