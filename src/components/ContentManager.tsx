@@ -173,72 +173,7 @@ const ContentManager: React.FC = () => {
 
   // Contenu par défaut déplacé dans la fonction getDefaultContent ci-dessus
   const [activeSection, setActiveSection] = useState<keyof SiteContent>('hero');
-      hero: {
-        title: "l'excellence immobilière en toute discrétion",
-        subtitle: "",
-        backgroundImage: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920"
-      },
-      concept: {
-        title: "CONCEPT",
-        subtitle: "l'immobilier haut gamme en off market",
-        description: [
-          "nous avons fait le choix de la discrétion, de l'exclusivité et de l'excellence.",
-          "Nous sommes spécialisés dans la vente de biens immobiliers haut de gamme en off-market, une approche confidentielle réservée à une clientèle exigeante, en quête de biens rares, souvent inaccessibles via les canaux traditionnels."
-        ],
-        image: "https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800"
-      },
-      offMarket: {
-        title: "Qu'est-ce que l'Off-Market ?",
-        description: "L'immobilier \"off-market\" consiste à proposer des biens à la vente sans publicité publique ni diffusion sur les plateformes classiques. Ce mode de commercialisation, réservé à un cercle restreint d'acheteurs qualifiés, garantit une confidentialité totale et permet de préserver la rareté et la valeur des biens proposés.",
-        sellerAdvantages: [
-          "Discrétion totale",
-          "Moins de visites inutiles", 
-          "Rapidité de transaction",
-          "Position de force sur le prix",
-          "Préservation de la valeur du bien"
-        ],
-        buyerAdvantages: [
-          "Accès à des biens rares ou exclusifs",
-          "Moins de concurrence",
-          "Négociation plus directe",
-          "Opportunité d'investissement discrète"
-        ]
-      },
-      services: {
-        title: "Nos services",
-        subtitle: "Un accompagnement personnalisé pour tous vos projets immobiliers",
-        items: [
-          {
-            title: "Achat",
-            description: "Conseil et accompagnement personnalisé pour l'acquisition de votre bien d'exception"
-          },
-          {
-            title: "Vente", 
-            description: "Estimation et commercialisation de votre propriété avec notre expertise du marché de prestige"
-          },
-          {
-            title: "Location",
-            description: "Gestion locative haut de gamme pour propriétaires et recherche pour locataires exigeants"
-          },
-          {
-            title: "Investissement",
-            description: "Conseil en investissement immobilier et opportunités sur la Côte d'Azur"
-          }
-        ]
-      },
-      contact: {
-        email: "nicolas.c@lacremerie.fr",
-        phone: "+33 1 23 45 67 89",
-        address: "123 Boulevard de la Croisette, 06400 Cannes"
-      },
-      branding: {
-        siteName: "CERCLE PRIVÉ",
-        logoUrl: ""
-      }
-    };
-  });
 
-  const [activeSection, setActiveSection] = useState<keyof SiteContent>('hero');
   const [isEditing, setIsEditing] = useState(false);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
