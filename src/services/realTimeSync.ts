@@ -69,7 +69,7 @@ export class RealTimeSyncService {
               });
             }
           } else if (status === 'CHANNEL_ERROR') {
-            console.error('❌ Erreur de canal temps réel');
+            console.error('❌ Erreur de canal temps réel Supabase. Vérifiez VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY et les paramètres Realtime de votre projet Supabase.');
             this.handleConnectionError();
           } else if (status === 'CLOSED') {
             console.warn('⚠️ Canal temps réel fermé');
