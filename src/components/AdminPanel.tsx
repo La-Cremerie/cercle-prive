@@ -305,24 +305,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     if (connectionStatus.connected) {
                       // Passer en mode hors ligne
                       RealTimeSyncService.getInstance().disconnect();
-                      toast.success('Mode hors ligne activé', { icon: '🔴' });
+                      toast.success('Mode manuel activé - Mises à jour désactivées', { icon: '🔴' });
                     } else {
                       // Passer en mode en ligne
                       RealTimeSyncService.getInstance().reconnect();
-                      toast.success('Reconnexion en cours...', { icon: '🟡' });
+                      toast.success('Mode automatique activé - Mises à jour en temps réel', { icon: '🟡' });
                     }
                   }}
                   className={`flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-medium transition-all duration-300 ${
                     connectionStatus.connected
-                      ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                      : 'bg-red-100 text-red-700 hover:bg-red-200'
+                      ? 'bg-green-100 text-green-700 hover:bg-green-200 shadow-sm'
+                      : 'bg-orange-100 text-orange-700 hover:bg-orange-200 shadow-sm'
                   }`}
-                  title={connectionStatus.connected ? 'Passer en mode hors ligne' : 'Passer en mode en ligne'}
+                  title={connectionStatus.connected ? 'Passer en mode manuel (désactiver les mises à jour automatiques)' : 'Passer en mode automatique (activer les mises à jour en temps réel)'}
                 >
                   <div className={`w-2 h-2 rounded-full ${
-                    connectionStatus.connected ? 'bg-green-500' : 'bg-red-500'
+                    connectionStatus.connected ? 'bg-green-500 animate-pulse' : 'bg-orange-500'
                   }`}></div>
-                  <span>{connectionStatus.connected ? 'ON' : 'OFF'}</span>
+                  <span>{connectionStatus.connected ? 'AUTO' : 'MANUEL'}</span>
                 </button>
                 
                 <div className={`w-3 h-3 rounded-full ${
@@ -330,12 +330,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 }`}></div>
                 <div className="text-sm">
                   <div className={`font-medium ${
-                    connectionStatus.connected ? 'text-green-700' : 'text-red-800'
+                    connectionStatus.connected ? 'text-green-700' : 'text-orange-700'
                   }`}>
-                    {connectionStatus.connected ? '🟢 SYNCHRONISATION ACTIVE' : '🔴 HORS LIGNE'}
+                    {connectionStatus.connected ? '🟢 MISES À JOUR AUTOMATIQUES' : '🟠 MODE MANUEL'}
                   </div>
                   <div className="text-xs text-gray-500">
-                    {connectionStatus.subscribers} composant(s) connecté(s)
+                    {connectionStatus.connected 
+                      ? `${connectionStatus.subscribers} composant(s) synchronisé(s)`
+                      : 'Synchronisation désactivée'
+                    }
                   </div>
                 </div>
               </div>
