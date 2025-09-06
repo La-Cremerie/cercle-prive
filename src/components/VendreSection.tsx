@@ -122,10 +122,10 @@ const VendreSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-light text-blue-600 tracking-wide mb-8">
+          <h2 className="text-3xl sm:text-4xl font-light text-yellow-600 tracking-wide mb-8">
             VENDRE VOTRE BIEN
           </h2>
-          <div className="w-24 h-px bg-blue-600 mx-auto mb-8"></div>
+          <div className="w-24 h-px bg-yellow-600 mx-auto mb-8"></div>
           <p className="text-lg text-gray-700 dark:text-gray-300 font-light leading-relaxed max-w-4xl mx-auto">
             Confiez-nous la vente de votre bien immobilier de prestige. Notre approche off-market garantit discrétion, 
             valorisation optimale et accompagnement personnalisé pour une transaction réussie.

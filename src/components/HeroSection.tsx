@@ -131,7 +131,7 @@ const HeroSection: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: imageLoaded ? 0.6 : 0.9 }}
           href="mailto:nicolas.c@lacremerie.fr"
-          className="inline-block border-2 border-white text-white px-8 py-4 text-sm font-light tracking-wider hover:bg-white hover:text-blue-900 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          className="inline-block border border-white text-white px-8 py-3 text-sm font-light tracking-wider hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105"
         >
           Entrer en relation
         </motion.a>

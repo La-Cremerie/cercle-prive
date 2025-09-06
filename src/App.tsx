@@ -171,9 +171,9 @@ function App() {
       <RechercheSection />
       <PropertyGallery />
       <VendreSection />
-      <ContactSection />
       <PWAInstallPrompt />
-      {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && <Chatbot />}
+      <Chatbot />
+      <ContactSection />
       <Toaster position="top-right" />
     </>
   );

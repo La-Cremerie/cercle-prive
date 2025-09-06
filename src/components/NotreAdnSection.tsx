@@ -38,7 +38,7 @@ const NotreAdnSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-20">
           {/* Left Content */}
           <div className="space-y-8 lg:pr-8">
-            <h2 className="text-3xl sm:text-4xl font-light text-blue-600 tracking-wide">
+            <h2 className="text-3xl sm:text-4xl font-light text-yellow-600 tracking-wide">
               CONCEPT
             </h2>
             <div className="space-y-4">
@@ -53,19 +53,19 @@ const NotreAdnSection: React.FC = () => {
               </p>
               <ul className="space-y-2 text-gray-700 text-base leading-relaxed font-light">
                 <li className="flex items-start">
-                  <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
                   Acquisition immobilière rigoureusement sélectionnée
                 </li>
                 <li className="flex items-start">
-                  <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
                   Travaux et ameublement conçus pour la valorisation
                 </li>
                 <li className="flex items-start">
-                  <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
                   Financement et structuration patrimoniale sur mesure
                 </li>
                 <li className="flex items-start">
-                  <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></span>
                   Revente optimisée pour maximiser la performance
                 </li>
               </ul>
@@ -105,7 +105,7 @@ const NotreAdnSection: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-yellow-600 rounded-full mt-3 flex-shrink-0"></div>
                   <div>
                     <h5 className="text-lg font-medium text-gray-900 mb-2">Discrétion assurée</h5>
                     <p className="text-gray-600 font-light leading-relaxed">
@@ -115,7 +115,7 @@ const NotreAdnSection: React.FC = () => {
                 </div>
                 
                 <div className="flex items-start space-x-4">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-yellow-600 rounded-full mt-3 flex-shrink-0"></div>
                   <div>
                     <h5 className="text-lg font-medium text-gray-900 mb-2">Sélection exclusive</h5>
                     <p className="text-gray-600 font-light leading-relaxed">
@@ -125,7 +125,7 @@ const NotreAdnSection: React.FC = () => {
                 </div>
                 
                 <div className="flex items-start space-x-4">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-yellow-600 rounded-full mt-3 flex-shrink-0"></div>
                   <div>
                     <h5 className="text-lg font-medium text-gray-900 mb-2">Patrimoine immobilier</h5>
                     <p className="text-gray-600 font-light leading-relaxed">
@@ -137,7 +137,7 @@ const NotreAdnSection: React.FC = () => {
               
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-yellow-600 rounded-full mt-3 flex-shrink-0"></div>
                   <div>
                     <h5 className="text-lg font-medium text-gray-900 mb-2">Accompagnement sur-mesure</h5>
                     <p className="text-gray-600 font-light leading-relaxed">
@@ -147,7 +147,7 @@ const NotreAdnSection: React.FC = () => {
                 </div>
                 
                 <div className="flex items-start space-x-4">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-yellow-600 rounded-full mt-3 flex-shrink-0"></div>
                   <div>
                     <h5 className="text-lg font-medium text-gray-900 mb-2">Réseau d'exception</h5>
                     <p className="text-gray-600 font-light leading-relaxed">
@@ -157,7 +157,7 @@ const NotreAdnSection: React.FC = () => {
                 </div>
                 
                 <div className="flex items-start space-x-4">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-yellow-600 rounded-full mt-3 flex-shrink-0"></div>
                   <div>
                     <h5 className="text-lg font-medium text-gray-900 mb-2">Rentabilité</h5>
                     <p className="text-gray-600 font-light leading-relaxed">
@@ -173,7 +173,7 @@ const NotreAdnSection: React.FC = () => {
             <h4 className="text-xl sm:text-2xl font-light text-gray-900 mb-6 tracking-wide">
               Une autre vision de l'immobilier de prestige
             </h4>
-            <div className="w-24 h-px bg-blue-400 mx-auto mb-6"></div>
+            <div className="w-24 h-px bg-yellow-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-700 font-light leading-relaxed max-w-3xl mx-auto italic">
               Nous croyons que l'immobilier de luxe ne se vend pas, il se transmet. C'est pourquoi nous privilégions une approche humaine, fondée sur la confiance, la confidentialité et l'excellence dans chaque détail.
             </p>

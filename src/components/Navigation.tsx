@@ -33,35 +33,29 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            <a href="#notre-adn" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
+            <a href="#notre-adn" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
               CONCEPT
             </a>
-            <a href="#nos-services" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
+            <a href="#nos-services" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
               NOS SERVICES
             </a>
-            <a href="#recherche" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
+            <a href="#recherche" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
               RECHERCHE
             </a>
-            <a href="#galerie-biens" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
+            <a href="#galerie-biens" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
               ACHETER
             </a>
-            <a href="#vendre" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
+            <a href="#vendre" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
               VENDRE
-            </a>
-            <a href="#off-market" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
-              OFF-MARKET
-            </a>
-            <a href="#contact" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
-              CONTACT
             </a>
             
             {/* Theme toggle only in development */}
             <ThemeToggle />
             
-            {(onAdminClick && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) && (
+            {onAdminClick && (
               <button
                 onClick={handleAdminClick}
-                className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
               >
                 <Settings className="w-4 h-4" />
                 {unreadCount > 0 && (
@@ -91,59 +85,45 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
               <a
                 href="#notre-adn"
                 onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
               >
                 CONCEPT
               </a>
               <a
                 href="#nos-services"
                 onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
               >
                 NOS SERVICES
               </a>
               <a
                 href="#recherche"
                 onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
               >
                 RECHERCHE
               </a>
               <a
                 href="#galerie-biens"
                 onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
               >
                 ACHETER
               </a>
               <a
                 href="#vendre"
                 onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
               >
                 VENDRE
               </a>
-              <a
-                href="#off-market"
-                onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
-              >
-                OFF-MARKET
-              </a>
-              <a
-                href="#contact"
-                onClick={toggleMenu}
-                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
-              >
-                CONTACT
-              </a>
-              {(onAdminClick && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) && (
+              {onAdminClick && (
                 <button
                   onClick={() => {
                     handleAdminClick();
                     toggleMenu();
                   }}
-                  className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                  className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
                 >
                   <Settings className="w-4 h-4" />
                   <span>ADMIN</span>
