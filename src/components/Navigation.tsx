@@ -61,13 +61,6 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
             {/* Theme toggle only in development */}
             <ThemeToggle />
             
-            {/* Indicateur de synchronisation temps réel */}
-            <RealTimeSyncIndicator 
-              connected={connectionStatus.connected}
-              subscribers={connectionStatus.subscribers}
-              className="hidden lg:flex"
-            />
-            
             {/* Admin access logo - always visible but discreet */}
             {onAdminClick && (
               <button
