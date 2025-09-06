@@ -7,9 +7,11 @@ import { useRealTimeSync } from '../hooks/useRealTimeSync';
 
 interface NavigationProps {
   onAdminClick?: () => void;
+  onLogout?: () => void;
+  onForceLogin?: () => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
+const Navigation: React.FC<NavigationProps> = ({ onAdminClick, onLogout, onForceLogin }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { unreadCount, markAsRead } = useNotifications();
   const { connectionStatus } = useRealTimeSync('navigation');
@@ -60,6 +62,28 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
             
             {/* Theme toggle only in development */}
             <ThemeToggle />
+            
+            {/* Bouton Login */}
+            {onForceLogin && (
+              <button
+                onClick={onForceLogin}
+                className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                title="Accéder à la page de connexion"
+              >
+                LOGIN
+              </button>
+            )}
+            
+            {/* Bouton Logout */}
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors tracking-wide"
+                title="Se déconnecter"
+              >
+                LOGOUT
+              </button>
+            )}
             
             {/* Admin access logo - always visible but discreet */}
             {onAdminClick && (
@@ -148,6 +172,32 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
               >
                 CONTACT
               </a>
+              
+              {/* Boutons Login/Logout pour mobile */}
+              {onForceLogin && (
+                <button
+                  onClick={() => {
+                    onForceLogin();
+                    toggleMenu();
+                  }}
+                  className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
+                >
+                  LOGIN
+                </button>
+              )}
+              
+              {onLogout && (
+                <button
+                  onClick={() => {
+                    onLogout();
+                    toggleMenu();
+                  }}
+                  className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors tracking-wide"
+                >
+                  LOGOUT
+                </button>
+              )}
+              
               {onAdminClick && (
                 <button
                   onClick={() => {

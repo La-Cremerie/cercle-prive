@@ -47,6 +47,7 @@ function App() {
   const [appReady, setAppReady] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [showDiagnostic, setShowDiagnostic] = useState(false);
+  const [forceShowLogin, setForceShowLogin] = useState(false);
   const { showUpdateSlider, setShowUpdateSlider, updateInfo, isPWA, isMobile } = useUpdateChecker();
   
   // Initialiser la synchronisation temps réel
@@ -85,6 +86,13 @@ function App() {
     };
   }, []);
 
+  // Écouter les paramètres URL pour forcer l'affichage du login
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login') === 'true' || urlParams.get('force-login') === 'true') {
+      setForceShowLogin(true);
+    }
+  }, []);
   // Initialisation ultra-simple et robuste
   useEffect(() => {
     try {
@@ -145,8 +153,24 @@ function App() {
     console.log('Login success callback triggered');
     setIsUserLoggedIn(true);
     setIsLoading(false);
+    setForceShowLogin(false);
+    // Nettoyer l'URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('login');
+    url.searchParams.delete('force-login');
+    window.history.replaceState({}, '', url.toString());
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('userLoggedIn');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('adminLoggedIn');
+    setIsUserLoggedIn(false);
+    setIsAdminLoggedIn(false);
+    setShowAdmin(false);
+    setForceShowLogin(false);
+    toast.success('Déconnexion réussie');
+  };
   // Fallback d'erreur
   if (hasError) {
     return (
@@ -230,10 +254,22 @@ function App() {
   };
 
   // Si l'utilisateur n'est pas connecté, afficher le formulaire de connexion
-  if (!isUserLoggedIn) {
+  if (!isUserLoggedIn || forceShowLogin) {
     return (
       <>
-        <LoginForm onLoginSuccess={handleLoginSuccess} />
+        <div className="relative">
+          <LoginForm onLoginSuccess={handleLoginSuccess} />
+          {forceShowLogin && isUserLoggedIn && (
+            <div className="absolute top-4 right-4">
+              <button
+                onClick={() => setForceShowLogin(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+              >
+                Retour au site
+              </button>
+            </div>
+          )}
+        </div>
         <Toaster position="top-right" />
       </>
     );
@@ -266,7 +302,11 @@ function App() {
   return (
     <>
       <BlankPageDetector />
-      <Navigation onAdminClick={toggleAdmin} />
+      <Navigation 
+        onAdminClick={toggleAdmin}
+        onLogout={handleLogout}
+        onForceLogin={() => setForceShowLogin(true)}
+      />
       <HeroSection />
       <NotreAdnSection />
       <ServicesSection />
