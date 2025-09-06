@@ -77,7 +77,8 @@ export const useAdminPermissions = (currentUser: AdminUser | null) => {
       { key: 'admin_management', label: 'Administration', module: 'admin_management' as AdminModule },
       { key: 'nicolas_content', label: 'Contenu Nicolas', module: 'content' as AdminModule },
       { key: 'content_publisher', label: 'Publication', module: 'content' as AdminModule },
-      { key: 'diagnostic', label: 'Diagnostic', module: 'admin_management' as AdminModule }
+      { key: 'diagnostic', label: 'Diagnostic', module: 'admin_management' as AdminModule },
+      { key: 'auth_test', label: 'Test Auth', module: 'admin_management' as AdminModule }
     ];
 
     return allTabs.filter(tab => canAccessModule(tab.module));

@@ -25,6 +25,7 @@ import SEOManager from './SEOManager';
 import PerformanceOptimizer from './PerformanceOptimizer';
 import ContentSyncDashboard from './ContentSyncDashboard';
 import DiagnosticPanel from './DiagnosticPanel';
+import AuthenticationTester from './AuthenticationTester';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -819,6 +820,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
        {activeTab === 'content_publisher' && canAccessModule('content') && (
          <ContentPublisher />
        )}
+
+        {activeTab === 'auth_test' && canAccessModule('admin_management') && (
+          <AuthenticationTester />
+        )}
 
         {activeTab === 'nicolas_content' && canAccessModule('content') && (
           <NicolasContentViewer />
