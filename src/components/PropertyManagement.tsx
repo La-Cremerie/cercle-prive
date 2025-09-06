@@ -114,6 +114,7 @@ const PropertyManagement: React.FC = () => {
   const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadMethod, setUploadMethod] = useState<'url' | 'file' | 'drive'>('url');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { broadcastChange } = useRealTimeSync('property-management');
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [selectedPropertyHistory, setSelectedPropertyHistory] = useState<string | null>(null);
@@ -296,10 +297,19 @@ const PropertyManagement: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Prevent multiple submissions
+    if (isLoading) {
+      toast.error('Une opération est déjà en cours. Veuillez patienter.');
+      return;
+    }
+    
     if (!formData.name || !formData.location || !formData.price) {
       toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
+
+    // Set loading state to prevent concurrent operations
+    setIsLoading(true);
 
     const propertyData: Property = {
       id: editingProperty?.id || Date.now().toString(),
@@ -346,13 +356,14 @@ const PropertyManagement: React.FC = () => {
         localStorage.setItem('properties', JSON.stringify(updatedProperties));
         // Diffuser le changement en temps réel
         broadcastChange('properties', 'update', propertyData);
-        toast.success('Bien modifié avec succès');
+        toast.success(`Property successfully updated - ID: #${propertyData.id}, Address: ${propertyData.location}, Type: ${propertyData.type}`);
       } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
           toast.error('Espace de stockage insuffisant. Utilisez des images plus petites ou des liens externes.');
         } else {
           toast.error('Erreur lors de la sauvegarde');
         }
+        setIsLoading(false);
         return;
       }
     } else {
@@ -362,13 +373,14 @@ const PropertyManagement: React.FC = () => {
         localStorage.setItem('properties', JSON.stringify(updatedProperties));
         // Diffuser le changement en temps réel
         broadcastChange('properties', 'create', propertyData);
-        toast.success('Nouveau bien ajouté avec succès');
+        toast.success(`Property successfully added - ID: #${propertyData.id}, Address: ${propertyData.location}, Type: ${propertyData.type}`);
       } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
           toast.error('Espace de stockage insuffisant. Utilisez des images plus petites ou des liens externes.');
         } else {
           toast.error('Erreur lors de la sauvegarde');
         }
+        setIsLoading(false);
         return;
       }
     }
@@ -377,6 +389,7 @@ const PropertyManagement: React.FC = () => {
     window.dispatchEvent(new Event('storage'));
     setShowForm(false);
     resetForm();
+    setIsLoading(false);
   };
 
   const addFeature = () => {
@@ -993,10 +1006,11 @@ const PropertyManagement: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
+                    disabled={isLoading}
+                    className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Save className="w-4 h-4" />
-                    <span>{editingProperty ? 'Modifier' : 'Ajouter'}</span>
+                    <span>{isLoading ? 'En cours...' : (editingProperty ? 'Modifier' : 'Ajouter')}</span>
                   </button>
                 </div>
               </form>
