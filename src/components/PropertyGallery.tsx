@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Heart, MapPin, Bed, Bath, Square, Eye, X, Plus, Calculator, Bell } from 'lucide-react';
-import { GitCompare as Compare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Property } from '../types/property';
-import PropertyComparator from './PropertyComparator';
-import RentabilityCalculator from './RentabilityCalculator';
-import PropertyAlerts from './PropertyAlerts';
 
 // Utiliser les données depuis localStorage ou données par défaut
 const getPropertiesFromStorage = () => {
@@ -79,9 +75,6 @@ const PropertyGallery: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'villa' | 'appartement' | 'penthouse'>('all');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [properties, setProperties] = useState(() => getPropertiesFromStorage());
-  const [showComparator, setShowComparator] = useState(false);
-  const [showCalculator, setShowCalculator] = useState(false);
-  const [showAlerts, setShowAlerts] = useState(false);
 
   // Écouter les changements dans localStorage
   useEffect(() => {
@@ -152,36 +145,6 @@ const PropertyGallery: React.FC = () => {
                 {label}
               </button>
             ))}
-          </div>
-        </div>
-
-        {/* Outils d'analyse immobilière */}
-        <div className="text-center mt-16">
-          <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-8 tracking-wide">
-            OUTILS D'ANALYSE
-          </h3>
-          <div className="flex justify-center space-x-4 flex-wrap gap-4">
-            <button
-              onClick={() => setShowComparator(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <Compare className="w-5 h-5" />
-              <span>Comparer les biens</span>
-            </button>
-            <button
-              onClick={() => setShowCalculator(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-            >
-              <Calculator className="w-5 h-5" />
-              <span>Calculer la rentabilité</span>
-            </button>
-            <button
-              onClick={() => setShowAlerts(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-            >
-              <Bell className="w-5 h-5" />
-              <span>Créer des alertes</span>
-            </button>
           </div>
         </div>
 
@@ -484,25 +447,6 @@ const PropertyGallery: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Modals pour les outils */}
-        {showComparator && (
-          <PropertyComparator 
-            properties={properties}
-            onClose={() => setShowComparator(false)}
-          />
-        )}
-        
-        {showCalculator && (
-          <RentabilityCalculator 
-            onClose={() => setShowCalculator(false)}
-          />
-        )}
-        
-        {showAlerts && (
-          <PropertyAlerts 
-            onClose={() => setShowAlerts(false)}
-          />
-        )}
       </div>
     </section>
   );
