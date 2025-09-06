@@ -307,27 +307,85 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                       try {
                         toast.loading('Synchronisation manuelle en cours...', { id: 'manual-sync' });
                         
+                       // 1. D'abord sauvegarder toutes les modifications locales
+                       console.log('💾 Sauvegarde des modifications locales...');
+                       
+                       // Sauvegarder le contenu du site
+                       const siteContent = localStorage.getItem('siteContent');
+                       if (siteContent) {
+                         window.dispatchEvent(new CustomEvent('contentUpdated', { detail: JSON.parse(siteContent) }));
+                       }
+                       
+                       // Sauvegarder les propriétés
+                       const properties = localStorage.getItem('properties');
+                       if (properties) {
+                         window.dispatchEvent(new Event('storage'));
+                       }
+                       
+                       // Sauvegarder les images de présentation
+                       const presentationImages = localStorage.getItem('presentationImages');
+                       if (presentationImages) {
+                         const images = JSON.parse(presentationImages);
+                         const activeImage = images.find((img: any) => img.isActive);
+                         if (activeImage) {
+                           window.dispatchEvent(new CustomEvent('presentationImageChanged', { detail: activeImage.url }));
+                         }
+                       }
+                       
+                       // Sauvegarder les paramètres de design
+                       const designSettings = localStorage.getItem('designSettings');
+                       if (designSettings) {
+                         window.dispatchEvent(new CustomEvent('designSettingsChanged', { detail: JSON.parse(designSettings) }));
+                       }
+                       
+                       // 2. Diffuser tous les changements via le service de sync
+                       console.log('📡 Diffusion des changements...');
+                       
+                       if (siteContent) {
+                         await broadcastChange('content', 'update', JSON.parse(siteContent));
+                       }
+                       
+                       if (properties) {
+                         await broadcastChange('properties', 'update', JSON.parse(properties));
+                       }
+                       
+                       if (presentationImages) {
+                         const images = JSON.parse(presentationImages);
+                         const activeImage = images.find((img: any) => img.isActive);
+                         await broadcastChange('images', 'update', {
+                           category: 'hero',
+                           images,
+                           activeImage: activeImage?.url
+                         });
+                       }
+                       
+                       if (designSettings) {
+                         await broadcastChange('design', 'update', JSON.parse(designSettings));
+                       }
+                       
+                       // 3. Forcer la reconnexion et synchronisation
                         // Forcer la reconnexion et synchronisation
                         await RealTimeSyncService.getInstance().reconnect();
                         
-                        // Recharger les données
+                       // 4. Recharger les données utilisateurs
                         await loadUsers();
                         
-                        toast.success('Synchronisation manuelle terminée', { id: 'manual-sync', icon: '🔄' });
+                       toast.success('Modifications sauvegardées et synchronisées !', { id: 'manual-sync', icon: '✅' });
                       } catch (error) {
-                        toast.error('Erreur lors de la synchronisation manuelle', { id: 'manual-sync' });
+                       console.error('Erreur sync manuelle:', error);
+                       toast.error('Erreur lors de la sauvegarde/synchronisation', { id: 'manual-sync' });
                       }
                     };
                     
                     performManualSync();
                   }}
-                  className="flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-medium transition-all duration-300 bg-blue-100 text-blue-700 hover:bg-blue-200 shadow-sm"
-                  title="Lancer une synchronisation manuelle des données"
+                 className="flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-medium transition-all duration-300 bg-green-100 text-green-700 hover:bg-green-200 shadow-sm"
+                 title="Sauvegarder toutes les modifications et les publier en ligne"
                 >
                   <div className={`w-2 h-2 rounded-full ${
                     connectionStatus.connected ? 'bg-green-500' : 'bg-orange-500'
                   }`}></div>
-                  <span>SYNC MANUEL</span>
+                 <span>SAUVEGARDER & PUBLIER</span>
                 </button>
                 
                 <div className={`w-3 h-3 rounded-full ${
