@@ -297,13 +297,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
             <div className="flex items-center space-x-4">
               {/* Indicateur de connexion temps réel */}
-              <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  connectionStatus.connected ? 'bg-green-500' : 'bg-red-500'
+              <div className="flex items-center space-x-3 px-3 py-2 bg-gray-50 rounded-lg border">
+                <div className={`w-3 h-3 rounded-full ${
+                  connectionStatus.connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'
                 }`}></div>
-                <span className="text-xs text-gray-500">
-                  {connectionStatus.connected ? 'Sync ON' : 'Sync OFF'}
-                </span>
+                <div className="text-sm">
+                  <div className={`font-medium ${
+                    connectionStatus.connected ? 'text-green-700' : 'text-red-700'
+                  }`}>
+                    {connectionStatus.connected ? 'SYNCHRONISATION ACTIVE' : 'HORS LIGNE'}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {connectionStatus.subscribers} composant(s) connecté(s)
+                  </div>
+                </div>
               </div>
             <div className="flex space-x-2">
               <button
