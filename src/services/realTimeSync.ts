@@ -421,6 +421,42 @@ export class RealTimeSyncService {
     this.isConnected = false;
   }
 
+  // Déconnecter manuellement
+  disconnect(): void {
+    console.log('🔴 Déconnexion manuelle du mode temps réel');
+    this.isConnected = false;
+    
+    if (this.channel) {
+      supabase.removeChannel(this.channel);
+      this.channel = null;
+    }
+    
+    // Notifier les abonnés de la déconnexion
+    this.subscribers.forEach(callback => {
+      try {
+        const disconnectEvent: SyncEvent = {
+          id: Date.now().toString(),
+          type: 'config',
+          action: 'update',
+          data: { status: 'disconnected' },
+          timestamp: new Date().toISOString(),
+          adminId: 'system',
+          adminName: 'Système'
+        };
+        callback(disconnectEvent);
+      } catch (error) {
+        console.error('Erreur notification déconnexion:', error);
+      }
+    });
+  }
+
+  // Reconnecter manuellement
+  async reconnect(): Promise<void> {
+    console.log('🟡 Reconnexion manuelle au mode temps réel');
+    this.reconnectAttempts = 0; // Reset des tentatives
+    await this.initialize();
+  }
+
   // Obtenir le statut de connexion
   getConnectionStatus(): { connected: boolean; subscribers: number } {
     return {

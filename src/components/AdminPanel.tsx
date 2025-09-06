@@ -297,7 +297,33 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
             </div>
             <div className="flex items-center space-x-4">
               {/* Indicateur de connexion temps réel */}
-              <div className="flex items-center space-x-3 px-4 py-2 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center space-x-3 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                {/* Bouton Toggle Online/Offline */}
+                <button
+                  onClick={() => {
+                    if (connectionStatus.connected) {
+                      // Passer en mode hors ligne
+                      syncService.disconnect();
+                      toast.success('Mode hors ligne activé', { icon: '🔴' });
+                    } else {
+                      // Passer en mode en ligne
+                      syncService.reconnect();
+                      toast.success('Reconnexion en cours...', { icon: '🟡' });
+                    }
+                  }}
+                  className={`flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-medium transition-all duration-300 ${
+                    connectionStatus.connected
+                      ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                      : 'bg-red-100 text-red-700 hover:bg-red-200'
+                  }`}
+                  title={connectionStatus.connected ? 'Passer en mode hors ligne' : 'Passer en mode en ligne'}
+                >
+                  <div className={`w-2 h-2 rounded-full ${
+                    connectionStatus.connected ? 'bg-green-500' : 'bg-red-500'
+                  }`}></div>
+                  <span>{connectionStatus.connected ? 'ON' : 'OFF'}</span>
+                </button>
+                
                 <div className={`w-3 h-3 rounded-full ${
                   connectionStatus.connected ? 'bg-green-500 animate-pulse' : 'bg-red-500 animate-pulse'
                 }`}></div>
