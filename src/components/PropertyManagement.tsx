@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, Save, X, Home, MapPin, Bed, Bath, Square, Upload, L
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useRealTimeSync } from '../hooks/useRealTimeSync';
+import { ContentVersioningService } from '../services/contentVersioningService';
 
 interface Property {
   id: string;
@@ -114,6 +115,26 @@ const PropertyManagement: React.FC = () => {
   const [uploadMethod, setUploadMethod] = useState<'url' | 'file' | 'drive'>('url');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { broadcastChange } = useRealTimeSync('property-management');
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [selectedPropertyHistory, setSelectedPropertyHistory] = useState<string | null>(null);
+  const [versionHistory, setVersionHistory] = useState<any[]>([]);
+
+  // Charger les propriétés depuis Supabase au démarrage
+  useEffect(() => {
+    const loadPropertiesFromSupabase = async () => {
+      try {
+        const supabaseProperties = await ContentVersioningService.getCurrentProperties();
+        if (supabaseProperties.length > 0) {
+          setProperties(supabaseProperties);
+          localStorage.setItem('properties', JSON.stringify(supabaseProperties));
+        }
+      } catch (error) {
+        console.warn('Erreur chargement propriétés Supabase:', error);
+      }
+    };
+
+    loadPropertiesFromSupabase();
+  }, []);
 
   // Écouter les changements dans localStorage
   useEffect(() => {
@@ -147,6 +168,38 @@ const PropertyManagement: React.FC = () => {
     setNewImageUrl('');
     setEditingProperty(null);
   };
+  const showPropertyHistory = async (propertyId: string) => {
+    setSelectedPropertyHistory(propertyId);
+    try {
+      const history = await ContentVersioningService.getVersionHistory('properties', propertyId);
+      setVersionHistory(history);
+      setShowVersionHistory(true);
+    } catch (error) {
+      toast.error('Erreur lors du chargement de l\'historique');
+    }
+  };
+
+  const rollbackPropertyToVersion = async (versionId: string, versionNumber: number) => {
+    if (window.confirm(`Restaurer la propriété à la version ${versionNumber} ?`)) {
+      try {
+        const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+        const adminName = adminEmail.split('@')[0];
+        
+        await ContentVersioningService.rollbackToVersion('properties', versionId, adminName, adminEmail);
+        
+        // Recharger les propriétés
+        const updatedProperties = await ContentVersioningService.getCurrentProperties();
+        setProperties(updatedProperties);
+        localStorage.setItem('properties', JSON.stringify(updatedProperties));
+        window.dispatchEvent(new Event('storage'));
+        
+        setShowVersionHistory(false);
+      } catch (error) {
+        toast.error('Erreur lors de la restauration');
+      }
+    }
+  };
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -264,6 +317,27 @@ const PropertyManagement: React.FC = () => {
       yield: formData.yield || 0,
       isVisible: formData.isVisible !== false
     };
+
+    // Sauvegarder dans Supabase avec versioning
+    const saveToSupabase = async () => {
+      try {
+        const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+        const adminName = adminEmail.split('@')[0];
+        
+        await ContentVersioningService.savePropertyVersion(
+          propertyData,
+          adminName,
+          adminEmail,
+          editingProperty ? `Modification de ${propertyData.name}` : `Création de ${propertyData.name}`
+        );
+        
+        console.log('✅ Propriété sauvegardée dans Supabase avec versioning');
+      } catch (error) {
+        console.warn('⚠️ Erreur sauvegarde Supabase, utilisation localStorage:', error);
+      }
+    };
+
+    saveToSupabase();
 
     if (editingProperty) {
       const updatedProperties = properties.map(p => p.id === editingProperty.id ? propertyData : p);
@@ -412,6 +486,13 @@ const PropertyManagement: React.FC = () => {
                   title="Dupliquer ce bien"
                 >
                   <Copy className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => showPropertyHistory(property.id)}
+                  className="p-2 bg-white/90 text-purple-600 rounded-full hover:bg-white transition-colors"
+                  title="Voir l'historique"
+                >
+                  <Eye className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(property.id)}
@@ -923,6 +1004,119 @@ const PropertyManagement: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Modal d'historique des versions de propriété */}
+      {showVersionHistory && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+                  Historique des Versions - Propriété
+                </h3>
+                <button
+                  onClick={() => setShowVersionHistory(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {versionHistory.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  Aucun historique disponible pour cette propriété
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {versionHistory.map((version) => (
+                    <div
+                      key={version.id}
+                      className={`border rounded-lg p-4 ${
+                        version.is_current
+                          ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                          : 'border-gray-200 dark:border-gray-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            version.is_current
+                              ? 'bg-yellow-600 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}>
+                            Version {version.version_number}
+                          </span>
+                          <span className="text-sm text-gray-900 dark:text-white font-medium">
+                            {version.name}
+                          </span>
+                          {version.is_current && (
+                            <span className="text-sm text-yellow-600 font-medium">
+                              (Version actuelle)
+                            </span>
+                          )}
+                        </div>
+                        {!version.is_current && (
+                          <button
+                            onClick={() => rollbackPropertyToVersion(version.id, version.version_number)}
+                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                          >
+                            Restaurer
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-3">
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Prix:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">{version.price}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Localisation:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">{version.location}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Statut:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">{version.status}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Auteur:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">
+                            {version.author_name} ({version.author_email})
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Date:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">
+                            {new Date(version.created_at).toLocaleString('fr-FR')}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {version.change_description && (
+                        <div className="mt-3 text-sm">
+                          <span className="text-gray-500 dark:text-gray-400">Description:</span>
+                          <span className="ml-2 text-gray-700 dark:text-gray-300">
+                            {version.change_description}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

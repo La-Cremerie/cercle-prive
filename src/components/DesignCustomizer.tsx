@@ -3,6 +3,7 @@ import { Palette, Layout, Type, Sliders, Save, RotateCcw, Eye, Monitor, Smartpho
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useRealTimeSync } from '../hooks/useRealTimeSync';
+import { ContentVersioningService } from '../services/contentVersioningService';
 
 interface DesignSettings {
   colors: {
@@ -73,6 +74,23 @@ const DesignCustomizer: React.FC = () => {
   const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const { broadcastChange } = useRealTimeSync('design-customizer');
 
+  // Charger les paramètres depuis Supabase au démarrage
+  useEffect(() => {
+    const loadDesignFromSupabase = async () => {
+      try {
+        const supabaseDesign = await ContentVersioningService.getCurrentDesignSettings();
+        if (supabaseDesign) {
+          setSettings(supabaseDesign);
+          localStorage.setItem('designSettings', JSON.stringify(supabaseDesign));
+        }
+      } catch (error) {
+        console.warn('Erreur chargement design Supabase:', error);
+      }
+    };
+
+    loadDesignFromSupabase();
+  }, []);
+
   const applyDesignSettings = () => {
     const root = document.documentElement;
     
@@ -92,6 +110,28 @@ const DesignCustomizer: React.FC = () => {
   };
 
   const saveSettings = () => {
+    // Sauvegarder dans Supabase avec versioning
+    const saveToSupabase = async () => {
+      try {
+        const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+        const adminName = adminEmail.split('@')[0];
+        
+        await ContentVersioningService.saveDesignSettingsVersion(
+          settings,
+          adminName,
+          adminEmail,
+          'Modification des paramètres de design'
+        );
+        
+        console.log('✅ Paramètres de design sauvegardés dans Supabase avec versioning');
+      } catch (error) {
+        console.warn('⚠️ Erreur sauvegarde Supabase, utilisation localStorage:', error);
+      }
+    };
+
+    saveToSupabase();
+
+    // Sauvegarder localement (fallback)
     localStorage.setItem('designSettings', JSON.stringify(settings));
     applyDesignSettings();
     // Diffuser le changement en temps réel
@@ -182,6 +222,22 @@ const DesignCustomizer: React.FC = () => {
           >
             <RotateCcw className="w-4 h-4" />
             <span>Réinitialiser</span>
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                const history = await ContentVersioningService.getVersionHistory('design');
+                // Afficher l'historique des versions de design
+                console.log('Historique design:', history);
+                toast.success(`${history.length} version(s) trouvée(s)`);
+              } catch (error) {
+                toast.error('Erreur lors du chargement de l\'historique');
+              }
+            }}
+            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Historique</span>
           </button>
           <button
             onClick={saveSettings}

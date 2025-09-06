@@ -3,6 +3,7 @@ import { Save, Edit, Image, Type, Globe, Eye, Upload, Link, Trash2, Plus, X, Cop
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useRealTimeSync } from '../hooks/useRealTimeSync';
+import { ContentVersioningService } from '../services/contentVersioningService';
 
 interface ContentSection {
   id: string;
@@ -180,10 +181,52 @@ const ContentManager: React.FC = () => {
   const [showBulkEditor, setShowBulkEditor] = useState(false);
   const [bulkText, setBulkText] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [versionHistory, setVersionHistory] = useState<any[]>([]);
+  const [isLoadingVersions, setIsLoadingVersions] = useState(false);
   const { broadcastChange } = useRealTimeSync('content-manager');
+
+  // Charger le contenu depuis Supabase au démarrage
+  useEffect(() => {
+    const loadContentFromSupabase = async () => {
+      try {
+        const supabaseContent = await ContentVersioningService.getCurrentSiteContent();
+        if (supabaseContent) {
+          setContent(supabaseContent);
+          localStorage.setItem('siteContent', JSON.stringify(supabaseContent));
+        }
+      } catch (error) {
+        console.warn('Erreur chargement contenu Supabase:', error);
+      }
+    };
+
+    loadContentFromSupabase();
+  }, []);
 
   const saveContent = () => {
     try {
+      // Sauvegarder dans Supabase avec versioning
+      const saveToSupabase = async () => {
+        try {
+          const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+          const adminName = adminEmail.split('@')[0];
+          
+          await ContentVersioningService.saveContentVersion(
+            content,
+            adminName,
+            adminEmail,
+            'Modification du contenu via ContentManager'
+          );
+          
+          console.log('✅ Contenu sauvegardé dans Supabase avec versioning');
+        } catch (error) {
+          console.warn('⚠️ Erreur sauvegarde Supabase, utilisation localStorage:', error);
+        }
+      };
+
+      saveToSupabase();
+
+      // Sauvegarder localement (fallback)
       localStorage.setItem('siteContent', JSON.stringify(content));
       
       // Déclencher des événements pour mettre à jour les composants
@@ -195,6 +238,55 @@ const ContentManager: React.FC = () => {
       toast.success('Contenu sauvegardé avec succès');
     } catch (error) {
       toast.error('Erreur lors de la sauvegarde');
+    }
+  };
+
+  const loadVersionHistory = async () => {
+    setIsLoadingVersions(true);
+    try {
+      const history = await ContentVersioningService.getVersionHistory('content');
+      setVersionHistory(history);
+      setShowVersionHistory(true);
+    } catch (error) {
+      toast.error('Erreur lors du chargement de l\'historique');
+    } finally {
+      setIsLoadingVersions(false);
+    }
+  };
+
+  const rollbackToVersion = async (versionId: string, versionNumber: number) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir revenir à la version ${versionNumber} ?`)) {
+      try {
+        const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+        const adminName = adminEmail.split('@')[0];
+        
+        await ContentVersioningService.rollbackToVersion('content', versionId, adminName, adminEmail);
+        
+        // Recharger le contenu après rollback
+        const restoredContent = await ContentVersioningService.getCurrentSiteContent();
+        if (restoredContent) {
+          setContent(restoredContent);
+          localStorage.setItem('siteContent', JSON.stringify(restoredContent));
+          window.dispatchEvent(new CustomEvent('contentUpdated', { detail: restoredContent }));
+        }
+        
+        setShowVersionHistory(false);
+      } catch (error) {
+        toast.error('Erreur lors du rollback');
+      }
+    }
+  };
+
+  const migrateLocalData = async () => {
+    if (window.confirm('Migrer les données locales vers Supabase ? Cette action sauvegarde définitivement vos modifications.')) {
+      try {
+        const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+        const adminName = adminEmail.split('@')[0];
+        
+        await ContentVersioningService.migrateLocalDataToSupabase(adminName, adminEmail);
+      } catch (error) {
+        toast.error('Erreur lors de la migration');
+      }
     }
   };
 
@@ -643,6 +735,21 @@ const ContentManager: React.FC = () => {
             <span>Édition en masse</span>
           </button>
           <button
+            onClick={loadVersionHistory}
+            disabled={isLoadingVersions}
+            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50"
+          >
+            <Eye className="w-4 h-4" />
+            <span>{isLoadingVersions ? 'Chargement...' : 'Historique'}</span>
+          </button>
+          <button
+            onClick={migrateLocalData}
+            className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+          >
+            <Save className="w-4 h-4" />
+            <span>Migrer vers Supabase</span>
+          </button>
+          <button
             onClick={resetToDefaults}
             className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
           >
@@ -1071,6 +1178,101 @@ const ContentManager: React.FC = () => {
                   <span>Appliquer les modifications</span>
                 </button>
               </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Modal d'historique des versions */}
+      {showVersionHistory && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+                  Historique des Versions - Contenu
+                </h3>
+                <button
+                  onClick={() => setShowVersionHistory(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {versionHistory.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  Aucun historique disponible
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {versionHistory.map((version) => (
+                    <div
+                      key={version.id}
+                      className={`border rounded-lg p-4 ${
+                        version.is_current
+                          ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                          : 'border-gray-200 dark:border-gray-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            version.is_current
+                              ? 'bg-yellow-600 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}>
+                            Version {version.version_number}
+                          </span>
+                          {version.is_current && (
+                            <span className="text-sm text-yellow-600 font-medium">
+                              (Version actuelle)
+                            </span>
+                          )}
+                        </div>
+                        {!version.is_current && (
+                          <button
+                            onClick={() => rollbackToVersion(version.id, version.version_number)}
+                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                          >
+                            Restaurer
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Auteur:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">
+                            {version.author_name} ({version.author_email})
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Date:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">
+                            {new Date(version.created_at).toLocaleString('fr-FR')}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {version.change_description && (
+                        <div className="mt-3 text-sm">
+                          <span className="text-gray-500 dark:text-gray-400">Description:</span>
+                          <span className="ml-2 text-gray-700 dark:text-gray-300">
+                            {version.change_description}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

@@ -3,6 +3,7 @@ import { Image, Upload, Link, Save, X, Eye, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useRealTimeSync } from '../hooks/useRealTimeSync';
+import { ContentVersioningService } from '../services/contentVersioningService';
 
 interface PresentationImage {
   id: string;
@@ -52,8 +53,57 @@ const PresentationImageManager: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { broadcastChange } = useRealTimeSync('image-manager');
   
+  // Charger les images depuis Supabase au démarrage
+  useEffect(() => {
+    const loadImagesFromSupabase = async () => {
+      try {
+        const heroImagesFromSupabase = await ContentVersioningService.getCurrentPresentationImages('hero');
+        const conceptImagesFromSupabase = await ContentVersioningService.getCurrentPresentationImages('concept');
+        
+        if (heroImagesFromSupabase.length > 0) {
+          setImages(heroImagesFromSupabase);
+          localStorage.setItem('presentationImages', JSON.stringify(heroImagesFromSupabase));
+        }
+        
+        if (conceptImagesFromSupabase.length > 0) {
+          setConceptImages(conceptImagesFromSupabase);
+          localStorage.setItem('conceptImages', JSON.stringify(conceptImagesFromSupabase));
+        }
+      } catch (error) {
+        console.warn('Erreur chargement images Supabase:', error);
+      }
+    };
+
+    loadImagesFromSupabase();
+  }, []);
+
   const saveImages = () => {
     try {
+      // Sauvegarder dans Supabase avec versioning
+      const saveToSupabase = async () => {
+        try {
+          const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+          const adminName = adminEmail.split('@')[0];
+          
+          const currentImages = activeCategory === 'hero' ? images : conceptImages;
+          
+          await ContentVersioningService.savePresentationImagesVersion(
+            activeCategory,
+            currentImages,
+            adminName,
+            adminEmail,
+            `Modification des images ${activeCategory}`
+          );
+          
+          console.log(`✅ Images ${activeCategory} sauvegardées dans Supabase avec versioning`);
+        } catch (error) {
+          console.warn('⚠️ Erreur sauvegarde Supabase, utilisation localStorage:', error);
+        }
+      };
+
+      saveToSupabase();
+
+      // Sauvegarder localement (fallback)
       if (activeCategory === 'hero') {
         localStorage.setItem('presentationImages', JSON.stringify(images));
         // Déclencher un événement pour mettre à jour le hero
@@ -93,6 +143,30 @@ const PresentationImageManager: React.FC = () => {
       } else {
         toast.error('Erreur lors de la sauvegarde des images');
       }
+    }
+  };
+
+  const addImageFromUrl = async () => {
+    if (!newImageUrl.trim() || !newImageName.trim()) {
+      toast.error('Veuillez remplir tous les champs');
+      return;
+    }
+
+    try {
+      const newImage: PresentationImage = {
+        id: Date.now().toString(),
+        url: newImageUrl.trim(),
+        name: newImageName.trim(),
+        type: 'url',
+        isActive: false
+      };
+
+      setCurrentImages(prev => [...prev, newImage]);
+      setNewImageUrl('');
+      setNewImageName('');
+      toast.success('Image ajoutée depuis URL');
+    } catch (error) {
+      toast.error('Erreur lors de l\'ajout de l\'image');
     }
   };
 
@@ -441,6 +515,23 @@ const PresentationImageManager: React.FC = () => {
             <span>Sauvegarder</span>
           </button>
         </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={async () => {
+              try {
+                const history = await ContentVersioningService.getVersionHistory('images', activeCategory);
+                setVersionHistory(history);
+                setShowVersionHistory(true);
+              } catch (error) {
+                toast.error('Erreur lors du chargement de l\'historique');
+              }
+            }}
+            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Historique</span>
+          </button>
+        </div>
 
         {currentImages.length === 0 ? (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
@@ -513,6 +604,129 @@ const PresentationImageManager: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Modal d'historique des versions d'images */}
+      {showVersionHistory && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+                  Historique des Images - {activeCategory === 'hero' ? 'Page d\'accueil' : 'Section Concept'}
+                </h3>
+                <button
+                  onClick={() => setShowVersionHistory(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {versionHistory.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  Aucun historique disponible
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {versionHistory.map((version) => (
+                    <div
+                      key={version.id}
+                      className={`border rounded-lg p-4 ${
+                        version.is_current
+                          ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                          : 'border-gray-200 dark:border-gray-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            version.is_current
+                              ? 'bg-yellow-600 text-white'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}>
+                            Version {version.version_number}
+                          </span>
+                          {version.is_current && (
+                            <span className="text-sm text-yellow-600 font-medium">
+                              (Version actuelle)
+                            </span>
+                          )}
+                        </div>
+                        {!version.is_current && (
+                          <button
+                            onClick={async () => {
+                              try {
+                                const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+                                const adminName = adminEmail.split('@')[0];
+                                
+                                await ContentVersioningService.rollbackToVersion('images', version.id, adminName, adminEmail);
+                                
+                                // Recharger les images
+                                const updatedImages = await ContentVersioningService.getCurrentPresentationImages(activeCategory);
+                                if (activeCategory === 'hero') {
+                                  setImages(updatedImages);
+                                  localStorage.setItem('presentationImages', JSON.stringify(updatedImages));
+                                } else {
+                                  setConceptImages(updatedImages);
+                                  localStorage.setItem('conceptImages', JSON.stringify(updatedImages));
+                                }
+                                
+                                setShowVersionHistory(false);
+                              } catch (error) {
+                                toast.error('Erreur lors de la restauration');
+                              }
+                            }}
+                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                          >
+                            Restaurer
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-3">
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Auteur:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">
+                            {version.author_name} ({version.author_email})
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">Date:</span>
+                          <span className="ml-2 text-gray-900 dark:text-white">
+                            {new Date(version.created_at).toLocaleString('fr-FR')}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="text-sm mb-3">
+                        <span className="text-gray-500 dark:text-gray-400">Images:</span>
+                        <span className="ml-2 text-gray-900 dark:text-white">
+                          {version.images_data?.length || 0} image(s)
+                        </span>
+                      </div>
+                      
+                      {version.change_description && (
+                        <div className="text-sm">
+                          <span className="text-gray-500 dark:text-gray-400">Description:</span>
+                          <span className="ml-2 text-gray-700 dark:text-gray-300">
+                            {version.change_description}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

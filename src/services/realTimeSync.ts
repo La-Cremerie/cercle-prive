@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import toast from 'react-hot-toast';
+import { ContentVersioningService } from './contentVersioningService';
 
 export interface SyncEvent {
   id: string;
@@ -32,6 +33,9 @@ export class RealTimeSyncService {
     try {
       console.log('🔄 Initialisation de la synchronisation temps réel...');
       
+      // Synchroniser les données depuis Supabase au démarrage
+      await ContentVersioningService.syncFromSupabaseToLocal();
+      
       // Vérifier la configuration Supabase
       if (!this.isSupabaseConfigured()) {
         console.warn('⚠️ Supabase non configuré - synchronisation temps réel désactivée');
@@ -51,6 +55,38 @@ export class RealTimeSyncService {
           }, (payload) => {
             console.log('📊 Changement utilisateur détecté:', payload);
             this.handleUserChange(payload);
+          })
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'site_content_versions'
+          }, (payload) => {
+            console.log('📝 Changement contenu détecté:', payload);
+            this.handleContentVersionChange(payload);
+          })
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'properties_versions'
+          }, (payload) => {
+            console.log('🏠 Changement propriétés détecté:', payload);
+            this.handlePropertiesVersionChange(payload);
+          })
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'presentation_images_versions'
+          }, (payload) => {
+            console.log('🖼️ Changement images détecté:', payload);
+            this.handleImagesVersionChange(payload);
+          })
+          .on('postgres_changes', {
+            event: '*,
+            schema: 'public',
+            table: 'design_settings_versions'
+          }, (payload) => {
+            console.log('🎨 Changement design détecté:', payload);
+            this.handleDesignVersionChange(payload);
           })
           .on('broadcast', { event: 'admin_change' }, (payload) => {
             console.log('📡 Événement admin reçu:', payload);
@@ -86,6 +122,98 @@ export class RealTimeSyncService {
     } catch (error) {
       console.error('❌ Erreur initialisation sync:', error);
       this.handleConnectionError();
+    }
+  }
+
+  // Gérer les changements de version de contenu
+  private async handleContentVersionChange(payload: any): Promise<void> {
+    if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
+      console.log('📝 Nouvelle version de contenu active');
+      
+      // Synchroniser depuis Supabase
+      const newContent = await ContentVersioningService.getCurrentSiteContent();
+      if (newContent) {
+        localStorage.setItem('siteContent', JSON.stringify(newContent));
+        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: newContent }));
+        
+        // Notification pour les utilisateurs non-admin
+        if (!this.isAdminUser()) {
+          this.showMobileUpdateNotification('content');
+        }
+      }
+    }
+  }
+
+  // Gérer les changements de version de propriétés
+  private async handlePropertiesVersionChange(payload: any): Promise<void> {
+    if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
+      console.log('🏠 Nouvelle version de propriétés active');
+      
+      // Synchroniser toutes les propriétés depuis Supabase
+      const newProperties = await ContentVersioningService.getCurrentProperties();
+      if (newProperties.length > 0) {
+        localStorage.setItem('properties', JSON.stringify(newProperties));
+        window.dispatchEvent(new Event('storage'));
+        
+        if (!this.isAdminUser()) {
+          this.showMobileUpdateNotification('properties');
+        }
+      }
+    }
+  }
+
+  // Gérer les changements de version d'images
+  private async handleImagesVersionChange(payload: any): Promise<void> {
+    if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
+      console.log('🖼️ Nouvelle version d\'images active');
+      
+      const category = payload.new.category;
+      const newImages = await ContentVersioningService.getCurrentPresentationImages(category);
+      
+      if (newImages.length > 0) {
+        localStorage.setItem(`${category}Images`, JSON.stringify(newImages));
+        
+        const activeImage = newImages.find((img: any) => img.isActive);
+        if (activeImage) {
+          if (category === 'hero') {
+            window.dispatchEvent(new CustomEvent('presentationImageChanged', { detail: activeImage.url }));
+          } else if (category === 'concept') {
+            const siteContent = JSON.parse(localStorage.getItem('siteContent') || '{}');
+            siteContent.concept = { ...siteContent.concept, image: activeImage.url };
+            localStorage.setItem('siteContent', JSON.stringify(siteContent));
+            window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
+          }
+        }
+        
+        if (!this.isAdminUser()) {
+          this.showMobileUpdateNotification('images');
+        }
+      }
+    }
+  }
+
+  // Gérer les changements de version de design
+  private async handleDesignVersionChange(payload: any): Promise<void> {
+    if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
+      console.log('🎨 Nouvelle version de design active');
+      
+      const newDesignSettings = await ContentVersioningService.getCurrentDesignSettings();
+      if (newDesignSettings) {
+        localStorage.setItem('designSettings', JSON.stringify(newDesignSettings));
+        window.dispatchEvent(new CustomEvent('designSettingsChanged', { detail: newDesignSettings }));
+        
+        // Appliquer les variables CSS
+        const root = document.documentElement;
+        if (newDesignSettings.colors) {
+          Object.entries(newDesignSettings.colors).forEach(([key, value]) => {
+            root.style.setProperty(`--color-${key}`, value as string);
+          });
+        }
+        
+        if (!this.isAdminUser()) {
+          this.showMobileUpdateNotification('design');
+        }
+      }
     }
   }
 
