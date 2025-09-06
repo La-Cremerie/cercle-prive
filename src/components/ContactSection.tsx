@@ -93,7 +93,7 @@ export default function ContactSection() {
           <h2 className="text-4xl font-light text-white mb-4 tracking-wide">
             CONTACTEZ-NOUS
           </h2>
-          <div className="w-24 h-px bg-blue-400 mx-auto mb-8"></div>
+          <div className="w-24 h-px bg-blue-300 mx-auto mb-8"></div>
           <p className="text-xl text-blue-100 font-light">
             Notre équipe d'experts est à votre disposition
           </p>
@@ -211,7 +211,7 @@ export default function ContactSection() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-blue-900 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-blue-900 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
                 <Send className={`w-5 h-5 ${isSubmitting ? 'animate-pulse' : ''}`} />
                 <span>{isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}</span>
