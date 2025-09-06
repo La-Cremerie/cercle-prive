@@ -15,6 +15,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import AdminLogin from './components/AdminLogin';
 import AdminPanel from './components/AdminPanel';
 import Chatbot from './components/Chatbot';
+import ContactSection from './components/ContactSection';
 
 // Fallback de chargement
 const LoadingFallback = () => (
@@ -137,7 +138,7 @@ function App() {
   }
 
   // Admin panel (development only)
-  if (showAdmin && import.meta.env.DEV) {
+  if (showAdmin) {
     return (
       <>
         <AdminPanel onLogout={handleAdminLogout} />
@@ -147,7 +148,7 @@ function App() {
   }
 
   // Admin login (development only)
-  if (showAdminLogin && import.meta.env.DEV) {
+  if (showAdminLogin) {
     return (
       <>
         <AdminLogin 
@@ -162,7 +163,7 @@ function App() {
   // Main site - show all sections
   return (
     <>
-      <Navigation onAdminClick={import.meta.env.DEV ? toggleAdmin : undefined} />
+      <Navigation onAdminClick={toggleAdmin} />
       <HeroSection />
       <NotreAdnSection />
       <ServicesSection />
@@ -171,7 +172,8 @@ function App() {
       <PropertyGallery />
       <VendreSection />
       <PWAInstallPrompt />
-      {import.meta.env.DEV && <Chatbot />}
+      <Chatbot />
+      <ContactSection />
       <Toaster position="top-right" />
     </>
   );

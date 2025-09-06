@@ -155,6 +155,36 @@ const PropertyGallery: React.FC = () => {
           </div>
         </div>
 
+        {/* Outils d'analyse immobilière */}
+        <div className="text-center mt-16">
+          <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-8 tracking-wide">
+            OUTILS D'ANALYSE
+          </h3>
+          <div className="flex justify-center space-x-4 flex-wrap gap-4">
+            <button
+              onClick={() => setShowComparator(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Compare className="w-5 h-5" />
+              <span>Comparer les biens</span>
+            </button>
+            <button
+              onClick={() => setShowCalculator(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              <Calculator className="w-5 h-5" />
+              <span>Calculer la rentabilité</span>
+            </button>
+            <button
+              onClick={() => setShowAlerts(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            >
+              <Bell className="w-5 h-5" />
+              <span>Créer des alertes</span>
+            </button>
+          </div>
+        </div>
+
         {/* Grille des propriétés */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProperties.map((property) => (
@@ -453,6 +483,26 @@ const PropertyGallery: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Modals pour les outils */}
+        {showComparator && (
+          <PropertyComparator 
+            properties={properties}
+            onClose={() => setShowComparator(false)}
+          />
+        )}
+        
+        {showCalculator && (
+          <RentabilityCalculator 
+            onClose={() => setShowCalculator(false)}
+          />
+        )}
+        
+        {showAlerts && (
+          <PropertyAlerts 
+            onClose={() => setShowAlerts(false)}
+          />
+        )}
       </div>
     </section>
   );
