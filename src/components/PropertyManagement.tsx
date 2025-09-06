@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Save, X, Home, MapPin, Bed, Bath, Square, Upload, Link, Image, Copy, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useRealTimeSync } from '../hooks/useRealTimeSync';
 
 interface Property {
   id: string;
@@ -112,6 +113,7 @@ const PropertyManagement: React.FC = () => {
   const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadMethod, setUploadMethod] = useState<'url' | 'file' | 'drive'>('url');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const { broadcastChange } = useRealTimeSync('property-management');
 
   // Écouter les changements dans localStorage
   useEffect(() => {
@@ -231,6 +233,8 @@ const PropertyManagement: React.FC = () => {
       const updatedProperties = properties.filter(p => p.id !== propertyId);
       setProperties(updatedProperties);
       localStorage.setItem('properties', JSON.stringify(updatedProperties));
+      // Diffuser le changement en temps réel
+      broadcastChange('properties', 'delete', { id: propertyId });
       window.dispatchEvent(new Event('storage'));
       toast.success('Bien supprimé avec succès');
     }
@@ -266,6 +270,8 @@ const PropertyManagement: React.FC = () => {
       try {
         setProperties(updatedProperties);
         localStorage.setItem('properties', JSON.stringify(updatedProperties));
+        // Diffuser le changement en temps réel
+        await broadcastChange('properties', 'update', propertyData);
         toast.success('Bien modifié avec succès');
       } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
@@ -280,6 +286,8 @@ const PropertyManagement: React.FC = () => {
       try {
         setProperties(updatedProperties);
         localStorage.setItem('properties', JSON.stringify(updatedProperties));
+        // Diffuser le changement en temps réel
+        await broadcastChange('properties', 'create', propertyData);
         toast.success('Nouveau bien ajouté avec succès');
       } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {

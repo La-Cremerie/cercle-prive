@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Menu, X, Settings, Bell } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import ThemeToggle from './ThemeToggle';
+import RealTimeSyncIndicator from './RealTimeSyncIndicator';
+import { useRealTimeSync } from '../hooks/useRealTimeSync';
 
 interface NavigationProps {
   onAdminClick?: () => void;
@@ -10,6 +12,7 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { unreadCount, markAsRead } = useNotifications();
+  const { connectionStatus } = useRealTimeSync('navigation');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -57,6 +60,13 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
             
             {/* Theme toggle only in development */}
             <ThemeToggle />
+            
+            {/* Indicateur de synchronisation temps réel */}
+            <RealTimeSyncIndicator 
+              connected={connectionStatus.connected}
+              subscribers={connectionStatus.subscribers}
+              className="hidden lg:flex"
+            />
             
             {/* Admin access logo - always visible but discreet */}
             {onAdminClick && (

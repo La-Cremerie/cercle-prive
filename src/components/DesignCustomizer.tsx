@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Palette, Layout, Type, Sliders, Save, RotateCcw, Eye, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useRealTimeSync } from '../hooks/useRealTimeSync';
 
 interface DesignSettings {
   colors: {
@@ -70,6 +71,7 @@ const DesignCustomizer: React.FC = () => {
 
   const [activeSection, setActiveSection] = useState<'colors' | 'typography' | 'layout' | 'animations'>('colors');
   const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const { broadcastChange } = useRealTimeSync('design-customizer');
 
   const applyDesignSettings = () => {
     const root = document.documentElement;
@@ -92,6 +94,8 @@ const DesignCustomizer: React.FC = () => {
   const saveSettings = () => {
     localStorage.setItem('designSettings', JSON.stringify(settings));
     applyDesignSettings();
+    // Diffuser le changement en temps réel
+    broadcastChange('design', 'update', settings);
     toast.success('Paramètres de design sauvegardés');
   };
 

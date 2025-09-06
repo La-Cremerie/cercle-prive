@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Edit, Image, Type, Globe, Eye, Upload, Link, Trash2, Plus, X, Copy, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useRealTimeSync } from '../hooks/useRealTimeSync';
 
 interface ContentSection {
   id: string;
@@ -179,6 +180,7 @@ const ContentManager: React.FC = () => {
   const [showBulkEditor, setShowBulkEditor] = useState(false);
   const [bulkText, setBulkText] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const { broadcastChange } = useRealTimeSync('content-manager');
 
   const saveContent = () => {
     try {
@@ -186,6 +188,9 @@ const ContentManager: React.FC = () => {
       
       // Déclencher des événements pour mettre à jour les composants
       window.dispatchEvent(new CustomEvent('contentUpdated', { detail: content }));
+      
+      // Diffuser le changement en temps réel
+      broadcastChange('content', 'update', content);
       
       toast.success('Contenu sauvegardé avec succès');
     } catch (error) {

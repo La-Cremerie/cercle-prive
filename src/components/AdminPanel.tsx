@@ -8,6 +8,7 @@ import type { AdminUser } from '../types/admin';
 import { useAdminPermissions } from '../hooks/useAdminPermissions';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useRealTimeSync } from '../hooks/useRealTimeSync';
 import StatsCharts from './StatsCharts';
 import EmailSettings from './EmailSettings';
 import AdvancedAnalytics from './AdvancedAnalytics';
@@ -45,6 +46,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
   });
   
   const { hasPermission, canAccessModule, getAccessibleTabs } = useAdminPermissions(currentUser);
+  const { broadcastChange, connectionStatus } = useRealTimeSync('admin-panel');
 
   // Charger l'utilisateur admin actuel
   useEffect(() => {
@@ -197,6 +199,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur ${userName} ?`)) {
       try {
         await UserService.deleteUser(userId);
+        // Diffuser le changement en temps réel
+        await broadcastChange('users', 'delete', { id: userId, name: userName });
         await loadUsers();
         toast.success('Utilisateur supprimé avec succès');
       } catch (error) {
@@ -217,9 +221,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
     try {
       if (editingUser) {
         await UserService.updateUser(editingUser.id, userFormData);
+        // Diffuser le changement en temps réel
+        await broadcastChange('users', 'update', { ...userFormData, id: editingUser.id });
         toast.success('Utilisateur modifié avec succès');
       } else {
         await UserService.createUser(userFormData);
+        // Diffuser le changement en temps réel
+        await broadcastChange('users', 'create', userFormData);
         toast.success('Nouvel utilisateur créé avec succès');
       }
       
@@ -287,6 +295,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 </p>
               </div>
             </div>
+            <div className="flex items-center space-x-4">
+              {/* Indicateur de connexion temps réel */}
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  connectionStatus.connected ? 'bg-green-500' : 'bg-red-500'
+                }`}></div>
+                <span className="text-xs text-gray-500">
+                  {connectionStatus.connected ? 'Sync ON' : 'Sync OFF'}
+                </span>
+              </div>
             <div className="flex space-x-2">
               <button
                 onClick={loadUsers}

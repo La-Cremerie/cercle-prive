@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Image, Upload, Link, Save, X, Eye, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useRealTimeSync } from '../hooks/useRealTimeSync';
 
 interface PresentationImage {
   id: string;
@@ -49,6 +50,7 @@ const PresentationImageManager: React.FC = () => {
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageName, setNewImageName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { broadcastChange } = useRealTimeSync('image-manager');
   
   const saveImages = () => {
     try {
@@ -58,6 +60,12 @@ const PresentationImageManager: React.FC = () => {
         window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
           detail: images.find(img => img.isActive)?.url 
         }));
+        // Diffuser le changement en temps réel
+        broadcastChange('images', 'update', {
+          category: 'hero',
+          images,
+          activeImage: images.find(img => img.isActive)?.url
+        });
       } else {
         localStorage.setItem('conceptImages', JSON.stringify(conceptImages));
         // Mettre à jour le contenu du site avec la nouvelle image
@@ -70,6 +78,12 @@ const PresentationImageManager: React.FC = () => {
           };
           localStorage.setItem('siteContent', JSON.stringify(siteContent));
           window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
+          // Diffuser le changement en temps réel
+          broadcastChange('images', 'update', {
+            category: 'concept',
+            images: conceptImages,
+            activeImage: activeConceptImage.url
+          });
         }
       }
       toast.success('Images sauvegardées');

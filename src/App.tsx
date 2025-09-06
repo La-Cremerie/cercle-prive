@@ -18,6 +18,8 @@ import Chatbot from './components/Chatbot';
 import ContactSection from './components/ContactSection';
 import UpdateSlider from './components/UpdateSlider';
 import { useUpdateChecker } from './hooks/useUpdateChecker';
+import { useRealTimeSync } from './hooks/useRealTimeSync';
+import { syncService } from './services/realTimeSync';
 
 // Fallback de chargement
 const LoadingFallback = () => (
@@ -40,6 +42,17 @@ function App() {
   const [appReady, setAppReady] = useState(false);
   const [hasError, setHasError] = useState(false);
   const { showUpdateSlider, setShowUpdateSlider, updateInfo, isPWA, isMobile } = useUpdateChecker();
+  
+  // Initialiser la synchronisation temps réel
+  const { connectionStatus } = useRealTimeSync('main-app', (event) => {
+    console.log('🔄 Changement reçu dans App:', event);
+    
+    // Forcer le re-render des composants si nécessaire
+    if (event.type === 'content' || event.type === 'design') {
+      // Les composants se mettront à jour automatiquement via les événements
+      console.log('✅ Mise à jour automatique déclenchée');
+    }
+  });
 
   // Initialisation ultra-simple et robuste
   useEffect(() => {
@@ -68,6 +81,13 @@ function App() {
       setAppReady(true);
       document.body.classList.add('app-ready');
     }
+  }, []);
+
+  // Cleanup de la synchronisation
+  useEffect(() => {
+    return () => {
+      syncService.cleanup();
+    };
   }, []);
 
   // Gestion d'erreur globale
