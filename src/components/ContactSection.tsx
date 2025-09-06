@@ -120,7 +120,6 @@ export default function ContactSection() {
           {/* Informations de contact */}
           <div className="space-y-8">
             <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-10 border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-500 group">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-3xl"></div>
               <MapPin className="w-8 h-8 text-amber-400 mb-4" />
               <h3 className="text-xl font-light text-white mb-3 tracking-wide">Localisation</h3>
               <div className="w-12 h-px bg-amber-400/50 mb-4"></div>
@@ -129,7 +128,6 @@ export default function ContactSection() {
             </div>
 
             <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-10 border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-500 group">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-3xl"></div>
               <Phone className="w-8 h-8 text-amber-400 mb-4" />
               <h3 className="text-xl font-light text-white mb-3 tracking-wide">Téléphone</h3>
               <div className="w-12 h-px bg-amber-400/50 mb-4"></div>
@@ -140,7 +138,6 @@ export default function ContactSection() {
             </div>
 
             <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-10 border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-500 group">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-3xl"></div>
               <Mail className="w-8 h-8 text-amber-400 mb-4" />
               <h3 className="text-xl font-light text-white mb-3 tracking-wide">Email</h3>
               <div className="w-12 h-px bg-amber-400/50 mb-4"></div>
