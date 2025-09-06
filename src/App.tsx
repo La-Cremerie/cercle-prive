@@ -21,6 +21,9 @@ import { useUpdateChecker } from './hooks/useUpdateChecker';
 import { useRealTimeSync } from './hooks/useRealTimeSync';
 import { syncService } from './services/realTimeSync';
 import { ContentVersioningService } from './services/contentVersioningService';
+import DiagnosticPanel from './components/DiagnosticPanel';
+import BlankPageDetector from './components/BlankPageDetector';
+import { BlankPageDiagnostics } from './utils/diagnostics';
 
 // Fallback de chargement
 const LoadingFallback = () => (
@@ -42,6 +45,7 @@ function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [appReady, setAppReady] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [showDiagnostic, setShowDiagnostic] = useState(false);
   const { showUpdateSlider, setShowUpdateSlider, updateInfo, isPWA, isMobile } = useUpdateChecker();
   
   // Initialiser la synchronisation temps réel
@@ -124,6 +128,7 @@ function App() {
   // Gestion d'erreur globale
   const handleError = (error: Error) => {
     console.error('Erreur App:', error);
+    BlankPageDiagnostics.logError(error, 'App.tsx');
     setHasError(true);
   };
 
@@ -136,20 +141,54 @@ function App() {
   // Fallback d'erreur
   if (hasError) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <>
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-light text-yellow-600 tracking-wider mb-4">
             CERCLE PRIVÉ
           </h1>
           <p className="text-gray-400 mb-6">Erreur de chargement</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
-          >
-            Recharger la page
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={() => setShowDiagnostic(true)}
+              className="w-full px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Diagnostic Technique
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
+            >
+              Recharger la page
+            </button>
+            <button
+              onClick={() => {
+                BlankPageDiagnostics.emergencyReset();
+                window.location.reload();
+              }}
+              className="w-full px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              Reset d'urgence
+            </button>
+          </div>
         </div>
-      </div>
+        </div>
+        {showDiagnostic && (
+          <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+            <DiagnosticPanel />
+            <div className="fixed top-4 right-4">
+              <button
+                onClick={() => setShowDiagnostic(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        )}
+        <BlankPageDetector />
+        <Toaster position="top-right" />
+      </>
     );
   }
 
@@ -217,6 +256,7 @@ function App() {
   // Main site - show all sections
   return (
     <>
+      <BlankPageDetector />
       <Navigation onAdminClick={toggleAdmin} />
       <HeroSection />
       <NotreAdnSection />

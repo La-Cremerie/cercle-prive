@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Technique - CERCLE PRIVÉ</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1a237e 50%, #0d1b2a 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #d97706;
+        }
+        .logo {
+            color: #d97706;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+            border-left: 4px solid;
+        }
+        .status.success { 
+            background: rgba(34, 197, 94, 0.1); 
+            color: #22c55e; 
+            border-left-color: #22c55e; 
+        }
+        .status.warning { 
+            background: rgba(245, 158, 11, 0.1); 
+            color: #f59e0b; 
+            border-left-color: #f59e0b; 
+        }
+        .status.error { 
+            background: rgba(239, 68, 68, 0.1); 
+            color: #ef4444; 
+            border-left-color: #ef4444; 
+        }
+        .status.info { 
+            background: rgba(59, 130, 246, 0.1); 
+            color: #3b82f6; 
+            border-left-color: #3b82f6; 
+        }
+        .test-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .test-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .test-title::before {
+            content: "🔍";
+            margin-right: 10px;
+        }
+        .btn {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 5px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { 
+            background: #b45309; 
+            transform: translateY(-2px);
+        }
+        .btn.secondary {
+            background: #6b7280;
+        }
+        .btn.secondary:hover { 
+            background: #4b5563; 
+        }
+        .btn.danger {
+            background: #ef4444;
+        }
+        .btn.danger:hover { 
+            background: #dc2626; 
+        }
+        .results {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #d97706, #f59e0b);
+            transition: width 0.3s ease;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">CERCLE PRIVÉ</h1>
+            <h2>Diagnostic Technique Avancé</h2>
+            <p>Outil de diagnostic automatique pour résoudre les problèmes de page blanche</p>
+        </div>
+
+        <!-- État général -->
+        <div class="test-section">
+            <div class="test-title">État Général du Système</div>
+            <div id="general-status">
+                <div class="status info">🔄 Initialisation du diagnostic...</div>
+            </div>
+            <button class="btn" onclick="runComprehensiveDiagnostic()">🔍 Diagnostic Complet</button>
+            <button class="btn secondary" onclick="runQuickFix()">🔧 Réparation Rapide</button>
+        </div>
+
+        <!-- Tests spécifiques -->
+        <div class="test-section">
+            <div class="test-title">Tests Spécialisés</div>
+            <div class="grid">
+                <button class="btn" onclick="testReactMounting()">⚛️ Test React</button>
+                <button class="btn" onclick="testSupabaseConnection()">🗄️ Test Supabase</button>
+                <button class="btn" onclick="testUserSession()">👤 Test Session</button>
+                <button class="btn" onclick="testResourceLoading()">📦 Test Ressources</button>
+            </div>
+            <div id="specialized-results"></div>
+        </div>
+
+        <!-- Réparations automatiques -->
+        <div class="test-section">
+            <div class="test-title">Réparations Automatiques</div>
+            <div id="auto-fix-results"></div>
+            <div class="grid">
+                <button class="btn" onclick="clearCorruptedData()">🧹 Nettoyer Données</button>
+                <button class="btn" onclick="resetUserSession()">🔄 Reset Session</button>
+                <button class="btn" onclick="clearAllCaches()">💾 Vider Caches</button>
+                <button class="btn danger" onclick="emergencyReset()">🚨 Reset Complet</button>
+            </div>
+        </div>
+
+        <!-- Informations système -->
+        <div class="test-section">
+            <div class="test-title">Informations Système</div>
+            <div id="system-info"></div>
+        </div>
+
+        <!-- Actions de récupération -->
+        <div class="test-section">
+            <div class="test-title">Actions de Récupération</div>
+            <div class="grid">
+                <a href="/" class="btn">🏠 Retour Accueil</a>
+                <a href="/debug-check.html" class="btn secondary">🔧 Page Test</a>
+                <button class="btn" onclick="exportDiagnosticData()">📋 Exporter Rapport</button>
+                <a href="mailto:nicolas.c@lacremerie.fr?subject=Problème technique CERCLE PRIVÉ" class="btn">📧 Contacter Support</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales pour le diagnostic
+        let diagnosticData = {
+            errors: [],
+            warnings: [],
+            fixes: [],
+            systemInfo: {},
+            timestamp: new Date().toISOString()
+        };
+
+        // Initialiser les informations système
+        function initializeSystemInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                protocol: window.location.protocol,
+                host: window.location.host,
+                viewport: `${window.innerWidth} × ${window.innerHeight}`,
+                localStorage: typeof Storage !== 'undefined',
+                serviceWorker: 'serviceWorker' in navigator,
+                online: navigator.onLine,
+                language: navigator.language,
+                cookieEnabled: navigator.cookieEnabled,
+                javaScriptEnabled: true,
+                timestamp: new Date().toLocaleString('fr-FR')
+            };
+
+            diagnosticData.systemInfo = info;
+
+            document.getElementById('system-info').innerHTML = `
+                <div class="results">
+Browser: ${info.userAgent.split(' ')[0]}
+URL: ${info.url}
+Protocol: ${info.protocol}
+Host: ${info.host}
+Viewport: ${info.viewport}
+LocalStorage: ${info.localStorage ? '✅ Disponible' : '❌ Non disponible'}
+Service Worker: ${info.serviceWorker ? '✅ Supporté' : '❌ Non supporté'}
+Connexion: ${info.online ? '✅ En ligne' : '❌ Hors ligne'}
+Langue: ${info.language}
+Cookies: ${info.cookieEnabled ? '✅ Activés' : '❌ Désactivés'}
+JavaScript: ✅ Activé
+Dernière vérification: ${info.timestamp}
+                </div>
+            `;
+        }
+
+        // 1. Diagnostic complet
+        async function runComprehensiveDiagnostic() {
+            const statusDiv = document.getElementById('general-status');
+            statusDiv.innerHTML = '<div class="status info">🔄 Diagnostic complet en cours...</div>';
+
+            try {
+                let html = '';
+                let criticalIssues = 0;
+
+                // Test 1: Structure HTML/DOM
+                const rootElement = document.getElementById('root');
+                const hasRoot = !!rootElement;
+                const hasContent = rootElement && rootElement.children.length > 0;
+                
+                if (!hasRoot) {
+                    html += '<div class="status error">❌ Élément #root manquant dans le DOM</div>';
+                    criticalIssues++;
+                } else if (!hasContent) {
+                    html += '<div class="status warning">⚠️ Élément #root vide - React non monté</div>';
+                    criticalIssues++;
+                } else {
+                    html += '<div class="status success">✅ Structure DOM correcte</div>';
+                }
+
+                // Test 2: JavaScript et React
+                const reactLoaded = typeof React !== 'undefined';
+                if (!reactLoaded) {
+                    html += '<div class="status error">❌ React non chargé</div>';
+                    criticalIssues++;
+                } else {
+                    html += '<div class="status success">✅ React chargé correctement</div>';
+                }
+
+                // Test 3: CSS et styles
+                const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
+                const cssLoaded = stylesheets.length > 0;
+                if (!cssLoaded) {
+                    html += '<div class="status warning">⚠️ Aucune feuille de style détectée</div>';
+                } else {
+                    html += '<div class="status success">✅ Feuilles de style chargées (${stylesheets.length})</div>';
+                }
+
+                // Test 4: LocalStorage et données utilisateur
+                const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+                const userData = localStorage.getItem('userData');
+                
+                if (!userLoggedIn) {
+                    html += '<div class="status warning">⚠️ Utilisateur non connecté</div>';
+                } else if (!userData) {
+                    html += '<div class="status warning">⚠️ Données utilisateur manquantes</div>';
+                } else {
+                    html += '<div class="status success">✅ Session utilisateur valide</div>';
+                }
+
+                // Test 5: Erreurs JavaScript
+                const errorLog = localStorage.getItem('errorLog');
+                const errors = errorLog ? JSON.parse(errorLog) : [];
+                
+                if (errors.length > 0) {
+                    html += `<div class="status error">❌ ${errors.length} erreur(s) JavaScript détectée(s)</div>`;
+                    criticalIssues++;
+                } else {
+                    html += '<div class="status success">✅ Aucune erreur JavaScript</div>';
+                }
+
+                // Test 6: Connexion réseau
+                if (!navigator.onLine) {
+                    html += '<div class="status error">❌ Pas de connexion internet</div>';
+                    criticalIssues++;
+                } else {
+                    html += '<div class="status success">✅ Connexion internet active</div>';
+                }
+
+                // Résumé final
+                if (criticalIssues === 0) {
+                    html += '<div class="status success">🎉 Aucun problème critique détecté</div>';
+                } else {
+                    html += `<div class="status error">⚠️ ${criticalIssues} problème(s) critique(s) détecté(s)</div>`;
+                }
+
+                statusDiv.innerHTML = html;
+                diagnosticData.errors = errors;
+
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ Erreur lors du diagnostic : ${error.message}</div>`;
+                diagnosticData.errors.push(`Comprehensive diagnostic: ${error.message}`);
+            }
+        }
+
+        // 2. Test React spécifique
+        function testReactMounting() {
+            const resultsDiv = document.getElementById('specialized-results');
+            
+            try {
+                const rootElement = document.getElementById('root');
+                let html = '';
+
+                if (!rootElement) {
+                    html += '<div class="status error">❌ Élément #root introuvable</div>';
+                } else {
+                    html += '<div class="status success">✅ Élément #root trouvé</div>';
+                    
+                    const hasChildren = rootElement.children.length > 0;
+                    if (!hasChildren) {
+                        html += '<div class="status error">❌ React non monté - #root vide</div>';
+                        html += '<div class="status info">💡 Solution: Vérifier les erreurs JavaScript et recharger</div>';
+                    } else {
+                        html += `<div class="status success">✅ React monté avec ${rootElement.children.length} élément(s)</div>';
+                    }
+                }
+
+                // Vérifier les scripts React
+                const reactScripts = document.querySelectorAll('script[src*="react"]');
+                if (reactScripts.length === 0) {
+                    html += '<div class="status warning">⚠️ Scripts React non détectés</div>';
+                } else {
+                    html += `<div class="status success">✅ ${reactScripts.length} script(s) React chargé(s)</div>';
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur test React : ${error.message}</div>`;
+            }
+        }
+
+        // 3. Test Supabase
+        async function testSupabaseConnection() {
+            const resultsDiv = document.getElementById('specialized-results');
+            resultsDiv.innerHTML = '<div class="status info">🔄 Test de connexion Supabase...</div>';
+
+            try {
+                // Vérifier les variables d'environnement
+                const supabaseUrl = 'https://your-project.supabase.co'; // Remplacez par votre URL
+                const supabaseKey = 'your-anon-key'; // Remplacez par votre clé
+                
+                let html = '';
+
+                if (supabaseUrl === 'https://your-project.supabase.co') {
+                    html += '<div class="status warning">⚠️ Supabase non configuré - utilisation du mode local</div>';
+                } else {
+                    try {
+                        const response = await fetch(`${supabaseUrl}/rest/v1/`, {
+                            headers: {
+                                'apikey': supabaseKey,
+                                'Authorization': `Bearer ${supabaseKey}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            html += '<div class="status success">✅ Connexion Supabase réussie</div>';
+                        } else {
+                            html += `<div class="status error">❌ Erreur Supabase: ${response.status}</div>`;
+                        }
+                    } catch (error) {
+                        html += `<div class="status error">❌ Impossible de se connecter à Supabase: ${error.message}</div>`;
+                    }
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur test Supabase : ${error.message}</div>`;
+            }
+        }
+
+        // 4. Test session utilisateur
+        function testUserSession() {
+            const resultsDiv = document.getElementById('specialized-results');
+            
+            try {
+                let html = '';
+
+                const userLoggedIn = localStorage.getItem('userLoggedIn');
+                const userData = localStorage.getItem('userData');
+                const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+
+                html += `<div class="status ${userLoggedIn === 'true' ? 'success' : 'warning'}">
+                    ${userLoggedIn === 'true' ? '✅' : '⚠️'} Statut utilisateur: ${userLoggedIn || 'non défini'}
+                </div>`;
+
+                if (userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        html += `<div class="status success">✅ Données utilisateur valides: ${user.prenom} ${user.nom}</div>`;
+                    } catch {
+                        html += '<div class="status error">❌ Données utilisateur corrompues</div>';
+                    }
+                } else {
+                    html += '<div class="status warning">⚠️ Aucune donnée utilisateur</div>';
+                }
+
+                html += `<div class="status ${adminLoggedIn === 'true' ? 'success' : 'info'}">
+                    ${adminLoggedIn === 'true' ? '✅' : 'ℹ️'} Statut admin: ${adminLoggedIn || 'non défini'}
+                </div>`;
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur test session : ${error.message}</div>`;
+            }
+        }
+
+        // 5. Test chargement des ressources
+        async function testResourceLoading() {
+            const resultsDiv = document.getElementById('specialized-results');
+            resultsDiv.innerHTML = '<div class="status info">🔄 Test des ressources...</div>';
+
+            try {
+                const criticalResources = [
+                    { name: 'Manifest PWA', url: '/manifest.json' },
+                    { name: 'Service Worker', url: '/sw.js' },
+                    { name: 'Icône 192', url: '/icon-192.png' },
+                    { name: 'Icône 512', url: '/icon-512.png' }
+                ];
+
+                let html = '';
+                let failedResources = 0;
+
+                for (const resource of criticalResources) {
+                    try {
+                        const response = await fetch(resource.url, { method: 'HEAD' });
+                        if (response.ok) {
+                            html += `<div class="status success">✅ ${resource.name}: OK (${response.status})</div>`;
+                        } else {
+                            html += `<div class="status warning">⚠️ ${resource.name}: ${response.status}</div>`;
+                            failedResources++;
+                        }
+                    } catch (error) {
+                        html += `<div class="status error">❌ ${resource.name}: Échec</div>`;
+                        failedResources++;
+                    }
+                }
+
+                if (failedResources === 0) {
+                    html += '<div class="status success">🎉 Toutes les ressources sont accessibles</div>';
+                } else {
+                    html += `<div class="status warning">⚠️ ${failedResources} ressource(s) inaccessible(s)</div>`;
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur test ressources : ${error.message}</div>`;
+            }
+        }
+
+        // 6. Réparation rapide
+        async function runQuickFix() {
+            const statusDiv = document.getElementById('general-status');
+            statusDiv.innerHTML = '<div class="status info">🔧 Réparation rapide en cours...</div>';
+
+            try {
+                let fixes = [];
+                let html = '';
+
+                // Fix 1: Nettoyer les données corrompues
+                let corruptedKeys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key) {
+                        try {
+                            const value = localStorage.getItem(key);
+                            if (value && value.startsWith('{')) {
+                                JSON.parse(value);
+                            }
+                        } catch (e) {
+                            corruptedKeys.push(key);
+                        }
+                    }
+                }
+
+                if (corruptedKeys.length > 0) {
+                    corruptedKeys.forEach(key => localStorage.removeItem(key));
+                    fixes.push(`Supprimé ${corruptedKeys.length} donnée(s) corrompue(s)`);
+                    html += `<div class="status success">✅ ${corruptedKeys.length} donnée(s) corrompue(s) nettoyée(s)</div>`;
+                }
+
+                // Fix 2: Vérifier et corriger la session utilisateur
+                const userLoggedIn = localStorage.getItem('userLoggedIn');
+                if (userLoggedIn === null) {
+                    localStorage.setItem('userLoggedIn', 'false');
+                    fixes.push('Statut de connexion réinitialisé');
+                    html += '<div class="status success">✅ Statut de connexion réinitialisé</div>';
+                }
+
+                // Fix 3: Nettoyer les caches obsolètes
+                if ('caches' in window) {
+                    try {
+                        const cacheNames = await caches.keys();
+                        const oldCaches = cacheNames.filter(name => !name.includes('v3'));
+                        
+                        for (const cacheName of oldCaches) {
+                            await caches.delete(cacheName);
+                        }
+                        
+                        if (oldCaches.length > 0) {
+                            fixes.push(`Supprimé ${oldCaches.length} cache(s) obsolète(s)`);
+                            html += `<div class="status success">✅ ${oldCaches.length} cache(s) obsolète(s) supprimé(s)</div>`;
+                        }
+                    } catch (error) {
+                        html += `<div class="status warning">⚠️ Erreur nettoyage cache: ${error.message}</div>`;
+                    }
+                }
+
+                if (fixes.length === 0) {
+                    html = '<div class="status success">✅ Aucune réparation nécessaire - Le système fonctionne correctement</div>';
+                } else {
+                    html += `<div class="status success">🎉 ${fixes.length} réparation(s) appliquée(s) avec succès</div>`;
+                    html += '<div class="status info">🔄 Rechargement recommandé pour appliquer les corrections</div>';
+                }
+
+                statusDiv.innerHTML = html;
+                diagnosticData.fixes = fixes;
+
+                // Proposer de recharger si des fixes ont été appliqués
+                if (fixes.length > 0) {
+                    setTimeout(() => {
+                        if (confirm('Réparations appliquées. Recharger la page maintenant ?')) {
+                            window.location.reload();
+                        }
+                    }, 2000);
+                }
+
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ Erreur réparation rapide : ${error.message}</div>`;
+            }
+        }
+
+        // 7. Nettoyer les données corrompues
+        function clearCorruptedData() {
+            const resultsDiv = document.getElementById('auto-fix-results');
+            
+            try {
+                let corruptedKeys = [];
+                let html = '';
+
+                // Identifier les clés corrompues
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key) {
+                        try {
+                            const value = localStorage.getItem(key);
+                            if (value && (value.startsWith('{') || value.startsWith('['))) {
+                                JSON.parse(value);
+                            }
+                        } catch (e) {
+                            corruptedKeys.push(key);
+                        }
+                    }
+                }
+
+                if (corruptedKeys.length > 0) {
+                    corruptedKeys.forEach(key => localStorage.removeItem(key));
+                    html += `<div class="status success">✅ ${corruptedKeys.length} donnée(s) corrompue(s) supprimée(s)</div>`;
+                    html += '<div class="results">Clés supprimées:\n' + corruptedKeys.join('\n') + '</div>';
+                } else {
+                    html += '<div class="status success">✅ Aucune donnée corrompue détectée</div>';
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur nettoyage : ${error.message}</div>`;
+            }
+        }
+
+        // 8. Reset session utilisateur
+        function resetUserSession() {
+            const resultsDiv = document.getElementById('auto-fix-results');
+            
+            try {
+                // Sauvegarder les données importantes
+                const importantData = {};
+                const importantKeys = ['siteContent', 'properties', 'presentationImages'];
+                
+                importantKeys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    if (value) importantData[key] = value;
+                });
+
+                // Reset session
+                localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('userData');
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('errorLog');
+
+                // Restaurer les données importantes
+                Object.entries(importantData).forEach(([key, value]) => {
+                    localStorage.setItem(key, value);
+                });
+
+                let html = '<div class="status success">✅ Session utilisateur réinitialisée</div>';
+                html += '<div class="status info">ℹ️ Données de contenu préservées</div>';
+                html += '<div class="status warning">⚠️ Vous devrez vous reconnecter</div>';
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur reset session : ${error.message}</div>`;
+            }
+        }
+
+        // 9. Vider tous les caches
+        async function clearAllCaches() {
+            const resultsDiv = document.getElementById('auto-fix-results');
+            resultsDiv.innerHTML = '<div class="status info">🔄 Nettoyage des caches...</div>';
+
+            try {
+                let html = '';
+
+                // Vider les caches Service Worker
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    for (const cacheName of cacheNames) {
+                        await caches.delete(cacheName);
+                    }
+                    html += `<div class="status success">✅ ${cacheNames.length} cache(s) Service Worker supprimé(s)</div>`;
+                } else {
+                    html += '<div class="status warning">⚠️ Service Worker non supporté</div>';
+                }
+
+                // Vider sessionStorage
+                sessionStorage.clear();
+                html += '<div class="status success">✅ SessionStorage vidé</div>';
+
+                html += '<div class="status success">🎉 Nettoyage terminé</div>';
+                html += '<div class="status info">🔄 Rechargement recommandé</div>';
+
+                resultsDiv.innerHTML = html;
+
+                // Proposer de recharger
+                setTimeout(() => {
+                    if (confirm('Nettoyage terminé. Recharger la page maintenant ?')) {
+                        window.location.reload();
+                    }
+                }, 2000);
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur nettoyage caches : ${error.message}</div>`;
+            }
+        }
+
+        // 10. Reset d'urgence complet
+        function emergencyReset() {
+            if (!confirm('🚨 RESET D\'URGENCE 🚨\n\nCette action va :\n- Vider tous les caches\n- Supprimer toutes les données locales\n- Recharger la page\n\nContinuer ?')) {
+                return;
+            }
+
+            const resultsDiv = document.getElementById('auto-fix-results');
+            resultsDiv.innerHTML = '<div class="status error">🚨 Reset d\'urgence en cours...</div>';
+
+            try {
+                // Tout nettoyer
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Nettoyer les caches
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    });
+                }
+
+                resultsDiv.innerHTML = '<div class="status success">✅ Reset terminé - Rechargement...</div>';
+                
+                // Recharger après un délai
+                setTimeout(() => {
+                    window.location.href = window.location.origin + '?reset=' + Date.now();
+                }, 2000);
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur reset : ${error.message}</div>`;
+            }
+        }
+
+        // 11. Exporter les données de diagnostic
+        function exportDiagnosticData() {
+            try {
+                const report = `
+RAPPORT DE DIAGNOSTIC TECHNIQUE - CERCLE PRIVÉ
+=============================================
+
+Date: ${new Date().toLocaleString('fr-FR')}
+URL: ${window.location.href}
+Navigateur: ${navigator.userAgent}
+
+INFORMATIONS SYSTÈME:
+${JSON.stringify(diagnosticData.systemInfo, null, 2)}
+
+ERREURS DÉTECTÉES:
+${diagnosticData.errors.map((error, i) => `${i+1}. ${error}`).join('\n')}
+
+RÉPARATIONS APPLIQUÉES:
+${diagnosticData.fixes.map((fix, i) => `${i+1}. ${fix}`).join('\n')}
+
+RECOMMANDATIONS:
+${diagnosticData.errors.length === 0 ? 
+  '✅ Le système fonctionne correctement' : 
+  '⚠️ Contactez le support technique avec ce rapport'
+}
+
+ACTIONS SUGGÉRÉES:
+1. Vérifier la console JavaScript (F12)
+2. Tester en navigation privée
+3. Vider le cache du navigateur
+4. Vérifier la connexion internet
+5. Contacter nicolas.c@lacremerie.fr si le problème persiste
+                `;
+
+                const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `diagnostic-cercle-prive-${new Date().toISOString().split('T')[0]}.txt`;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                
+                document.getElementById('auto-fix-results').innerHTML = 
+                    '<div class="status success">✅ Rapport exporté - Envoyez ce fichier au support technique</div>';
+
+            } catch (error) {
+                document.getElementById('auto-fix-results').innerHTML = 
+                    `<div class="status error">❌ Erreur export : ${error.message}</div>`;
+            }
+        }
+
+        // Initialisation automatique
+        window.addEventListener('load', () => {
+            console.log('🔧 Diagnostic technique chargé');
+            initializeSystemInfo();
+            
+            // Auto-diagnostic après 2 secondes
+            setTimeout(() => {
+                runComprehensiveDiagnostic();
+            }, 2000);
+        });
+
+        // Capturer les erreurs en temps réel
+        window.addEventListener('error', (event) => {
+            diagnosticData.errors.push({
+                type: 'javascript',
+                message: event.error?.message || event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            diagnosticData.errors.push({
+                type: 'promise',
+                reason: event.reason?.toString() || 'Unknown rejection',
+                timestamp: new Date().toISOString()
+            });
+        });
+    </script>
+</body>
+</html>

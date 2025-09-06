@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 import { syncService } from './services/realTimeSync';
+import { BlankPageDiagnostics } from './utils/diagnostics';
 
 // Composant d'erreur de fallback
 const ErrorFallback = ({ error }: { error: Error }) => (
@@ -55,6 +56,7 @@ class ErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('React Error Boundary:', error, errorInfo);
+    BlankPageDiagnostics.logError(error, 'React.ErrorBoundary');
   }
 
   render() {
@@ -90,6 +92,7 @@ try {
     console.log('🔄 Service de synchronisation initialisé');
   } catch (error) {
     console.warn('⚠️ Erreur initialisation sync service:', error);
+    BlankPageDiagnostics.logError(error, 'SyncService.initialize');
   }
   
   // Masquer le loader après le montage réussi
@@ -103,6 +106,7 @@ try {
   
 } catch (error) {
   console.error('❌ Erreur critique lors du montage React:', error);
+  BlankPageDiagnostics.logError(error, 'React.mount');
   
   // Fallback d'urgence
   const rootElement = document.getElementById('root');

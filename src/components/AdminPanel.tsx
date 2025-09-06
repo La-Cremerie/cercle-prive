@@ -24,6 +24,7 @@ import LeadScoring from './LeadScoring';
 import SEOManager from './SEOManager';
 import PerformanceOptimizer from './PerformanceOptimizer';
 import ContentSyncDashboard from './ContentSyncDashboard';
+import DiagnosticPanel from './DiagnosticPanel';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -478,6 +479,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     case 'seo': return <Search className="w-4 h-4" />;
                     case 'performance': return <Settings className="w-4 h-4" />;
                     case 'sync_dashboard': return <RefreshCw className="w-4 h-4" />;
+                    case 'diagnostic': return <Settings className="w-4 h-4" />;
                     default: return <Settings className="w-4 h-4" />;
                   }
                 };
@@ -808,6 +810,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
         {activeTab === 'sync_dashboard' && canAccessModule('content') && (
           <ContentSyncDashboard />
+        )}
+
+        {activeTab === 'diagnostic' && canAccessModule('admin_management') && (
+          <DiagnosticPanel />
         )}
 
         {/* Message d'accès refusé */}
