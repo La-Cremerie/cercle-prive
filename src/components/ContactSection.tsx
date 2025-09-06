@@ -117,7 +117,6 @@ export default function ContactSection() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start relative z-10">
           {/* Informations de contact */}
           <div className="space-y-8">
             <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-10 border border-white/10 shadow-2xl hover:bg-white/10 transition-all duration-500 group">
