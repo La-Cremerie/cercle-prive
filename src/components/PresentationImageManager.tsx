@@ -173,30 +173,6 @@ const PresentationImageManager: React.FC = () => {
   const getCurrentImages = () => activeCategory === 'hero' ? images : conceptImages;
   const setCurrentImages = activeCategory === 'hero' ? setImages : setConceptImages;
 
-  const addImageFromUrl = async () => {
-    if (!newImageUrl.trim() || !newImageName.trim()) {
-      toast.error('Veuillez remplir tous les champs');
-      return;
-    }
-
-    try {
-      const newImage: PresentationImage = {
-        id: Date.now().toString(),
-        url: newImageUrl.trim(),
-        name: newImageName.trim(),
-        type: 'url',
-        isActive: false
-      };
-
-      setCurrentImages(prev => [...prev, newImage]);
-      setNewImageUrl('');
-      setNewImageName('');
-      toast.success('Image ajoutée depuis URL');
-    } catch (error) {
-      toast.error('Erreur lors de l\'ajout de l\'image');
-    }
-  };
-
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;

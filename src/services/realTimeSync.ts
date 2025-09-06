@@ -81,7 +81,7 @@ export class RealTimeSyncService {
             this.handleImagesVersionChange(payload);
           })
           .on('postgres_changes', {
-            event: '*,
+            event: '*',
             schema: 'public',
             table: 'design_settings_versions'
           }, (payload) => {
