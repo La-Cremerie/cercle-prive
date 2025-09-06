@@ -56,6 +56,14 @@ function App() {
     if (event.type === 'content' || event.type === 'design') {
       // Les composants se mettront à jour automatiquement via les événements
       console.log('✅ Mise à jour automatique déclenchée');
+     
+     // Notification spéciale pour la publication de contenu
+     if (event.adminName === 'Nicolas' && event.action === 'update') {
+       toast.success('🎉 Nouveau contenu publié par Nicolas !', {
+         duration: 5000,
+         icon: '📢'
+       });
+     }
     }
   });
 
