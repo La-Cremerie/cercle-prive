@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 // Fonction pour détecter si l'app est en mode PWA
 const detectPWA = () => {
@@ -23,8 +24,8 @@ export const useUpdateChecker = () => {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [showUpdateSlider, setShowUpdateSlider] = useState(false);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
-  const [isPWA] = useState(detectPWA());
-  const [isMobile] = useState(detectMobile());
+  const [isPWA] = useState(() => detectPWA());
+  const [isMobile] = useState(() => detectMobile());
 
   const checkForUpdates = async () => {
     try {

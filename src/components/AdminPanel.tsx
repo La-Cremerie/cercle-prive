@@ -351,6 +351,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 <span>Déconnexion</span>
               </button>
             </div>
+            </div>
           </div>
         </div>
 

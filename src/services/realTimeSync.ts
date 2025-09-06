@@ -257,22 +257,34 @@ export class RealTimeSyncService {
 
   // Vérifier si c'est un utilisateur admin
   private isAdminUser(): boolean {
-    return localStorage.getItem('adminLoggedIn') === 'true';
+    try {
+      return localStorage.getItem('adminLoggedIn') === 'true';
+    } catch {
+      return false;
+    }
   }
 
   // Vérifier si c'est l'admin actuel
   private isCurrentAdmin(adminId: string): boolean {
-    const currentAdminEmail = localStorage.getItem('currentAdminEmail');
-    return currentAdminEmail === 'nicolas.c@lacremerie.fr' && adminId === 'current-admin';
+    try {
+      const currentAdminEmail = localStorage.getItem('currentAdminEmail');
+      return currentAdminEmail === 'nicolas.c@lacremerie.fr' && adminId === 'current-admin';
+    } catch {
+      return false;
+    }
   }
 
   // Vérifier si Supabase est configuré
   private isSupabaseConfigured(): boolean {
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    return url && key && 
-           url !== 'https://your-project.supabase.co' && 
-           key !== 'your-anon-key';
+    try {
+      const url = import.meta.env.VITE_SUPABASE_URL;
+      const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      return url && key && 
+             url !== 'https://your-project.supabase.co' && 
+             key !== 'your-anon-key';
+    } catch {
+      return false;
+    }
   }
 
   // Fallback avec polling

@@ -8,21 +8,33 @@ export const useRealTimeSync = (
   const isInitialized = useRef(false);
 
   useEffect(() => {
-    // Initialiser le service une seule fois
+    // Initialiser le service de manière sécurisée
     if (!isInitialized.current) {
-      syncService.initialize();
-      isInitialized.current = true;
+      try {
+        syncService.initialize();
+        isInitialized.current = true;
+      } catch (error) {
+        console.warn('Erreur initialisation sync service:', error);
+      }
     }
 
     // S'abonner aux événements si callback fourni
     if (onSyncEvent) {
-      syncService.subscribe(componentId, onSyncEvent);
+      try {
+        syncService.subscribe(componentId, onSyncEvent);
+      } catch (error) {
+        console.warn('Erreur abonnement sync:', error);
+      }
     }
 
     // Cleanup
     return () => {
       if (onSyncEvent) {
-        syncService.unsubscribe(componentId);
+        try {
+          syncService.unsubscribe(componentId);
+        } catch (error) {
+          console.warn('Erreur désabonnement sync:', error);
+        }
       }
     };
   }, [componentId, onSyncEvent]);
@@ -33,20 +45,30 @@ export const useRealTimeSync = (
     action: SyncEvent['action'],
     data: any
   ) => {
-    const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
-    const adminName = adminEmail.split('@')[0];
+    try {
+      const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+      const adminName = adminEmail.split('@')[0];
 
-    await syncService.broadcastChange({
-      type,
-      action,
-      data,
-      adminId: 'current-admin',
-      adminName
-    });
+      await syncService.broadcastChange({
+        type,
+        action,
+        data,
+        adminId: 'current-admin',
+        adminName
+      });
+    } catch (error) {
+      console.warn('Erreur broadcast change:', error);
+    }
   };
 
   return {
     broadcastChange,
-    connectionStatus: syncService.getConnectionStatus()
+    connectionStatus: (() => {
+      try {
+        return syncService.getConnectionStatus();
+      } catch {
+        return { connected: false, subscribers: 0 };
+      }
+    })()
   };
 };
