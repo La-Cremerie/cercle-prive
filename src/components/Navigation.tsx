@@ -32,7 +32,7 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+          <div className="hidden md:flex items-center space-x-3 lg:space-x-4 ml-auto">
             <a href="#notre-adn" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
               CONCEPT
             </a>
