@@ -75,5 +75,12 @@
       background: rgba(13, 27, 42, 0.95);
       backdrop-filter: blur(15px);
     }
+    
+    /* Update slider mobile styling */
+    .update-slider-mobile {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1a237e 50%, #0d1b2a 100%);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
   }
 }

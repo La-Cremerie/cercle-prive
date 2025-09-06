@@ -16,6 +16,8 @@ import AdminLogin from './components/AdminLogin';
 import AdminPanel from './components/AdminPanel';
 import Chatbot from './components/Chatbot';
 import ContactSection from './components/ContactSection';
+import UpdateSlider from './components/UpdateSlider';
+import { useUpdateChecker } from './hooks/useUpdateChecker';
 
 // Fallback de chargement
 const LoadingFallback = () => (
@@ -37,6 +39,7 @@ function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [appReady, setAppReady] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const { showUpdateSlider, setShowUpdateSlider, updateInfo, isPWA, isMobile } = useUpdateChecker();
 
   // Initialisation ultra-simple et robuste
   useEffect(() => {
@@ -174,6 +177,9 @@ function App() {
       <PWAInstallPrompt />
       <Chatbot />
       <ContactSection />
+      {(showUpdateSlider && updateInfo?.available && (isPWA || isMobile)) && (
+        <UpdateSlider onClose={() => setShowUpdateSlider(false)} />
+      )}
       <Toaster position="top-right" />
     </>
   );
