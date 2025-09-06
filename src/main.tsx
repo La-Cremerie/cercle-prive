@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import { syncService } from './services/realTimeSync';
 
 // Composant d'erreur de fallback
 const ErrorFallback = ({ error }: { error: Error }) => (
@@ -82,6 +83,14 @@ try {
   );
   
   console.log('✅ React app montée avec succès');
+  
+  // Initialiser la synchronisation temps réel
+  try {
+    syncService.initialize();
+    console.log('🔄 Service de synchronisation initialisé');
+  } catch (error) {
+    console.warn('⚠️ Erreur initialisation sync service:', error);
+  }
   
   // Masquer le loader après le montage réussi
   setTimeout(() => {

@@ -32,39 +32,73 @@ export class RealTimeSyncService {
     try {
       console.log('🔄 Initialisation de la synchronisation temps réel...');
       
+      // Vérifier la configuration Supabase
+      if (!this.isSupabaseConfigured()) {
+        console.warn('⚠️ Supabase non configuré - utilisation du mode polling');
+        this.startPollingFallback();
+        return;
+      }
+      
       // Créer le canal Supabase pour les événements temps réel
       this.channel = supabase
         .channel('admin_changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'user_registrations'
+        }, (payload) => {
+          console.log('📊 Changement utilisateur détecté:', payload);
+          this.handleUserChange(payload);
+        })
         .on('broadcast', { event: 'admin_change' }, (payload) => {
+          console.log('📡 Événement admin reçu:', payload);
           this.handleSyncEvent(payload.payload as SyncEvent);
         })
         .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
             this.isConnected = true;
             this.reconnectAttempts = 0;
-            console.log('✅ Synchronisation temps réel connectée');
+            console.log('✅ Synchronisation temps réel ACTIVE');
             
             // Notifier les utilisateurs admin
             if (this.isAdminUser()) {
-              toast.success('Synchronisation temps réel activée', { 
+              toast.success('🔄 Synchronisation temps réel ACTIVE', { 
                 id: 'sync-connected',
-                duration: 2000 
+                duration: 3000,
+                icon: '🟢'
               });
             }
           } else if (status === 'CHANNEL_ERROR') {
+            console.error('❌ Erreur de canal temps réel');
             this.handleConnectionError();
+          } else if (status === 'CLOSED') {
+            console.warn('⚠️ Canal temps réel fermé');
+            this.isConnected = false;
           }
         });
-
-      // Fallback avec polling si Supabase n'est pas disponible
-      if (!this.isSupabaseConfigured()) {
-        this.startPollingFallback();
-      }
 
     } catch (error) {
       console.error('❌ Erreur initialisation sync:', error);
       this.handleConnectionError();
     }
+  }
+
+  // Gérer les changements d'utilisateurs en temps réel
+  private handleUserChange(payload: any): void {
+    console.log('👤 Changement utilisateur:', payload);
+    
+    const event: SyncEvent = {
+      id: Date.now().toString(),
+      type: 'users',
+      action: payload.eventType === 'INSERT' ? 'create' : 
+              payload.eventType === 'UPDATE' ? 'update' : 'delete',
+      data: payload.new || payload.old,
+      timestamp: new Date().toISOString(),
+      adminId: 'system',
+      adminName: 'Système'
+    };
+    
+    this.handleSyncEvent(event);
   }
 
   // Gérer les événements de synchronisation
@@ -124,13 +158,20 @@ export class RealTimeSyncService {
     try {
       // Diffuser via Supabase
       if (this.isConnected && this.channel) {
-        await this.channel.send({
+        const result = await this.channel.send({
           type: 'broadcast',
           event: 'admin_change',
           payload: fullEvent
         });
-        console.log('📤 Changement diffusé:', fullEvent);
+        
+        if (result === 'ok') {
+          console.log('📤 Changement diffusé avec succès:', fullEvent.type);
+        } else {
+          console.warn('⚠️ Échec diffusion, utilisation du fallback');
+          this.storeEventForPolling(fullEvent);
+        }
       } else {
+        console.log('📦 Stockage local (pas de connexion temps réel)');
         // Fallback: stocker localement pour le polling
         this.storeEventForPolling(fullEvent);
       }
@@ -289,11 +330,20 @@ export class RealTimeSyncService {
 
   // Fallback avec polling
   private startPollingFallback(): void {
-    console.log('🔄 Démarrage du polling fallback...');
+    console.log('🔄 Mode POLLING activé (fallback)');
     
-    setInterval(() => {
+    const pollInterval = setInterval(() => {
       this.checkForStoredEvents();
     }, 5000); // Vérifier toutes les 5 secondes
+    
+    // Nettoyer l'intervalle si la connexion se rétablit
+    const checkConnection = setInterval(() => {
+      if (this.isConnected) {
+        clearInterval(pollInterval);
+        clearInterval(checkConnection);
+        console.log('✅ Connexion rétablie, arrêt du polling');
+      }
+    }, 10000);
   }
 
   // Stocker un événement pour le polling
@@ -337,23 +387,25 @@ export class RealTimeSyncService {
   // Gérer les erreurs de connexion
   private handleConnectionError(): void {
     this.isConnected = false;
+    console.log('❌ Perte de connexion temps réel');
     
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
       
-      console.log(`🔄 Tentative de reconnexion ${this.reconnectAttempts}/${this.maxReconnectAttempts} dans ${delay}ms`);
+      console.log(`🔄 Reconnexion ${this.reconnectAttempts}/${this.maxReconnectAttempts} dans ${delay}ms`);
       
       setTimeout(() => {
         this.initialize();
       }, delay);
     } else {
-      console.error('❌ Échec de connexion temps réel, passage en mode polling');
+      console.error('❌ ÉCHEC connexion temps réel → Mode POLLING');
       this.startPollingFallback();
       
       if (this.isAdminUser()) {
-        toast.error('Synchronisation temps réel indisponible, mode dégradé activé', {
-          duration: 5000
+        toast.error('🔴 HORS LIGNE - Mode dégradé activé', {
+          duration: 5000,
+          icon: '⚠️'
         });
       }
     }
