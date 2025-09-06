@@ -20,6 +20,7 @@ import UpdateSlider from './components/UpdateSlider';
 import { useUpdateChecker } from './hooks/useUpdateChecker';
 import { useRealTimeSync } from './hooks/useRealTimeSync';
 import { syncService } from './services/realTimeSync';
+import { ContentVersioningService } from './services/contentVersioningService';
 
 // Fallback de chargement
 const LoadingFallback = () => (
@@ -75,6 +76,19 @@ function App() {
   useEffect(() => {
     try {
       console.log('App initialization started');
+      
+      // Synchroniser les données depuis Supabase au démarrage
+      const initializeContentSync = async () => {
+        try {
+          await ContentVersioningService.syncFromSupabaseToLocal();
+          console.log('✅ Synchronisation initiale depuis Supabase terminée');
+        } catch (error) {
+          console.warn('⚠️ Erreur synchronisation initiale Supabase:', error);
+        }
+      };
+      
+      initializeContentSync();
+      
       // Vérifier les connexions de manière sécurisée
       const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
       const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
