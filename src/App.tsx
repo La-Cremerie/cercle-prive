@@ -162,7 +162,7 @@ function App() {
   // Main site - show all sections
   return (
     <>
-      <Navigation onAdminClick={import.meta.env.DEV && window.location.hostname === 'localhost' ? toggleAdmin : undefined} />
+      <Navigation onAdminClick={import.meta.env.DEV ? toggleAdmin : undefined} />
       <HeroSection />
       <NotreAdnSection />
       <ServicesSection />
@@ -171,7 +171,7 @@ function App() {
       <PropertyGallery />
       <VendreSection />
       <PWAInstallPrompt />
-      {import.meta.env.DEV && window.location.hostname === 'localhost' && <Chatbot />}
+      {import.meta.env.DEV && <Chatbot />}
       <Toaster position="top-right" />
     </>
   );

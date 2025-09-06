@@ -50,11 +50,11 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
             </a>
             
             {/* Theme toggle only in development */}
-            {import.meta.env.DEV && window.location.hostname === 'localhost' && (
+            {import.meta.env.DEV && (
               <ThemeToggle />
             )}
             
-            {onAdminClick && import.meta.env.DEV && window.location.hostname === 'localhost' && (
+            {onAdminClick && import.meta.env.DEV && (
               <button
                 onClick={handleAdminClick}
                 className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
@@ -119,7 +119,7 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
               >
                 VENDRE
               </a>
-              {onAdminClick && import.meta.env.DEV && window.location.hostname === 'localhost' && (
+              {onAdminClick && import.meta.env.DEV && (
                 <button
                   onClick={() => {
                     handleAdminClick();
@@ -127,7 +127,6 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
                   }}
                   className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
                 >
-                  <Settings className="w-4 h-4" />
                   {unreadCount > 0 && (
                     <span className="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center ml-2">
                       {unreadCount}
