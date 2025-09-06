@@ -302,27 +302,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                 {/* Bouton Toggle Online/Offline */}
                 <button
                   onClick={() => {
-                    if (connectionStatus.connected) {
-                      // Passer en mode hors ligne
-                      RealTimeSyncService.getInstance().disconnect();
-                      toast.success('Mode manuel activé - Mises à jour désactivées', { icon: '🔴' });
-                    } else {
-                      // Passer en mode en ligne
-                      RealTimeSyncService.getInstance().reconnect();
-                      toast.success('Mode automatique activé - Mises à jour en temps réel', { icon: '🟡' });
-                    }
+                    // Déclencher une synchronisation manuelle
+                    const performManualSync = async () => {
+                      try {
+                        toast.loading('Synchronisation manuelle en cours...', { id: 'manual-sync' });
+                        
+                        // Forcer la reconnexion et synchronisation
+                        await RealTimeSyncService.getInstance().reconnect();
+                        
+                        // Recharger les données
+                        await loadUsers();
+                        
+                        toast.success('Synchronisation manuelle terminée', { id: 'manual-sync', icon: '🔄' });
+                      } catch (error) {
+                        toast.error('Erreur lors de la synchronisation manuelle', { id: 'manual-sync' });
+                      }
+                    };
+                    
+                    performManualSync();
                   }}
-                  className={`flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-medium transition-all duration-300 ${
-                    connectionStatus.connected
-                      ? 'bg-green-100 text-green-700 hover:bg-green-200 shadow-sm'
-                      : 'bg-orange-100 text-orange-700 hover:bg-orange-200 shadow-sm'
-                  }`}
-                  title={connectionStatus.connected ? 'Passer en mode manuel (désactiver les mises à jour automatiques)' : 'Passer en mode automatique (activer les mises à jour en temps réel)'}
+                  className="flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-medium transition-all duration-300 bg-blue-100 text-blue-700 hover:bg-blue-200 shadow-sm"
+                  title="Lancer une synchronisation manuelle des données"
                 >
                   <div className={`w-2 h-2 rounded-full ${
-                    connectionStatus.connected ? 'bg-green-500 animate-pulse' : 'bg-orange-500'
+                    connectionStatus.connected ? 'bg-green-500' : 'bg-orange-500'
                   }`}></div>
-                  <span>{connectionStatus.connected ? 'AUTO' : 'MANUEL'}</span>
+                  <span>SYNC MANUEL</span>
                 </button>
                 
                 <div className={`w-3 h-3 rounded-full ${
