@@ -56,8 +56,8 @@ export default function ServicesSection() {
                 <div className="flex items-start space-x-6">
                   {/* Icône avec design luxe */}
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 border-2 border-yellow-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <service.icon className="w-8 h-8 text-yellow-600" />
+                    <div className="w-16 h-16 border-2 border-blue-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <service.icon className="w-8 h-8 text-blue-600" />
                     </div>
                   </div>
                   
@@ -118,14 +118,14 @@ export default function ServicesSection() {
                 {/* Numéro avec design luxe */}
                 <div className="relative mb-6">
                   <div className="w-20 h-20 mx-auto relative">
-                    <div className="w-full h-full bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-2 border-yellow-600 dark:border-yellow-500">
-                      <span className="text-xl font-extralight text-yellow-600 tracking-wider">
+                    <div className="w-full h-full bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-2 border-blue-600 dark:border-blue-500">
+                      <span className="text-xl font-extralight text-blue-600 tracking-wider">
                         {etape.step}
                       </span>
                     </div>
                     {/* Ligne de connexion (sauf pour le dernier) */}
                     {index < 3 && (
-                      <div className="hidden md:block absolute top-10 left-full w-full h-px bg-gradient-to-r from-yellow-200 to-transparent dark:from-yellow-800/30 dark:to-transparent transform translate-x-2"></div>
+                      <div className="hidden md:block absolute top-10 left-full w-full h-px bg-gradient-to-r from-blue-200 to-transparent dark:from-blue-800/30 dark:to-transparent transform translate-x-2"></div>
                     )}
                   </div>
                 </div>
@@ -154,7 +154,7 @@ export default function ServicesSection() {
             </p>
             <a
               href="mailto:nicolas.c@lacremerie.fr"
-              className="inline-block px-8 py-4 bg-yellow-600 text-white font-light tracking-wider hover:bg-yellow-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="inline-block px-8 py-4 bg-blue-600 text-white font-light tracking-wider hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               PLANIFIER UNE CONSULTATION
             </a>
