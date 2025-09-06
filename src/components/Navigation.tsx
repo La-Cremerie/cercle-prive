@@ -48,11 +48,14 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
             <a href="#vendre" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
               VENDRE
             </a>
+            <a href="#off-market" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
+              OFF-MARKET
+            </a>
             
             {/* Theme toggle only in development */}
             <ThemeToggle />
             
-            {onAdminClick && (
+            {(onAdminClick && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) && (
               <button
                 onClick={handleAdminClick}
                 className="relative flex items-center space-x-2 text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
@@ -117,7 +120,14 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
               >
                 VENDRE
               </a>
-              {onAdminClick && (
+              <a
+                href="#off-market"
+                onClick={toggleMenu}
+                className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide"
+              >
+                OFF-MARKET
+              </a>
+              {(onAdminClick && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) && (
                 <button
                   onClick={() => {
                     handleAdminClick();
