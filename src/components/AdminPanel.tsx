@@ -9,6 +9,7 @@ import { useAdminPermissions } from '../hooks/useAdminPermissions';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useRealTimeSync } from '../hooks/useRealTimeSync';
+import { RealTimeSyncService } from '../services/realTimeSync';
 import StatsCharts from './StatsCharts';
 import EmailSettings from './EmailSettings';
 import AdvancedAnalytics from './AdvancedAnalytics';
@@ -303,11 +304,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   onClick={() => {
                     if (connectionStatus.connected) {
                       // Passer en mode hors ligne
-                      syncService.disconnect();
+                      RealTimeSyncService.getInstance().disconnect();
                       toast.success('Mode hors ligne activé', { icon: '🔴' });
                     } else {
                       // Passer en mode en ligne
-                      syncService.reconnect();
+                      RealTimeSyncService.getInstance().reconnect();
                       toast.success('Reconnexion en cours...', { icon: '🟡' });
                     }
                   }}
