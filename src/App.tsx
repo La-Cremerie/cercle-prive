@@ -54,6 +54,23 @@ function App() {
     }
   });
 
+  // Écouter les mises à jour forcées pour mobile
+  useEffect(() => {
+    const handleForceUpdate = (event: CustomEvent) => {
+      console.log('🔄 Mise à jour forcée reçue:', event.detail);
+      
+      // Forcer le re-render en mettant à jour un state
+      setAppReady(false);
+      setTimeout(() => setAppReady(true), 100);
+    };
+
+    window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
+    };
+  }, []);
+
   // Initialisation ultra-simple et robuste
   useEffect(() => {
     try {

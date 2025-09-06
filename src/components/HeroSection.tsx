@@ -70,12 +70,42 @@ const HeroSection: React.FC = () => {
       }
     };
 
+    const handleForceUpdate = (event: CustomEvent) => {
+      if (event.detail?.type === 'content' || event.detail?.type === 'images') {
+        // Recharger le contenu depuis localStorage
+        const stored = localStorage.getItem('siteContent');
+        if (stored) {
+          const content = JSON.parse(stored);
+          if (content.hero?.title) {
+            setHeroContent({ title: content.hero.title });
+          }
+          if (content.hero?.backgroundImage) {
+            setBackgroundImage(content.hero.backgroundImage);
+            setImageLoaded(false);
+          }
+        }
+        
+        // Vérifier les images de présentation
+        const storedImages = localStorage.getItem('presentationImages');
+        if (storedImages) {
+          const images = JSON.parse(storedImages);
+          const activeImage = images.find((img: any) => img.isActive);
+          if (activeImage) {
+            setBackgroundImage(activeImage.url);
+            setImageLoaded(false);
+          }
+        }
+      }
+    };
+
     window.addEventListener('contentUpdated', handleContentChange as EventListener);
     window.addEventListener('presentationImageChanged', handleImageChange as EventListener);
+    window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
     
     return () => {
       window.removeEventListener('contentUpdated', handleContentChange as EventListener);
       window.removeEventListener('presentationImageChanged', handleImageChange as EventListener);
+      window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
     };
   }, []);
 

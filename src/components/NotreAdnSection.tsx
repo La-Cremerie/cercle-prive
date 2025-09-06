@@ -25,10 +25,19 @@ const NotreAdnSection: React.FC = () => {
       }
     };
 
+    const handleForceUpdate = (event: CustomEvent) => {
+      if (event.detail?.type === 'content' || event.detail?.type === 'images') {
+        console.log('🎨 Mise à jour forcée du concept');
+        loadConceptImage();
+      }
+    };
+
     window.addEventListener('contentUpdated', handleContentChange as EventListener);
+    window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
     
     return () => {
       window.removeEventListener('contentUpdated', handleContentChange as EventListener);
+      window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
     };
   }, []);
 

@@ -197,6 +197,9 @@ export class RealTimeSyncService {
     if (event.action === 'update') {
       localStorage.setItem('siteContent', JSON.stringify(event.data));
       window.dispatchEvent(new CustomEvent('contentUpdated', { detail: event.data }));
+      
+      // Forcer le re-render des composants React
+      this.forceComponentUpdate('content');
     }
   }
 
@@ -222,6 +225,7 @@ export class RealTimeSyncService {
     }
     
     window.dispatchEvent(new Event('storage'));
+    this.forceComponentUpdate('properties');
   }
 
   // Gestion des mises à jour d'images
@@ -231,12 +235,14 @@ export class RealTimeSyncService {
       window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
         detail: event.data.activeImage 
       }));
+      this.forceComponentUpdate('images');
     } else if (event.data.category === 'concept') {
       localStorage.setItem('conceptImages', JSON.stringify(event.data.images));
       const siteContent = JSON.parse(localStorage.getItem('siteContent') || '{}');
       siteContent.concept = { ...siteContent.concept, image: event.data.activeImage };
       localStorage.setItem('siteContent', JSON.stringify(siteContent));
       window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
+      this.forceComponentUpdate('images');
     }
   }
 
@@ -253,6 +259,7 @@ export class RealTimeSyncService {
           root.style.setProperty(`--color-${key}`, value as string);
         });
       }
+      this.forceComponentUpdate('design');
     }
   }
 
@@ -260,6 +267,7 @@ export class RealTimeSyncService {
   private handleUsersUpdate(event: SyncEvent): void {
     // Recharger la liste des utilisateurs si on est dans l'admin
     window.dispatchEvent(new CustomEvent('usersUpdated', { detail: event }));
+    this.forceComponentUpdate('users');
   }
 
   // Gestion des mises à jour de configuration
@@ -271,6 +279,51 @@ export class RealTimeSyncService {
     }
     
     window.dispatchEvent(new CustomEvent('configUpdated', { detail: event.data }));
+    this.forceComponentUpdate('config');
+  }
+
+  // Forcer la mise à jour des composants React
+  private forceComponentUpdate(type: string): void {
+    // Déclencher un événement global pour forcer le re-render
+    window.dispatchEvent(new CustomEvent('forceUpdate', { 
+      detail: { type, timestamp: Date.now() } 
+    }));
+    
+    // Notification visuelle pour les utilisateurs mobiles
+    if (this.isMobileDevice() && !this.isAdminUser()) {
+      this.showMobileUpdateNotification(type);
+    }
+  }
+
+  // Détecter si c'est un appareil mobile
+  private isMobileDevice(): boolean {
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  // Notification spéciale pour mobile
+  private showMobileUpdateNotification(type: string): void {
+    const messages = {
+      content: '📝 Contenu mis à jour',
+      properties: '🏠 Nouveaux biens disponibles',
+      images: '🖼️ Images mises à jour',
+      design: '🎨 Apparence mise à jour',
+      users: '👥 Données utilisateurs mises à jour',
+      config: '⚙️ Configuration mise à jour'
+    };
+
+    const message = messages[type as keyof typeof messages] || '🔄 Mise à jour effectuée';
+    
+    // Toast spécial pour mobile avec durée plus longue
+    toast.success(message, {
+      duration: 4000,
+      icon: '📱',
+      style: {
+        background: '#1F2937',
+        color: '#F3F4F6',
+        fontSize: '14px',
+        padding: '12px 16px'
+      }
+    });
   }
 
   // S'abonner aux changements
