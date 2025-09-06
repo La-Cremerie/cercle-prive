@@ -34,48 +34,54 @@ export class RealTimeSyncService {
       
       // Vérifier la configuration Supabase
       if (!this.isSupabaseConfigured()) {
-        console.warn('⚠️ Supabase non configuré - utilisation du mode polling');
+        console.warn('⚠️ Supabase non configuré - synchronisation temps réel désactivée');
+        this.isConnected = false;
         this.startPollingFallback();
         return;
       }
       
-      // Créer le canal Supabase pour les événements temps réel
-      this.channel = supabase
-        .channel('admin_changes')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'user_registrations'
-        }, (payload) => {
-          console.log('📊 Changement utilisateur détecté:', payload);
-          this.handleUserChange(payload);
-        })
-        .on('broadcast', { event: 'admin_change' }, (payload) => {
-          console.log('📡 Événement admin reçu:', payload);
-          this.handleSyncEvent(payload.payload as SyncEvent);
-        })
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            this.isConnected = true;
-            this.reconnectAttempts = 0;
-            console.log('✅ Synchronisation temps réel ACTIVE');
-            
-            // Notifier les utilisateurs admin
-            if (this.isAdminUser()) {
-              toast.success('🔄 Synchronisation temps réel ACTIVE', { 
-                id: 'sync-connected',
-                duration: 3000,
-                icon: '🟢'
-              });
+      try {
+        // Créer le canal Supabase pour les événements temps réel
+        this.channel = supabase
+          .channel('admin_changes')
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'user_registrations'
+          }, (payload) => {
+            console.log('📊 Changement utilisateur détecté:', payload);
+            this.handleUserChange(payload);
+          })
+          .on('broadcast', { event: 'admin_change' }, (payload) => {
+            console.log('📡 Événement admin reçu:', payload);
+            this.handleSyncEvent(payload.payload as SyncEvent);
+          })
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              this.isConnected = true;
+              this.reconnectAttempts = 0;
+              console.log('✅ Synchronisation temps réel ACTIVE');
+              
+              // Notifier les utilisateurs admin
+              if (this.isAdminUser()) {
+                toast.success('🔄 Synchronisation temps réel ACTIVE', { 
+                  id: 'sync-connected',
+                  duration: 3000,
+                  icon: '🟢'
+                });
+              }
+            } else if (status === 'CHANNEL_ERROR') {
+              console.warn('⚠️ Erreur de canal Supabase - passage en mode hors ligne');
+              this.handleConnectionError();
+            } else if (status === 'CLOSED') {
+              console.warn('⚠️ Canal temps réel fermé');
+              this.isConnected = false;
             }
-          } else if (status === 'CHANNEL_ERROR') {
-            console.error('❌ Erreur de canal temps réel Supabase. Vérifiez VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY et les paramètres Realtime de votre projet Supabase.');
-            this.handleConnectionError();
-          } else if (status === 'CLOSED') {
-            console.warn('⚠️ Canal temps réel fermé');
-            this.isConnected = false;
-          }
-        });
+          });
+      } catch (channelError) {
+        console.warn('⚠️ Impossible de créer le canal Supabase:', channelError);
+        this.handleConnectionError();
+      }
 
     } catch (error) {
       console.error('❌ Erreur initialisation sync:', error);
@@ -387,24 +393,24 @@ export class RealTimeSyncService {
   // Gérer les erreurs de connexion
   private handleConnectionError(): void {
     this.isConnected = false;
-    console.log('❌ Perte de connexion temps réel');
+    console.log('⚠️ Passage en mode hors ligne');
     
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
       
-      console.log(`🔄 Reconnexion ${this.reconnectAttempts}/${this.maxReconnectAttempts} dans ${delay}ms`);
+      console.log(`🔄 Tentative de reconnexion ${this.reconnectAttempts}/${this.maxReconnectAttempts} dans ${delay}ms`);
       
       setTimeout(() => {
         this.initialize();
       }, delay);
     } else {
-      console.error('❌ ÉCHEC connexion temps réel → Mode POLLING');
+      console.warn('⚠️ Mode hors ligne permanent activé');
       this.startPollingFallback();
       
       if (this.isAdminUser()) {
-        toast.error('🔴 HORS LIGNE - Mode dégradé activé', {
-          duration: 5000,
+        toast('🔴 Mode hors ligne activé', {
+          duration: 3000,
           icon: '⚠️'
         });
       }
@@ -423,7 +429,7 @@ export class RealTimeSyncService {
 
   // Déconnecter manuellement
   disconnect(): void {
-    console.log('🔴 Déconnexion manuelle du mode temps réel');
+    console.log('🔴 Passage en mode hors ligne (manuel)');
     this.isConnected = false;
     
     if (this.channel) {
@@ -431,29 +437,21 @@ export class RealTimeSyncService {
       this.channel = null;
     }
     
-    // Notifier les abonnés de la déconnexion
-    this.subscribers.forEach(callback => {
-      try {
-        const disconnectEvent: SyncEvent = {
-          id: Date.now().toString(),
-          type: 'config',
-          action: 'update',
-          data: { status: 'disconnected' },
-          timestamp: new Date().toISOString(),
-          adminId: 'system',
-          adminName: 'Système'
-        };
-        callback(disconnectEvent);
-      } catch (error) {
-        console.error('Erreur notification déconnexion:', error);
-      }
-    });
+    // Démarrer le mode polling comme fallback
+    this.startPollingFallback();
   }
 
   // Reconnecter manuellement
   async reconnect(): Promise<void> {
-    console.log('🟡 Reconnexion manuelle au mode temps réel');
+    console.log('🟡 Passage en mode en ligne (manuel)');
     this.reconnectAttempts = 0; // Reset des tentatives
+    
+    // Nettoyer l'ancien canal si il existe
+    if (this.channel) {
+      supabase.removeChannel(this.channel);
+      this.channel = null;
+    }
+    
     await this.initialize();
   }
 
