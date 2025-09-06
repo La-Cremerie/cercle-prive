@@ -34,21 +34,28 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick }) => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             <a href="#notre-adn" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
+              <a href="#notre-adn" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
               CONCEPT
             </a>
             <a href="#nos-services" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
+              <a href="#nos-services" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
               NOS SERVICES
             </a>
             <a href="#recherche" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
+              <a href="#recherche" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
               RECHERCHE
             </a>
             <a href="#galerie-biens" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
+              <a href="#galerie-biens" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
               ACHETER
             </a>
             <a href="#vendre" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
+              <a href="#vendre" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
               VENDRE
             </a>
             <a href="#off-market" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-amber-600 transition-colors tracking-wide">
+              <a href="#off-market" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
+              <a href="#off-market" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
               OFF-MARKET
             </a>
             
