@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Phone, Mail, UserCheck, Eye, EyeOff } from 'lucide-react';
+import { User, Phone, Mail, UserCheck, Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
 import { UserService } from '../services/userService';
 import type { NewUserRegistration } from '../types/database';
 import toast from 'react-hot-toast';
@@ -23,7 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     email: ''
   });
   const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true); // Default to login mode
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,32 +53,32 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   };
 
   const validateForm = (): boolean => {
-    // En mode connexion, seuls email et mot de passe sont requis
+    // In connection mode, only email and password are required
     if (!isLogin) {
       if (!formData.nom.trim()) {
-        setError('Le nom est requis');
+        setError('Name is required');
         return false;
       }
       if (!formData.prenom.trim()) {
-        setError('Le prénom est requis');
+        setError('First name is required');
         return false;
       }
       if (!formData.telephone.trim()) {
-        setError('Le téléphone est requis');
+        setError('Phone number is required');
         return false;
       }
     }
     
     if (!formData.email.trim()) {
-      setError('L\'email est requis');
+      setError('Email is required');
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Format d\'email invalide');
+      setError('Invalid email format');
       return false;
     }
     if (!password.trim()) {
-      setError('Le mot de passe est requis');
+      setError('Password is required');
       return false;
     }
     return true;
@@ -96,39 +96,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
     try {
       if (isLogin) {
-        console.log('Login mode - checking existing user');
-        // Mode connexion - vérifier dans les utilisateurs enregistrés
-        const existingUser = await UserService.getUserByEmail(formData.email);
+        console.log('Connection mode - authenticating user');
+        // Connection mode - authenticate existing user
+        const authenticatedUser = await UserService.authenticateUser(formData.email, password);
         
-        if (!existingUser) {
-          console.log('No user found for email:', formData.email);
-          throw new Error('Aucun compte trouvé avec cet email. Veuillez vous inscrire d\'abord.');
-        }
-        
-        console.log('User found, logging in');
-        // Pour la démo, accepter n'importe quel mot de passe pour un utilisateur existant
+        console.log('User authenticated successfully');
         localStorage.setItem('userLoggedIn', 'true');
-        localStorage.setItem('userData', JSON.stringify(existingUser));
+        localStorage.setItem('userData', JSON.stringify(authenticatedUser));
+        
+        toast.success(`Welcome back, ${authenticatedUser.prenom}!`);
         
         onLoginSuccess();
       } else {
         console.log('Registration mode - creating new user');
-        // Mode inscription
-        // Vérifier si l'utilisateur existe déjà
+        // Registration mode
+        // Check if user already exists
         const existingUser = await UserService.getUserByEmail(formData.email);
         
         if (existingUser) {
-          console.log('User already exists, logging them in');
-          // Si l'utilisateur existe déjà, le connecter directement
-          localStorage.setItem('userLoggedIn', 'true');
-          localStorage.setItem('userData', JSON.stringify(existingUser));
-          toast.success('Inscription réussie ! Bienvenue dans le Cercle Privé.');
-          onLoginSuccess();
-          return;
+          throw new Error('An account with this email already exists. Please use the connection tab.');
         }
 
         console.log('Creating new user');
-        // Nouvel utilisateur - procéder à l'inscription
+        // New user - proceed with registration
         const userData: Omit<NewUserRegistration, 'id' | 'created_at'> = {
           nom: formData.nom,
           prenom: formData.prenom,
@@ -155,7 +145,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         }
         
         setSuccess(true);
-        toast.success('Inscription réussie ! Bienvenue dans le Cercle Privé.');
+        toast.success('Registration successful! Welcome to Cercle Privé.');
         
         // Redirect after a short delay
         setTimeout(() => {
@@ -182,10 +172,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           <div className="mb-6">
             <UserCheck className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h2 className="text-2xl font-light text-gray-900 mb-2">
-              Inscription réussie !
+              Registration successful!
             </h2>
             <p className="text-gray-600 font-light">
-              Redirection en cours...
+              Redirecting...
             </p>
           </div>
         </div>
@@ -202,32 +192,40 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             CERCLE PRIVÉ
           </h1>
           <p className="text-sm text-gray-600 font-light mt-2">
-            Bienvenue dans votre espace dédié à l'immobilier en toute discrétion
+            Welcome to your dedicated space for discreet real estate
           </p>
         </div>
 
         <div className="flex mb-6 bg-white/5 rounded-lg p-1">
           <button
             type="button"
-            onClick={() => setIsLogin(false)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-              !isLogin
-                ? 'bg-yellow-600 text-white shadow-lg'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Inscription
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsLogin(true)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+            onClick={() => {
+              setIsLogin(true);
+              setError(null);
+            }}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
               isLogin
                 ? 'bg-yellow-600 text-white shadow-lg'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Connexion
+            <LogIn className="w-4 h-4" />
+            <span>Connection</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setIsLogin(false);
+              setError(null);
+            }}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
+              !isLogin
+                ? 'bg-yellow-600 text-white shadow-lg'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Registration</span>
           </button>
         </div>
 
@@ -244,7 +242,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               <>
                 <div>
                   <label htmlFor="nom" className="block text-sm font-medium text-gray-700 mb-2">
-                    Nom *
+                    Last Name *
                   </label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -255,7 +253,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                       value={formData.nom}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors"
-                      placeholder="Votre nom"
+                      placeholder="Your last name"
                       required
                     />
                   </div>
@@ -263,7 +261,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
                 <div>
                   <label htmlFor="prenom" className="block text-sm font-medium text-gray-700 mb-2">
-                    Prénom *
+                    First Name *
                   </label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -274,7 +272,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                       value={formData.prenom}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors"
-                      placeholder="Votre prénom"
+                      placeholder="Your first name"
                       required
                     />
                   </div>
@@ -282,7 +280,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
                 <div>
                   <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Numéro de téléphone *
+                    Phone Number *
                   </label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -293,7 +291,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                       value={formData.telephone}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors"
-                      placeholder="Votre numéro de téléphone"
+                      placeholder="Your phone number"
                       required
                     />
                   </div>
@@ -303,7 +301,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Adresse email *
+                Email Address *
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -314,7 +312,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   value={formData.email}
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors"
-                  placeholder="votre@email.com"
+                  placeholder="your@email.com"
                   required
                 />
               </div>
@@ -322,7 +320,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Mot de passe *
+                Password *
               </label>
               <div className="relative">
                 <input
@@ -332,7 +330,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-colors pr-12"
-                  placeholder="Votre mot de passe"
+                  placeholder="Your password"
                 />
                 <button
                   type="button"
@@ -350,23 +348,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             disabled={isLoading}
             className="w-full bg-yellow-600 text-white py-3 px-4 rounded-md hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Inscription en cours...' : 'Accéder au site'}
+            {isLoading ? (isLogin ? 'Connecting...' : 'Registering...') : (isLogin ? 'Connect to Site' : 'Register & Access')}
           </button>
         </form>
 
         <p className="text-xs text-gray-500 text-center mt-6 font-light">
-          En vous inscrivant, vous acceptez de recevoir des informations sur nos biens immobiliers de prestige.
+          By registering, you agree to receive information about our luxury real estate properties.
         </p>
         
-        {isLogin && (
+        {!isLogin && (
           <p className="text-xs text-gray-500 text-center mt-4">
-            Pas encore de compte ?{' '}
+            Already have an account?{' '}
             <button
               type="button"
-              onClick={() => setIsLogin(false)}
+              onClick={() => setIsLogin(true)}
               className="text-yellow-600 hover:text-yellow-700 underline"
             >
-              S'inscrire ici
+              Connect here
             </button>
           </p>
         )}

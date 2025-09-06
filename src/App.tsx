@@ -75,6 +75,7 @@ function App() {
   const handleLoginSuccess = () => {
     console.log('Login success callback triggered');
     setIsUserLoggedIn(true);
+    setIsLoading(false);
   };
 
   // Fallback d'erreur
@@ -135,7 +136,7 @@ function App() {
     );
   }
 
-  // Admin panel (développement uniquement)
+  // Admin panel (development only)
   if (showAdmin && import.meta.env.DEV) {
     return (
       <>
@@ -145,7 +146,7 @@ function App() {
     );
   }
 
-  // Admin login (développement uniquement)
+  // Admin login (development only)
   if (showAdminLogin && import.meta.env.DEV) {
     return (
       <>
@@ -158,10 +159,19 @@ function App() {
     );
   }
 
-  // Site principal
+  // Main site - show all sections
   return (
     <>
-      <LoginForm onLoginSuccess={handleLoginSuccess} />
+      <Navigation onAdminClick={import.meta.env.DEV ? toggleAdmin : undefined} />
+      <HeroSection />
+      <NotreAdnSection />
+      <ServicesSection />
+      <OffMarketSection />
+      <RechercheSection />
+      <PropertyGallery />
+      <VendreSection />
+      <PWAInstallPrompt />
+      {import.meta.env.DEV && <Chatbot />}
       <Toaster position="top-right" />
     </>
   );
