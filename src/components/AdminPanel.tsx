@@ -820,6 +820,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
          <ContentPublisher />
        )}
 
+        {activeTab === 'nicolas_content' && canAccessModule('content') && (
+          <NicolasContentViewer />
+        )}
+
         {/* Message d'accès refusé */}
         {!canAccessModule(activeTab as any) && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">

@@ -24,6 +24,7 @@ import { ContentVersioningService } from './services/contentVersioningService';
 import DiagnosticPanel from './components/DiagnosticPanel';
 import BlankPageDetector from './components/BlankPageDetector';
 import { BlankPageDiagnostics } from './utils/diagnostics';
+import NicolasContentViewer from './components/NicolasContentViewer';
 
 // Fallback de chargement
 const LoadingFallback = () => (
