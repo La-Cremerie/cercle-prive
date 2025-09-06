@@ -141,17 +141,17 @@ export default function ContactSection() {
           </div>
 
           {/* Formulaire de contact */}
-          <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-12 border border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-2xl relative overflow-hidden">
             {/* Effet de brillance luxueux */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent"></div>
             <div className="absolute bottom-0 right-0 w-px h-full bg-gradient-to-t from-transparent via-amber-400/30 to-transparent"></div>
             
-            <h3 className="text-2xl font-light text-white mb-8 text-center">
+            <h3 className="text-xl font-light text-white mb-6 text-center">
               Envoyez-nous un message
             </h3>
-            <div className="w-16 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto mb-8"></div>
+            <div className="w-12 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto mb-6"></div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-blue-100 mb-2">
@@ -162,7 +162,7 @@ export default function ContactSection() {
                     name="nom"
                     value={formData.nom}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15"
+                    className="w-full px-3 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15"
                     placeholder="Votre nom"
                     required
                   />
@@ -176,7 +176,7 @@ export default function ContactSection() {
                     name="prenom"
                     value={formData.prenom}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15"
+                    className="w-full px-3 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15"
                     placeholder="Votre prénom"
                     required
                   />
@@ -193,7 +193,7 @@ export default function ContactSection() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15"
+                    className="w-full px-3 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15"
                     placeholder="votre@email.com"
                     required
                   />
@@ -207,7 +207,7 @@ export default function ContactSection() {
                     name="telephone"
                     value={formData.telephone}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15"
+                    className="w-full px-3 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15"
                     placeholder="Votre téléphone"
                   />
                 </div>
@@ -221,8 +221,8 @@ export default function ContactSection() {
                   name="message"
                   value={formData.message}
                   onChange={handleInputChange}
-                  rows={5}
-                  className="w-full px-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15 resize-none"
+                  rows={3}
+                  className="w-full px-3 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400/50 text-white placeholder-blue-200/70 transition-all duration-300 hover:bg-white/15 focus:bg-white/15 resize-none"
                   placeholder="Décrivez votre projet immobilier..."
                   required
                 />
@@ -231,19 +231,19 @@ export default function ContactSection() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center space-x-3 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 text-white py-4 px-8 rounded-xl hover:from-amber-600 hover:via-amber-700 hover:to-amber-600 focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-blue-900 transition-all duration-300 font-light tracking-wide text-lg shadow-xl hover:shadow-2xl transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full flex items-center justify-center space-x-3 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 text-white py-3 px-6 rounded-lg hover:from-amber-600 hover:via-amber-700 hover:to-amber-600 focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-blue-900 transition-all duration-300 font-light tracking-wide text-base shadow-xl hover:shadow-2xl transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <Send className={`w-5 h-5 ${isSubmitting ? 'animate-pulse' : ''}`} />
                 <span>{isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}</span>
               </button>
             </form>
 
-            <p className="text-xs text-blue-200/80 text-center mt-8 font-light tracking-wide">
+            <p className="text-xs text-blue-200/80 text-center mt-6 font-light tracking-wide">
               Nous nous engageons à vous répondre dans les 24h.
             </p>
             
             {/* Signature luxueuse */}
-            <div className="text-center mt-8 pt-6 border-t border-white/10">
+            <div className="text-center mt-6 pt-4 border-t border-white/10">
               <p className="text-amber-400/80 text-sm font-light tracking-widest">
               </p>
               <p className="text-blue-200/60 text-xs mt-1 font-light">
