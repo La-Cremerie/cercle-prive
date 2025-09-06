@@ -26,6 +26,7 @@ import PerformanceOptimizer from './PerformanceOptimizer';
 import ContentSyncDashboard from './ContentSyncDashboard';
 import DiagnosticPanel from './DiagnosticPanel';
 import AuthenticationTester from './AuthenticationTester';
+import NicolasMorningContentViewer from './NicolasMorningContentViewer';
 
 interface AdminPanelProps {
   onLogout: () => void;
