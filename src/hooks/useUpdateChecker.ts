@@ -1,5 +1,17 @@
 import { useState, useEffect } from 'react';
 
+// Fonction pour détecter si l'app est en mode PWA
+const detectPWA = () => {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  const isInWebAppiOS = (window.navigator as any).standalone === true;
+  return isStandalone || isInWebAppiOS;
+};
+
+// Fonction pour détecter si c'est un appareil mobile
+const detectMobile = () => {
+  return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
 interface UpdateInfo {
   available: boolean;
   version: string;
@@ -11,6 +23,8 @@ export const useUpdateChecker = () => {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [showUpdateSlider, setShowUpdateSlider] = useState(false);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const [isPWA] = useState(detectPWA());
+  const [isMobile] = useState(detectMobile());
 
   const checkForUpdates = async () => {
     try {
