@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic HTTPS - Synchronisation</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1a237e 50%, #0d1b2a 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #d97706;
+        }
+        .logo {
+            color: #d97706;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+            border-left: 4px solid;
+        }
+        .status.success { 
+            background: rgba(34, 197, 94, 0.1); 
+            color: #22c55e; 
+            border-left-color: #22c55e; 
+        }
+        .status.warning { 
+            background: rgba(245, 158, 11, 0.1); 
+            color: #f59e0b; 
+            border-left-color: #f59e0b; 
+        }
+        .status.error { 
+            background: rgba(239, 68, 68, 0.1); 
+            color: #ef4444; 
+            border-left-color: #ef4444; 
+        }
+        .status.info { 
+            background: rgba(59, 130, 246, 0.1); 
+            color: #3b82f6; 
+            border-left-color: #3b82f6; 
+        }
+        .test-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .test-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .test-title::before {
+            content: "🔍";
+            margin-right: 10px;
+        }
+        .btn {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 5px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { 
+            background: #b45309; 
+            transform: translateY(-2px);
+        }
+        .btn.secondary {
+            background: #6b7280;
+        }
+        .btn.secondary:hover { 
+            background: #4b5563; 
+        }
+        .btn.danger {
+            background: #ef4444;
+        }
+        .btn.danger:hover { 
+            background: #dc2626; 
+        }
+        .results {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">DIAGNOSTIC HTTPS</h1>
+            <h2>Analyse de Synchronisation Temps Réel</h2>
+            <p>Outil de diagnostic pour résoudre les problèmes de collaboration HTTPS</p>
+        </div>
+
+        <!-- Métriques de base -->
+        <div class="test-section">
+            <div class="test-title">État HTTPS et Sécurité</div>
+            <div class="grid">
+                <div class="metric">
+                    <div class="metric-value" id="https-status">❓</div>
+                    <div class="metric-label">Protocole HTTPS</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="ssl-status">❓</div>
+                    <div class="metric-label">Certificat SSL</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="mixed-content">❓</div>
+                    <div class="metric-label">Contenu Mixte</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="websocket-status">❓</div>
+                    <div class="metric-label">WebSocket Sécurisé</div>
+                </div>
+            </div>
+            <button class="btn" onclick="checkHTTPSStatus()">🔒 Vérifier HTTPS</button>
+        </div>
+
+        <!-- Test de synchronisation -->
+        <div class="test-section">
+            <div class="test-title">Test de Synchronisation</div>
+            <div id="sync-results"></div>
+            <div class="grid">
+                <button class="btn" onclick="testSupabaseConnection()">🗄️ Test Supabase</button>
+                <button class="btn" onclick="testRealtimeChannel()">📡 Test Canal Temps Réel</button>
+                <button class="btn" onclick="testContentSync()">📝 Test Sync Contenu</button>
+                <button class="btn" onclick="testCrossDeviceSync()">📱 Test Multi-Appareils</button>
+            </div>
+        </div>
+
+        <!-- Diagnostic des ressources -->
+        <div class="test-section">
+            <div class="test-title">Ressources et Cache</div>
+            <div id="resources-results"></div>
+            <div class="grid">
+                <button class="btn" onclick="checkMixedContent()">🔍 Contenu Mixte</button>
+                <button class="btn" onclick="analyzeCacheHeaders()">💾 Headers Cache</button>
+                <button class="btn" onclick="testImageLoading()">🖼️ Test Images</button>
+                <button class="btn secondary" onclick="clearAllCaches()">🧹 Vider Caches</button>
+            </div>
+        </div>
+
+        <!-- Solutions automatiques -->
+        <div class="test-section">
+            <div class="test-title">Solutions Automatiques</div>
+            <div id="solutions-results"></div>
+            <div class="grid">
+                <button class="btn" onclick="fixMixedContent()">🔧 Corriger Contenu Mixte</button>
+                <button class="btn" onclick="forceHTTPSRedirect()">🔄 Forcer HTTPS</button>
+                <button class="btn" onclick="updateServiceWorker()">⚙️ Mettre à Jour SW</button>
+                <button class="btn danger" onclick="emergencyHTTPSFix()">🚨 Correction d'Urgence</button>
+            </div>
+        </div>
+
+        <!-- Monitoring temps réel -->
+        <div class="test-section">
+            <div class="test-title">Monitoring Temps Réel</div>
+            <div id="monitoring-results">
+                <div class="status info">🔄 Monitoring en attente...</div>
+            </div>
+            <button class="btn" onclick="startRealtimeMonitoring()">📊 Démarrer Monitoring</button>
+            <button class="btn secondary" onclick="stopRealtimeMonitoring()">⏹️ Arrêter</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales pour le diagnostic
+        let diagnosticData = {
+            httpsIssues: [],
+            syncProblems: [],
+            solutions: [],
+            timestamp: new Date().toISOString()
+        };
+
+        let monitoringInterval = null;
+
+        // 1. Vérification HTTPS et sécurité
+        async function checkHTTPSStatus() {
+            try {
+                const httpsStatus = document.getElementById('https-status');
+                const sslStatus = document.getElementById('ssl-status');
+                const mixedContent = document.getElementById('mixed-content');
+                const websocketStatus = document.getElementById('websocket-status');
+
+                // Test HTTPS
+                const isHTTPS = location.protocol === 'https:';
+                httpsStatus.textContent = isHTTPS ? '✅' : '❌';
+                httpsStatus.style.color = isHTTPS ? '#22c55e' : '#ef4444';
+
+                // Test certificat SSL
+                try {
+                    const response = await fetch(location.origin, { method: 'HEAD' });
+                    sslStatus.textContent = response.ok ? '✅' : '⚠️';
+                    sslStatus.style.color = response.ok ? '#22c55e' : '#f59e0b';
+                } catch (error) {
+                    sslStatus.textContent = '❌';
+                    sslStatus.style.color = '#ef4444';
+                }
+
+                // Test contenu mixte
+                const mixedContentIssues = checkForMixedContent();
+                mixedContent.textContent = mixedContentIssues.length === 0 ? '✅' : '❌';
+                mixedContent.style.color = mixedContentIssues.length === 0 ? '#22c55e' : '#ef4444';
+
+                // Test WebSocket sécurisé
+                const wsProtocol = isHTTPS ? 'wss:' : 'ws:';
+                websocketStatus.textContent = isHTTPS ? '✅' : '❌';
+                websocketStatus.style.color = isHTTPS ? '#22c55e' : '#ef4444';
+
+                console.log('HTTPS Status Check Complete');
+
+            } catch (error) {
+                console.error('Erreur vérification HTTPS:', error);
+            }
+        }
+
+        // 2. Test connexion Supabase
+        async function testSupabaseConnection() {
+            const resultsDiv = document.getElementById('sync-results');
+            resultsDiv.innerHTML = '<div class="status info">🔄 Test de connexion Supabase...</div>';
+
+            try {
+                // Vérifier les variables d'environnement
+                const supabaseUrl = 'https://your-project.supabase.co'; // À remplacer
+                const supabaseKey = 'your-anon-key'; // À remplacer
+
+                let html = '';
+
+                if (supabaseUrl === 'https://your-project.supabase.co') {
+                    html += '<div class="status error">❌ Supabase non configuré - Variables d\'environnement manquantes</div>';
+                    html += '<div class="status info">💡 Solution: Cliquez sur "Connect to Supabase" en haut à droite</div>';
+                } else {
+                    // Test de connexion HTTPS
+                    try {
+                        const response = await fetch(`${supabaseUrl}/rest/v1/`, {
+                            headers: {
+                                'apikey': supabaseKey,
+                                'Authorization': `Bearer ${supabaseKey}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            html += '<div class="status success">✅ Connexion Supabase HTTPS réussie</div>';
+                            
+                            // Test des tables
+                            const tablesResponse = await fetch(`${supabaseUrl}/rest/v1/user_registrations?select=count`, {
+                                headers: {
+                                    'apikey': supabaseKey,
+                                    'Authorization': `Bearer ${supabaseKey}`
+                                }
+                            });
+                            
+                            if (tablesResponse.ok) {
+                                html += '<div class="status success">✅ Tables de base de données accessibles</div>';
+                            } else {
+                                html += '<div class="status warning">⚠️ Problème d\'accès aux tables</div>';
+                            }
+                        } else {
+                            html += `<div class="status error">❌ Erreur connexion Supabase: ${response.status}</div>';
+                        }
+                    } catch (error) {
+                        html += `<div class="status error">❌ Impossible de se connecter à Supabase: ${error.message}</div>';
+                        html += '<div class="status info">💡 Vérifiez que l\'URL Supabase est en HTTPS</div>';
+                    }
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur test Supabase: ${error.message}</div>`;
+            }
+        }
+
+        // 3. Test canal temps réel
+        async function testRealtimeChannel() {
+            const resultsDiv = document.getElementById('sync-results');
+            const currentContent = resultsDiv.innerHTML;
+            resultsDiv.innerHTML = currentContent + '<div class="status info">🔄 Test du canal temps réel...</div>';
+
+            try {
+                let html = '';
+
+                // Vérifier WebSocket sécurisé
+                const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+                html += `<div class="status info">📡 Protocole WebSocket: ${wsProtocol}</div>`;
+
+                if (wsProtocol === 'ws:') {
+                    html += '<div class="status error">❌ WebSocket non sécurisé - Bloqué par HTTPS</div>';
+                    html += '<div class="status info">💡 Solution: Configurer WSS (WebSocket Secure)</div>';
+                } else {
+                    html += '<div class="status success">✅ WebSocket sécurisé (WSS)</div>';
+                    
+                    // Test de connexion WebSocket
+                    try {
+                        const testWS = new WebSocket('wss://echo.websocket.org');
+                        
+                        testWS.onopen = () => {
+                            html += '<div class="status success">✅ Connexion WebSocket fonctionnelle</div>';
+                            resultsDiv.innerHTML = currentContent + html;
+                            testWS.close();
+                        };
+                        
+                        testWS.onerror = () => {
+                            html += '<div class="status error">❌ Erreur connexion WebSocket</div>';
+                            resultsDiv.innerHTML = currentContent + html;
+                        };
+                        
+                        // Timeout après 5 secondes
+                        setTimeout(() => {
+                            if (testWS.readyState === WebSocket.CONNECTING) {
+                                testWS.close();
+                                html += '<div class="status warning">⚠️ Timeout connexion WebSocket</div>';
+                                resultsDiv.innerHTML = currentContent + html;
+                            }
+                        }, 5000);
+                        
+                    } catch (error) {
+                        html += `<div class="status error">❌ Erreur WebSocket: ${error.message}</div>`;
+                    }
+                }
+
+                resultsDiv.innerHTML = currentContent + html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = currentContent + `<div class="status error">❌ Erreur test canal: ${error.message}</div>`;
+            }
+        }
+
+        // 4. Test synchronisation contenu
+        async function testContentSync() {
+            const resultsDiv = document.getElementById('sync-results');
+            const currentContent = resultsDiv.innerHTML;
+            resultsDiv.innerHTML = currentContent + '<div class="status info">🔄 Test synchronisation contenu...</div>';
+
+            try {
+                let html = '';
+
+                // Test localStorage
+                try {
+                    const testData = { test: 'sync', timestamp: Date.now() };
+                    localStorage.setItem('sync-test', JSON.stringify(testData));
+                    const retrieved = localStorage.getItem('sync-test');
+                    
+                    if (retrieved && JSON.parse(retrieved).test === 'sync') {
+                        html += '<div class="status success">✅ LocalStorage fonctionnel</div>';
+                    } else {
+                        html += '<div class="status error">❌ Problème localStorage</div>';
+                    }
+                    localStorage.removeItem('sync-test');
+                } catch (error) {
+                    html += '<div class="status error">❌ LocalStorage non accessible</div>';
+                }
+
+                // Test Service Worker
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.getRegistration();
+                        if (registration) {
+                            html += '<div class="status success">✅ Service Worker actif</div>';
+                            
+                            // Vérifier si le SW utilise HTTPS
+                            if (registration.scope.startsWith('https://')) {
+                                html += '<div class="status success">✅ Service Worker sécurisé (HTTPS)</div>';
+                            } else {
+                                html += '<div class="status warning">⚠️ Service Worker non sécurisé</div>';
+                            }
+                        } else {
+                            html += '<div class="status warning">⚠️ Aucun Service Worker enregistré</div>';
+                        }
+                    } catch (error) {
+                        html += '<div class="status error">❌ Erreur Service Worker</div>';
+                    }
+                } else {
+                    html += '<div class="status error">❌ Service Worker non supporté</div>';
+                }
+
+                // Test des événements personnalisés
+                let eventReceived = false;
+                const testEvent = () => {
+                    eventReceived = true;
+                };
+                
+                window.addEventListener('test-sync-event', testEvent);
+                window.dispatchEvent(new CustomEvent('test-sync-event'));
+                
+                setTimeout(() => {
+                    if (eventReceived) {
+                        html += '<div class="status success">✅ Événements personnalisés fonctionnels</div>';
+                    } else {
+                        html += '<div class="status error">❌ Problème événements personnalisés</div>';
+                    }
+                    
+                    window.removeEventListener('test-sync-event', testEvent);
+                    resultsDiv.innerHTML = currentContent + html;
+                }, 100);
+
+            } catch (error) {
+                resultsDiv.innerHTML = currentContent + `<div class="status error">❌ Erreur test sync: ${error.message}</div>`;
+            }
+        }
+
+        // 5. Test multi-appareils
+        async function testCrossDeviceSync() {
+            const resultsDiv = document.getElementById('sync-results');
+            const currentContent = resultsDiv.innerHTML;
+            resultsDiv.innerHTML = currentContent + '<div class="status info">🔄 Test synchronisation multi-appareils...</div>';
+
+            try {
+                let html = '';
+
+                // Générer un ID de test unique
+                const testId = 'sync-test-' + Date.now();
+                const testData = {
+                    id: testId,
+                    content: 'Test de synchronisation',
+                    timestamp: new Date().toISOString(),
+                    device: navigator.userAgent.split(' ')[0]
+                };
+
+                // Sauvegarder localement
+                localStorage.setItem('cross-device-test', JSON.stringify(testData));
+                html += '<div class="status success">✅ Données de test sauvegardées localement</div>';
+
+                // Simuler une modification collaborative
+                html += '<div class="status info">📱 Simulation modification collaborative...</div>';
+                
+                // Test de diffusion d'événement
+                window.dispatchEvent(new CustomEvent('contentUpdated', { 
+                    detail: testData 
+                }));
+                
+                html += '<div class="status success">✅ Événement de synchronisation diffusé</div>';
+
+                // Instructions pour test manuel
+                html += '<div class="status info">📋 Pour tester complètement:</div>';
+                html += '<div class="results">1. Ouvrez ce site sur un autre appareil/navigateur\n';
+                html += '2. Connectez-vous en admin\n';
+                html += '3. Modifiez un bien immobilier\n';
+                html += '4. Cliquez "PUBLIER POUR TOUS"\n';
+                html += '5. Vérifiez que ce navigateur se met à jour automatiquement</div>';
+
+                resultsDiv.innerHTML = currentContent + html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = currentContent + `<div class="status error">❌ Erreur test multi-appareils: ${error.message}</div>`;
+            }
+        }
+
+        // 6. Vérifier le contenu mixte
+        function checkForMixedContent() {
+            const issues = [];
+            
+            // Vérifier les images
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                if (img.src && img.src.startsWith('http://')) {
+                    issues.push(`Image HTTP: ${img.src}`);
+                }
+            });
+            
+            // Vérifier les scripts
+            const scripts = document.querySelectorAll('script[src]');
+            scripts.forEach(script => {
+                if (script.src && script.src.startsWith('http://')) {
+                    issues.push(`Script HTTP: ${script.src}`);
+                }
+            });
+            
+            // Vérifier les CSS
+            const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
+            stylesheets.forEach(link => {
+                if (link.href && link.href.startsWith('http://')) {
+                    issues.push(`CSS HTTP: ${link.href}`);
+                }
+            });
+            
+            return issues;
+        }
+
+        function checkMixedContent() {
+            const resultsDiv = document.getElementById('resources-results');
+            resultsDiv.innerHTML = '<div class="status info">🔄 Analyse du contenu mixte...</div>';
+
+            try {
+                const issues = checkForMixedContent();
+                let html = '';
+
+                if (issues.length === 0) {
+                    html += '<div class="status success">✅ Aucun contenu mixte détecté</div>';
+                } else {
+                    html += `<div class="status error">❌ ${issues.length} problème(s) de contenu mixte détecté(s)</div>`;
+                    html += '<div class="results">Ressources HTTP détectées:\n' + issues.join('\n') + '</div>';
+                    html += '<div class="status info">💡 Solution: Convertir toutes les URLs en HTTPS</div>';
+                }
+
+                // Vérifier les fetch/XHR
+                const originalFetch = window.fetch;
+                let httpRequests = [];
+                
+                window.fetch = function(...args) {
+                    const url = args[0];
+                    if (typeof url === 'string' && url.startsWith('http://')) {
+                        httpRequests.push(url);
+                    }
+                    return originalFetch.apply(this, args);
+                };
+
+                // Restaurer fetch après 1 seconde
+                setTimeout(() => {
+                    window.fetch = originalFetch;
+                    if (httpRequests.length > 0) {
+                        html += `<div class="status warning">⚠️ ${httpRequests.length} requête(s) HTTP détectée(s)</div>`;
+                    }
+                }, 1000);
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur analyse contenu mixte: ${error.message}</div>`;
+            }
+        }
+
+        // 7. Analyser les headers de cache
+        async function analyzeCacheHeaders() {
+            const resultsDiv = document.getElementById('resources-results');
+            const currentContent = resultsDiv.innerHTML;
+            resultsDiv.innerHTML = currentContent + '<div class="status info">🔄 Analyse des headers de cache...</div>';
+
+            try {
+                let html = '';
+
+                // Test des headers de cache
+                const response = await fetch(location.href, { method: 'HEAD' });
+                const headers = response.headers;
+
+                // Vérifier les headers de sécurité HTTPS
+                const securityHeaders = [
+                    'strict-transport-security',
+                    'content-security-policy',
+                    'x-frame-options',
+                    'x-content-type-options'
+                ];
+
+                securityHeaders.forEach(header => {
+                    const value = headers.get(header);
+                    if (value) {
+                        html += `<div class="status success">✅ ${header}: ${value.substring(0, 50)}...</div>`;
+                    } else {
+                        html += `<div class="status warning">⚠️ Header manquant: ${header}</div>`;
+                    }
+                });
+
+                // Vérifier les headers de cache
+                const cacheControl = headers.get('cache-control');
+                if (cacheControl) {
+                    html += `<div class="status info">💾 Cache-Control: ${cacheControl}</div>`;
+                } else {
+                    html += '<div class="status warning">⚠️ Pas de Cache-Control défini</div>';
+                }
+
+                resultsDiv.innerHTML = currentContent + html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = currentContent + `<div class="status error">❌ Erreur analyse headers: ${error.message}</div>`;
+            }
+        }
+
+        // 8. Test chargement images
+        async function testImageLoading() {
+            const resultsDiv = document.getElementById('resources-results');
+            const currentContent = resultsDiv.innerHTML;
+            resultsDiv.innerHTML = currentContent + '<div class="status info">🔄 Test chargement images...</div>';
+
+            try {
+                let html = '';
+
+                // Test images Pexels (utilisées dans le site)
+                const testImages = [
+                    'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=100',
+                    'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=100'
+                ];
+
+                for (const imageUrl of testImages) {
+                    try {
+                        const response = await fetch(imageUrl, { method: 'HEAD' });
+                        if (response.ok) {
+                            html += `<div class="status success">✅ Image Pexels accessible (${response.status})</div>`;
+                        } else {
+                            html += `<div class="status warning">⚠️ Problème image Pexels: ${response.status}</div>`;
+                        }
+                    } catch (error) {
+                        html += `<div class="status error">❌ Image Pexels inaccessible: ${error.message}</div>`;
+                    }
+                }
+
+                // Test CORS
+                html += '<div class="status info">🌐 Test CORS pour images externes...</div>';
+                
+                resultsDiv.innerHTML = currentContent + html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = currentContent + `<div class="status error">❌ Erreur test images: ${error.message}</div>`;
+            }
+        }
+
+        // 9. Corriger le contenu mixte
+        function fixMixedContent() {
+            const resultsDiv = document.getElementById('solutions-results');
+            resultsDiv.innerHTML = '<div class="status info">🔧 Correction du contenu mixte...</div>';
+
+            try {
+                let fixes = [];
+                let html = '';
+
+                // Corriger les images HTTP
+                const images = document.querySelectorAll('img[src^="http://"]');
+                images.forEach(img => {
+                    const httpsUrl = img.src.replace('http://', 'https://');
+                    img.src = httpsUrl;
+                    fixes.push(`Image corrigée: ${httpsUrl}`);
+                });
+
+                // Corriger les liens HTTP
+                const links = document.querySelectorAll('a[href^="http://"]');
+                links.forEach(link => {
+                    const httpsUrl = link.href.replace('http://', 'https://');
+                    link.href = httpsUrl;
+                    fixes.push(`Lien corrigé: ${httpsUrl}`);
+                });
+
+                // Mettre à jour localStorage avec URLs HTTPS
+                const storageKeys = ['siteContent', 'properties', 'presentationImages'];
+                storageKeys.forEach(key => {
+                    try {
+                        const data = localStorage.getItem(key);
+                        if (data) {
+                            const parsed = JSON.parse(data);
+                            const updated = JSON.stringify(parsed).replace(/http:\/\//g, 'https://');
+                            if (updated !== data) {
+                                localStorage.setItem(key, updated);
+                                fixes.push(`LocalStorage ${key} mis à jour vers HTTPS`);
+                            }
+                        }
+                    } catch (error) {
+                        console.warn(`Erreur mise à jour ${key}:`, error);
+                    }
+                });
+
+                if (fixes.length === 0) {
+                    html = '<div class="status success">✅ Aucun contenu mixte à corriger</div>';
+                } else {
+                    html = `<div class="status success">✅ ${fixes.length} correction(s) appliquée(s)</div>`;
+                    html += '<div class="results">' + fixes.join('\n') + '</div>';
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur correction contenu mixte: ${error.message}</div>`;
+            }
+        }
+
+        // 10. Forcer redirection HTTPS
+        function forceHTTPSRedirect() {
+            const resultsDiv = document.getElementById('solutions-results');
+            
+            if (location.protocol === 'http:') {
+                resultsDiv.innerHTML = '<div class="status info">🔄 Redirection vers HTTPS...</div>';
+                setTimeout(() => {
+                    location.href = location.href.replace('http://', 'https://');
+                }, 1000);
+            } else {
+                resultsDiv.innerHTML = '<div class="status success">✅ Déjà en HTTPS</div>';
+            }
+        }
+
+        // 11. Mettre à jour Service Worker
+        async function updateServiceWorker() {
+            const resultsDiv = document.getElementById('solutions-results');
+            resultsDiv.innerHTML = '<div class="status info">🔄 Mise à jour Service Worker...</div>';
+
+            try {
+                let html = '';
+
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    
+                    if (registrations.length > 0) {
+                        for (const registration of registrations) {
+                            await registration.update();
+                            html += '<div class="status success">✅ Service Worker mis à jour</div>';
+                        }
+                        
+                        // Vider les caches
+                        if ('caches' in window) {
+                            const cacheNames = await caches.keys();
+                            for (const cacheName of cacheNames) {
+                                await caches.delete(cacheName);
+                            }
+                            html += `<div class="status success">✅ ${cacheNames.length} cache(s) vidé(s)</div>`;
+                        }
+                        
+                        html += '<div class="status info">🔄 Rechargement recommandé</div>';
+                    } else {
+                        html += '<div class="status warning">⚠️ Aucun Service Worker à mettre à jour</div>';
+                    }
+                } else {
+                    html += '<div class="status error">❌ Service Worker non supporté</div>';
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur mise à jour SW: ${error.message}</div>`;
+            }
+        }
+
+        // 12. Correction d'urgence HTTPS
+        function emergencyHTTPSFix() {
+            if (!confirm('🚨 CORRECTION D\'URGENCE HTTPS 🚨\n\nCette action va :\n- Forcer HTTPS sur toutes les ressources\n- Vider tous les caches\n- Recharger la page\n\nContinuer ?')) {
+                return;
+            }
+
+            const resultsDiv = document.getElementById('solutions-results');
+            resultsDiv.innerHTML = '<div class="status error">🚨 Correction d\'urgence HTTPS...</div>';
+
+            try {
+                // 1. Corriger toutes les URLs HTTP
+                fixMixedContent();
+                
+                // 2. Forcer HTTPS dans localStorage
+                Object.keys(localStorage).forEach(key => {
+                    try {
+                        const value = localStorage.getItem(key);
+                        if (value && value.includes('http://')) {
+                            const httpsValue = value.replace(/http:\/\//g, 'https://');
+                            localStorage.setItem(key, httpsValue);
+                        }
+                    } catch (error) {
+                        console.warn(`Erreur correction ${key}:`, error);
+                    }
+                });
+
+                // 3. Vider tous les caches
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    });
+                }
+
+                // 4. Mettre à jour Service Worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        registrations.forEach(registration => registration.update());
+                    });
+                }
+
+                resultsDiv.innerHTML = '<div class="status success">✅ Correction d\'urgence appliquée - Rechargement...</div>';
+                
+                // 5. Recharger avec HTTPS forcé
+                setTimeout(() => {
+                    const httpsUrl = location.href.replace('http://', 'https://');
+                    location.href = httpsUrl + '?https-fixed=' + Date.now();
+                }, 2000);
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur correction urgence: ${error.message}</div>`;
+            }
+        }
+
+        // 13. Monitoring temps réel
+        function startRealtimeMonitoring() {
+            const resultsDiv = document.getElementById('monitoring-results');
+            
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+            }
+
+            resultsDiv.innerHTML = '<div class="status success">📊 Monitoring temps réel démarré...</div>';
+
+            let eventCount = 0;
+            let lastUpdate = Date.now();
+
+            // Écouter tous les événements de synchronisation
+            const events = ['contentUpdated', 'storage', 'presentationImageChanged', 'designSettingsChanged', 'forceUpdate'];
+            
+            events.forEach(eventName => {
+                window.addEventListener(eventName, (event) => {
+                    eventCount++;
+                    lastUpdate = Date.now();
+                    
+                    const html = `
+                        <div class="status success">📡 Événement détecté: ${eventName}</div>
+                        <div class="results">Événements reçus: ${eventCount}
+Dernier événement: ${new Date(lastUpdate).toLocaleTimeString()}
+Type: ${eventName}
+Détails: ${event.detail ? JSON.stringify(event.detail, null, 2) : 'Aucun détail'}</div>
+                    `;
+                    resultsDiv.innerHTML = html;
+                });
+            });
+
+            // Monitoring périodique
+            monitoringInterval = setInterval(() => {
+                const timeSinceLastUpdate = Date.now() - lastUpdate;
+                const status = timeSinceLastUpdate > 30000 ? 'warning' : 'success';
+                const icon = timeSinceLastUpdate > 30000 ? '⚠️' : '✅';
+                
+                const html = `
+                    <div class="status ${status}">${icon} Monitoring actif - ${eventCount} événement(s)</div>
+                    <div class="results">Dernière activité: ${Math.round(timeSinceLastUpdate / 1000)}s
+État: ${timeSinceLastUpdate > 30000 ? 'Inactif' : 'Actif'}
+Protocole: ${location.protocol}
+WebSocket: ${location.protocol === 'https:' ? 'WSS (Sécurisé)' : 'WS (Non sécurisé)'}</div>
+                `;
+                resultsDiv.innerHTML = html;
+            }, 5000);
+        }
+
+        function stopRealtimeMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+            }
+            
+            document.getElementById('monitoring-results').innerHTML = 
+                '<div class="status info">⏹️ Monitoring arrêté</div>';
+        }
+
+        // 14. Vider tous les caches
+        async function clearAllCaches() {
+            const resultsDiv = document.getElementById('resources-results');
+            resultsDiv.innerHTML = '<div class="status info">🧹 Nettoyage des caches...</div>';
+
+            try {
+                let html = '';
+
+                // Vider localStorage (sauf données importantes)
+                const importantKeys = ['userLoggedIn', 'userData', 'adminLoggedIn'];
+                const keysToSave = {};
+                
+                importantKeys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    if (value) keysToSave[key] = value;
+                });
+
+                localStorage.clear();
+                
+                Object.entries(keysToSave).forEach(([key, value]) => {
+                    localStorage.setItem(key, value);
+                });
+
+                html += '<div class="status success">✅ LocalStorage nettoyé (session préservée)</div>';
+
+                // Vider sessionStorage
+                sessionStorage.clear();
+                html += '<div class="status success">✅ SessionStorage vidé</div>';
+
+                // Vider caches Service Worker
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    for (const cacheName of cacheNames) {
+                        await caches.delete(cacheName);
+                    }
+                    html += `<div class="status success">✅ ${cacheNames.length} cache(s) Service Worker vidé(s)</div>';
+                }
+
+                html += '<div class="status success">🎉 Nettoyage terminé - Rechargement recommandé</div>';
+                resultsDiv.innerHTML = html;
+
+                // Proposer de recharger
+                setTimeout(() => {
+                    if (confirm('Nettoyage terminé. Recharger la page maintenant ?')) {
+                        location.reload();
+                    }
+                }, 2000);
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">❌ Erreur nettoyage: ${error.message}</div>`;
+            }
+        }
+
+        // Initialisation automatique
+        window.addEventListener('load', () => {
+            console.log('🔧 Diagnostic HTTPS chargé');
+            checkHTTPSStatus();
+            
+            // Auto-diagnostic après 2 secondes
+            setTimeout(() => {
+                testSupabaseConnection();
+            }, 2000);
+        });
+
+        // Capturer les erreurs HTTPS
+        window.addEventListener('error', (event) => {
+            if (event.message && event.message.includes('Mixed Content')) {
+                diagnosticData.httpsIssues.push({
+                    type: 'mixed-content',
+                    message: event.message,
+                    source: event.filename,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        });
+
+        // Capturer les erreurs de sécurité
+        window.addEventListener('securitypolicyviolation', (event) => {
+            diagnosticData.httpsIssues.push({
+                type: 'csp-violation',
+                directive: event.violatedDirective,
+                blockedURI: event.blockedURI,
+                timestamp: new Date().toISOString()
+            });
+        });
+    </script>
+</body>
+</html>

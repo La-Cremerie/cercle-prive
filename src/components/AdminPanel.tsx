@@ -26,6 +26,7 @@ import PerformanceOptimizer from './PerformanceOptimizer';
 import ContentSyncDashboard from './ContentSyncDashboard';
 import DiagnosticPanel from './DiagnosticPanel';
 import AuthenticationTester from './AuthenticationTester';
+import HTTPSSyncMonitor from './HTTPSSyncMonitor';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -481,6 +482,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     case 'performance': return <Settings className="w-4 h-4" />;
                     case 'sync_dashboard': return <RefreshCw className="w-4 h-4" />;
                     case 'diagnostic': return <Settings className="w-4 h-4" />;
+                    case 'https_monitor': return <Shield className="w-4 h-4" />;
                     default: return <Settings className="w-4 h-4" />;
                   }
                 };
@@ -820,6 +822,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
        {activeTab === 'content_publisher' && canAccessModule('content') && (
          <ContentPublisher />
        )}
+
+        {activeTab === 'https_monitor' && canAccessModule('admin_management') && (
+          <HTTPSSyncMonitor />
+        )}
 
         {activeTab === 'auth_test' && canAccessModule('admin_management') && (
           <AuthenticationTester />
