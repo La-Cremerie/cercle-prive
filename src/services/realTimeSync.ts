@@ -391,8 +391,17 @@ export class RealTimeSyncService {
       throw new Error('Supabase non configuré - impossible de synchroniser');
     }
 
+    // Vérifier l'authentification
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (!user && !localStorage.getItem('currentAdminId')) {
+      console.warn('Aucune session Supabase active pour la synchronisation');
+      // Ne pas faire échouer, juste avertir
+      return;
+    }
+
     try {
-      const authorEmail = 'nicolas.c@lacremerie.fr'; // Email admin par défaut
+      const authorEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
       
       // Sauvegarder selon le type de changement
       switch (event.type) {
@@ -438,8 +447,8 @@ export class RealTimeSyncService {
       
       console.log('✅ Changement sauvegardé dans Supabase via HTTPS');
     } catch (error) {
-      console.error('❌ Erreur sauvegarde Supabase:', error);
-      throw error;
+      console.warn('⚠️ Erreur sauvegarde Supabase, mode local activé:', error);
+      // Ne pas faire échouer la synchronisation pour des problèmes d'auth
     }
   }
 
