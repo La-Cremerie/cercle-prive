@@ -42,6 +42,7 @@ const NicolasMorningContentViewer: React.FC = () => {
       console.log('🔍 Recherche du contenu de Nicolas ajouté ce matin via HTTPS...');
       
       const { start: morningStart, end: morningEnd } = getMorningTimeRange();
+      console.log(`📅 Recherche pour le samedi 6 septembre 2025, de ${morningStart.toLocaleString('fr-FR')} à ${morningEnd.toLocaleString('fr-FR')}`);
       const foundContent: MorningContent[] = [];
 
       // 1. Vérifier les événements de synchronisation récents depuis Supabase (HTTPS)
