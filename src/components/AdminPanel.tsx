@@ -26,7 +26,6 @@ import PerformanceOptimizer from './PerformanceOptimizer';
 import ContentSyncDashboard from './ContentSyncDashboard';
 import DiagnosticPanel from './DiagnosticPanel';
 import AuthenticationTester from './AuthenticationTester';
-import HTTPSSyncMonitor from './HTTPSSyncMonitor';
 import ContentManagementDiagnostic from './ContentManagementDiagnostic';
 
 interface AdminPanelProps {
@@ -811,10 +810,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
         {activeTab === 'content_diagnostic' && canAccessModule('admin_management') && (
           <ContentManagementDiagnostic />
-        )}
-
-        {activeTab === 'https_monitor' && canAccessModule('admin_management') && (
-          <HTTPSSyncMonitor />
         )}
 
         {activeTab === 'auth_test' && canAccessModule('admin_management') && (
