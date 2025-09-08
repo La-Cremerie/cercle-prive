@@ -53,25 +53,6 @@ const PropertyManagement: React.FC = () => {
         yield: 248000,
         isVisible: true
       },
-      {
-        id: '3',
-        name: 'Penthouse Élégance',
-        location: 'Monaco, Monte-Carlo',
-        price: '12 800 000 €',
-        bedrooms: 4,
-        bathrooms: 3,
-        surface: 280,
-        images: [
-          'https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800',
-          'https://images.pexels.com/photos/1571468/pexels-photo-1571468.jpeg?auto=compress&cs=tinysrgb&w=800'
-        ],
-        description: 'Penthouse exceptionnel au cœur de Monaco avec terrasse panoramique.',
-        features: ['Terrasse 200m²', 'Vue mer et ville', 'Concierge 24h/24', 'Parking privé'],
-        type: 'penthouse',
-        status: 'reserve',
-        yield: 512000,
-        isVisible: true
-      }
     ];
   });
 
