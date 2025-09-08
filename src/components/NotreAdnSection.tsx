@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 const NotreAdnSection: React.FC = () => {
   const [conceptImage, setConceptImage] = useState('https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800');
+  const [conceptImage, setConceptImage] = useState('https://i.postimg.cc/vmb2fvJr/Capture-d-e-cran-2025-09-03-a-07-06-21.png');
 
   useEffect(() => {
     // Charger l'image depuis le contenu du site
