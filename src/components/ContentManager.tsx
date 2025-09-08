@@ -106,11 +106,14 @@ const ContentManager: React.FC = () => {
 
   const saveContent = async () => {
     try {
+      console.log('💾 Début de sauvegarde du contenu:', content);
+      
       // 1. Sauvegarder dans Supabase IMMÉDIATEMENT
       const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
       const adminName = adminEmail.split('@')[0];
       
       try {
+        console.log('📤 Tentative de sauvegarde Supabase...');
         await ContentVersioningService.saveContentVersion(
           content,
           adminName,
@@ -119,27 +122,68 @@ const ContentManager: React.FC = () => {
         );
         console.log('✅ Contenu sauvegardé dans Supabase avec versioning');
       } catch (supabaseError) {
-        console.warn('Erreur Supabase, sauvegarde locale uniquement:', supabaseError);
+        console.warn('⚠️ Erreur Supabase, sauvegarde locale uniquement:', supabaseError);
         // Continuer avec la sauvegarde locale
       }
       
       // 2. Sauvegarder localement (fallback)
+      console.log('💾 Sauvegarde locale...');
       localStorage.setItem('siteContent', JSON.stringify(content));
       
       // 3. Diffuser le changement en temps réel pour TOUS les utilisateurs
+      console.log('📡 Diffusion du changement...');
       await broadcastChange('content', 'update', content);
       
       // 4. Déclencher la mise à jour locale immédiate
+      console.log('🔄 Déclenchement mise à jour locale...');
       window.dispatchEvent(new CustomEvent('contentUpdated', { detail: content }));
       
-      toast.success('✅ Contenu sauvegardé et synchronisé pour tous les utilisateurs !');
+      // 5. Forcer la mise à jour des images spécifiquement
+      if (content.hero?.backgroundImage) {
+        window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
+          detail: content.hero.backgroundImage 
+        }));
+      }
+      
+      // 6. Déclencher une mise à jour globale
+      window.dispatchEvent(new CustomEvent('forceUpdate', { 
+        detail: { type: 'content', source: 'admin', timestamp: Date.now() } 
+      }));
+      
+      console.log('✅ Sauvegarde terminée avec succès');
+      toast.success('✅ Contenu et images sauvegardés avec succès !', {
+        duration: 4000,
+        icon: '💾'
+      });
       
     } catch (error) {
       console.error('Erreur sauvegarde contenu:', error);
-      // Même en cas d'erreur Supabase, la sauvegarde locale fonctionne
-      localStorage.setItem('siteContent', JSON.stringify(content));
-      window.dispatchEvent(new CustomEvent('contentUpdated', { detail: content }));
-      toast.success('✅ Contenu sauvegardé localement !');
+      
+      try {
+        // Même en cas d'erreur Supabase, la sauvegarde locale fonctionne
+        console.log('🔄 Sauvegarde de secours...');
+        localStorage.setItem('siteContent', JSON.stringify(content));
+        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: content }));
+        
+        // Forcer la mise à jour des images
+        if (content.hero?.backgroundImage) {
+          window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
+            detail: content.hero.backgroundImage 
+          }));
+        }
+        
+        window.dispatchEvent(new CustomEvent('forceUpdate', { 
+          detail: { type: 'content', source: 'fallback', timestamp: Date.now() } 
+        }));
+        
+        toast.success('✅ Contenu sauvegardé localement (images incluses) !', {
+          duration: 4000,
+          icon: '📦'
+        });
+      } catch (fallbackError) {
+        console.error('❌ Erreur sauvegarde de secours:', fallbackError);
+        toast.error('❌ Erreur lors de la sauvegarde du contenu');
+      }
     }
   };
 
@@ -341,12 +385,28 @@ const ContentManager: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Image d'arrière-plan (URL)
             </label>
-            <input
-              type="url"
-              value={content.hero.backgroundImage}
-              onChange={(e) => updateContent('hero', 'backgroundImage', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
+            <div className="space-y-3">
+              <input
+                type="url"
+                value={content.hero.backgroundImage}
+                onChange={(e) => updateContent('hero', 'backgroundImage', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="https://images.pexels.com/photos/..."
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const newUrl = prompt('Entrez l\'URL de la nouvelle image d\'arrière-plan:');
+                  if (newUrl && newUrl.trim()) {
+                    updateContent('hero', 'backgroundImage', newUrl.trim());
+                    toast.success('Image d\'arrière-plan mise à jour');
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+              >
+                Changer l'image
+              </button>
+            </div>
             {content.hero.backgroundImage && (
               <div className="mt-3">
                 <img
@@ -396,12 +456,28 @@ const ContentManager: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Image illustrative (URL)
             </label>
-            <input
-              type="url"
-              value={content.concept.image}
-              onChange={(e) => updateContent('concept', 'image', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
+            <div className="space-y-3">
+              <input
+                type="url"
+                value={content.concept.image}
+                onChange={(e) => updateContent('concept', 'image', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="https://images.pexels.com/photos/..."
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const newUrl = prompt('Entrez l\'URL de la nouvelle image du concept:');
+                  if (newUrl && newUrl.trim()) {
+                    updateContent('concept', 'image', newUrl.trim());
+                    toast.success('Image du concept mise à jour');
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+              >
+                Changer l'image
+              </button>
+            </div>
             {content.concept.image && (
               <div className="mt-3">
                 <img

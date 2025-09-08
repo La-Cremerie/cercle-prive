@@ -58,6 +58,63 @@ const HeroSection: React.FC = () => {
   // Écouter les changements d'image depuis l'admin
   useEffect(() => {
     const handleContentChange = (event: CustomEvent) => {
+      console.log('🎨 HeroSection: Changement de contenu reçu:', event.detail);
+      if (event.detail?.hero?.backgroundImage) {
+        console.log('🖼️ Nouvelle image hero détectée:', event.detail.hero.backgroundImage);
+        setBackgroundImage(event.detail.hero.backgroundImage);
+        setImageLoaded(false);
+      }
+      if (event.detail?.hero?.title) {
+        setHeroContent({ title: event.detail.hero.title });
+      }
+    };
+
+    const handleImageChange = (event: CustomEvent) => {
+      console.log('🖼️ HeroSection: Changement d\'image direct:', event.detail);
+      if (event.detail && typeof event.detail === 'string') {
+        setBackgroundImage(event.detail);
+        setImageLoaded(false);
+      }
+    };
+
+    const handleForceUpdate = (event: CustomEvent) => {
+      console.log('🔄 HeroSection: Mise à jour forcée:', event.detail);
+      if (event.detail?.type === 'content' || event.detail?.type === 'images' || event.detail?.type === 'all') {
+        // Recharger le contenu depuis localStorage
+        try {
+          const stored = localStorage.getItem('siteContent');
+          if (stored) {
+            const content = JSON.parse(stored);
+            console.log('📄 Contenu rechargé depuis localStorage:', content);
+            
+            if (content.hero?.title) {
+              setHeroContent({ title: content.hero.title });
+            }
+            if (content.hero?.backgroundImage) {
+              console.log('🖼️ Nouvelle image hero depuis localStorage:', content.hero.backgroundImage);
+              setBackgroundImage(content.hero.backgroundImage);
+              setImageLoaded(false);
+            }
+          }
+          
+          // Vérifier les images de présentation
+          const storedImages = localStorage.getItem('presentationImages');
+          if (storedImages) {
+            const images = JSON.parse(storedImages);
+            const activeImage = images.find((img: any) => img.isActive);
+            if (activeImage) {
+              console.log('🖼️ Image active trouvée:', activeImage.url);
+              setBackgroundImage(activeImage.url);
+              setImageLoaded(false);
+            }
+          }
+        } catch (error) {
+          console.error('❌ Erreur rechargement contenu HeroSection:', error);
+        }
+      }
+    };
+
+    const handleContentChange = (event: CustomEvent) => {
       if (event.detail?.hero?.title) {
         setHeroContent({ title: event.detail.hero.title });
       }
