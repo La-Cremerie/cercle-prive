@@ -114,6 +114,24 @@ const getDefaultProperties = () => {
       status: 'vendu',
       yield: 450000,
       isVisible: true
+    },
+    {
+      id: '6',
+      name: '',
+      location: '',
+      price: '',
+      bedrooms: 0,
+      bathrooms: 0,
+      surface: 0,
+      images: [
+        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
+      ],
+      description: '',
+      features: [],
+      type: 'villa',
+      status: 'vendu',
+      yield: 0,
+      isVisible: true
     }
   ];
 };
