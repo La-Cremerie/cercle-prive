@@ -162,9 +162,12 @@ const HeroSection: React.FC = () => {
       {/* Fallback pendant le chargement */}
       {!imageLoaded && (
         <div 
-          className="absolute inset-0 w-full h-full bg-white"
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(https://i.postimg.cc/dVVFMXmf/Capture-d-e-cran-2025-09-03-a-06-19-50.png)`
+          }}
         >
-          <div className="absolute inset-0 bg-white"></div>
+          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         </div>
       )}
 
