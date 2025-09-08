@@ -381,17 +381,28 @@ export class ContentVersioningService {
     }
 
     try {
+      // Test de connectivité avant la requête
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 secondes timeout
+      
       const { data, error } = await supabase
         .from('design_settings_versions')
         .select('settings_data')
         .eq('is_current', true)
-        .single();
+        .single()
+        .abortSignal(controller.signal);
+      
+      clearTimeout(timeoutId);
 
       if (error && error.code !== 'PGRST116') throw error;
 
       return data?.settings_data || null;
     } catch (error) {
-      console.warn('Erreur récupération design:', error);
+      if (error.name === 'AbortError') {
+        console.warn('⚠️ Timeout Supabase - utilisation du cache local');
+      } else {
+        console.warn('⚠️ Erreur réseau Supabase - utilisation du cache local:', error);
+      }
       const stored = localStorage.getItem('designSettings');
       return stored ? JSON.parse(stored) : null;
     }
@@ -690,9 +701,28 @@ export class ContentVersioningService {
 
   // Synchroniser les données depuis Supabase vers localStorage
   static async syncFromSupabaseToLocal(): Promise<void> {
-    if (!this.isSupabaseConfigured()) return;
+    if (!this.isSupabaseConfigured()) {
+      console.log('📦 Supabase non configuré - synchronisation ignorée');
+      return;
+    }
 
     try {
+      console.log('🔄 Début de synchronisation depuis Supabase...');
+      
+      // Test de connectivité rapide
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      
+      await fetch(import.meta.env.VITE_SUPABASE_URL + '/rest/v1/', {
+        method: 'HEAD',
+        headers: {
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
       // Synchroniser le contenu du site
       const siteContent = await this.getCurrentSiteContent();
       if (siteContent) {
@@ -740,7 +770,16 @@ export class ContentVersioningService {
 
       console.log('✅ Synchronisation depuis Supabase terminée');
     } catch (error) {
-      console.error('Erreur synchronisation depuis Supabase:', error);
+      if (error.name === 'AbortError') {
+        console.warn('⚠️ Timeout de synchronisation Supabase - mode hors ligne activé');
+      } else if (error.message?.includes('Failed to fetch')) {
+        console.warn('⚠️ Pas de connexion internet - mode hors ligne activé');
+      } else {
+        console.warn('⚠️ Erreur synchronisation Supabase - mode hors ligne activé:', error);
+      }
+      
+      // En cas d'erreur réseau, continuer avec les données locales
+      console.log('📦 Utilisation des données locales existantes');
     }
   }
 }

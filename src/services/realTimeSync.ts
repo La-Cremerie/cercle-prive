@@ -44,10 +44,34 @@ export class RealTimeSyncService {
       
       // Synchroniser les données depuis Supabase au démarrage
       try {
+        // Test de connectivité rapide avant sync
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        
+        await fetch(import.meta.env.VITE_SUPABASE_URL + '/rest/v1/', {
+          method: 'HEAD',
+          headers: { 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY },
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        // Si la connectivité est OK, procéder à la sync
         await ContentVersioningService.syncFromSupabaseToLocal();
         console.log('✅ Synchronisation initiale depuis Supabase terminée');
       } catch (error) {
-        console.warn('⚠️ Erreur synchronisation initiale:', error);
+        if (error.name === 'AbortError') {
+          console.warn('⚠️ Timeout connexion Supabase - mode hors ligne');
+        } else if (error.message?.includes('Failed to fetch')) {
+          console.warn('⚠️ Pas de connexion internet - mode hors ligne');
+        } else {
+          console.warn('⚠️ Erreur synchronisation initiale - mode hors ligne:', error);
+        }
+        
+        // Passer en mode hors ligne
+        this.isConnected = false;
+        this.startPollingFallback();
+        return;
       }
       
       try {
