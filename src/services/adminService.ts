@@ -22,7 +22,9 @@ export class AdminService {
         
         // Créer un utilisateur admin temporaire pour le développement
         const devAdmin: AdminUser = {
-          id: `dev-${email.split('@')[0]}`,
+          id: email === 'nicolas.c@lacremerie.fr' 
+            ? '550e8400-e29b-41d4-a716-446655440001' 
+            : '550e8400-e29b-41d4-a716-446655440002',
           email,
           password_hash: await bcrypt.hash(password, 10),
           nom: email === 'nicolas.c@lacremerie.fr' ? 'Crémerie' : 'Lacremerie',
