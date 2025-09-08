@@ -25,7 +25,7 @@ const PropertyManagement: React.FC = () => {
         surface: 300,
         images: [
           'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800',
-          'https://i.postimg.cc/XvbKDv07/Whats-App-Image-2025-09-08-at-13-05-36.jpg'
+          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
         ],
         description: '',
         features: [],
@@ -89,6 +89,25 @@ const PropertyManagement: React.FC = () => {
         type: 'villa',
         status: 'disponible',
         yield: 359996,
+        isVisible: true
+      },
+      {
+        id: '5',
+        name: 'Villa cœur de village',
+        location: 'Saint-Tropez',
+        price: '8 900 000 €',
+        bedrooms: 5,
+        bathrooms: 4,
+        surface: 380,
+        images: [
+          'https://i.postimg.cc/wTqzXXrw/Whats-App-Image-2025-09-08-at-13-03-17-1.jpg',
+          'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800'
+        ],
+        description: 'Villa d\'exception au cœur du village de Saint-Tropez. Emplacement unique et prestations de luxe dans l\'un des lieux les plus prisés de la Côte d\'Azur.',
+        features: ['Cœur de Saint-Tropez', 'Emplacement unique', 'Prestations luxe', 'Terrasse panoramique', 'Garage sécurisé'],
+        type: 'villa',
+        status: 'vendu',
+        yield: 450000,
         isVisible: true
       },
     ];
