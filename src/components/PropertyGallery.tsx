@@ -96,23 +96,6 @@ const getDefaultProperties = () => {
       status: 'disponible',
       yield: 359996
     },
-    {
-      id: '5',
-      name: 'Villa coeur de village',
-      location: 'Saint-Tropez',
-      price: '8 900 000 €',
-      bedrooms: 5,
-      bathrooms: 4,
-      surface: 380,
-      images: [
-        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
-      ],
-      description: '',
-      features: [],
-      type: 'villa',
-      status: 'vendu',
-      yield: 450000,
     }
   ];
 };

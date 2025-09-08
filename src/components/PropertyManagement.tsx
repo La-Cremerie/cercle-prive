@@ -109,24 +109,6 @@ const PropertyManagement: React.FC = () => {
         status: 'vendu',
         yield: 450000,
         isVisible: true
-      }
-    ];
-  });
-
-  const [showForm, setShowForm] = useState(false);
-  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
-  const [formData, setFormData] = useState<Partial<Property>>({});
-  const [newImageUrl, setNewImageUrl] = useState('');
-  const [newFeature, setNewFeature] = useState('');
-
-  const { broadcastChange } = useRealTimeSync('property-management');
-
-  // Sauvegarder automatiquement les propriétés
-  const saveProperties = async (updatedProperties: Property[]) => {
-    try {
-      // 1. Sauvegarder localement
-      localStorage.setItem('properties', JSON.stringify(updatedProperties));
-      setProperties(updatedProperties);
       
       // 2. Déclencher IMMÉDIATEMENT les événements de mise à jour
       console.log('📡 Diffusion immédiate des nouvelles propriétés');
