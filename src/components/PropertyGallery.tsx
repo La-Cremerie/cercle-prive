@@ -173,21 +173,6 @@ const PropertyGallery: React.FC = () => {
     
     return () => clearInterval(interval);
   }, [properties]);
-            duration: 3000,
-            icon: '✨'
-          });
-        }
-      }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
-    };
-  }, []);
 
   const filteredProperties = filter === 'all' 
     ? properties.filter(p => p.isVisible !== false)
