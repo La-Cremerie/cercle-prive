@@ -27,7 +27,7 @@ const getDefaultProperties = () => {
     {
       id: '1',
       name: 'Villa Horizon',
-      location: 'Cannes, Côte d\'Azur',
+      location: 'Les Issambres',
       price: '4 500 000 €',
       bedrooms: 5,
       bathrooms: 5,
