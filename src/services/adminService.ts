@@ -5,59 +5,77 @@ import { AdminEmailService } from './adminEmailService';
 export class AdminService {
   // Authentification admin
   static async loginAdmin(email: string, password: string): Promise<AdminUser> {
-    // Mots de passe temporaires pour les admins (en attendant la vraie authentification)
-    const TEMP_PASSWORDS = {
-      'nicolas.c@lacremerie.fr': 'lacremerie2025',
-      'quentin@lacremerie.fr': '123'
-    };
+    try {
+      // Authentification avec Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-    // Vérifier le mot de passe temporaire
-    const expectedPassword = TEMP_PASSWORDS[email as keyof typeof TEMP_PASSWORDS];
-    if (!expectedPassword || password !== expectedPassword) {
+      if (authError || !authData.user) {
+        throw new Error('Email ou mot de passe incorrect');
+      }
+
+      // Récupérer l'utilisateur admin depuis la base
+      const { data: adminUser, error } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('email', email)
+        .eq('is_active', true)
+        .single();
+
+      if (error || !adminUser) {
+        throw new Error('Utilisateur admin non trouvé ou inactif');
+      }
+
+      // Mettre à jour la dernière connexion
+      await supabase
+        .from('admin_users')
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', adminUser.id);
+
+      // Stocker les informations admin dans le localStorage
+      localStorage.setItem('currentAdminId', adminUser.id);
+      localStorage.setItem('currentAdminEmail', adminUser.email);
+      localStorage.setItem('currentAdminName', `${adminUser.prenom} ${adminUser.nom}`);
+      localStorage.setItem('currentAdminRole', adminUser.role);
+
+      return adminUser;
+
+    } catch (error: any) {
+      console.error('Erreur authentification admin:', error);
+      
+      // Fallback pour les comptes temporaires (développement uniquement)
+      const TEMP_PASSWORDS = {
+        'nicolas.c@lacremerie.fr': 'lacremerie2025',
+        'quentin@lacremerie.fr': '123'
+      };
+
+      const expectedPassword = TEMP_PASSWORDS[email as keyof typeof TEMP_PASSWORDS];
+      if (expectedPassword && password === expectedPassword) {
+        // Récupérer l'utilisateur admin depuis la base
+        const { data: adminUser, error } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('email', email)
+          .eq('is_active', true)
+          .single();
+
+        if (error || !adminUser) {
+          throw new Error('Utilisateur admin non trouvé ou inactif');
+        }
+
+        // Stocker les informations admin dans le localStorage
+        localStorage.setItem('currentAdminId', adminUser.id);
+        localStorage.setItem('currentAdminEmail', adminUser.email);
+        localStorage.setItem('currentAdminName', `${adminUser.prenom} ${adminUser.nom}`);
+        localStorage.setItem('currentAdminRole', adminUser.role);
+
+        return adminUser;
+      }
+      
       throw new Error('Email ou mot de passe incorrect');
     }
-
-    // Récupérer l'utilisateur admin depuis la base
-    const { data: adminUser, error } = await supabase
-      .from('admin_users')
-      .select('*')
-      .eq('email', email)
-      .eq('is_active', true)
-      .single();
-
-    if (error || !adminUser) {
-      throw new Error('Utilisateur admin non trouvé ou inactif');
-    }
-
-    // Créer une session Supabase pour cet admin
-    // Note: En production, utilisez supabase.auth.signInWithPassword
-    // Pour l'instant, on simule une session avec l'ID admin
-    try {
-      // Simuler une session en définissant l'utilisateur actuel
-      const { error: sessionError } = await supabase.auth.admin.createUser({
-        email: adminUser.email,
-        password: 'temp-session',
-        user_metadata: {
-          admin_id: adminUser.id,
-          role: adminUser.role
-        }
-      });
-      
-      // Si l'utilisateur existe déjà, on continue
-      if (sessionError && !sessionError.message.includes('already registered')) {
-        console.warn('Erreur création session:', sessionError);
-      }
-    } catch (sessionErr) {
-      console.warn('Erreur session admin:', sessionErr);
-    }
-
-    // Mettre à jour la dernière connexion
-    await supabase
-      .from('admin_users')
-      .update({ last_login: new Date().toISOString() })
-      .eq('id', adminUser.id);
-
-    return adminUser;
   }
 
   // Récupérer les permissions d'un admin
