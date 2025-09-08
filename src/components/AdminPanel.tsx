@@ -473,7 +473,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     case 'crm': return <MessageSquare className="w-4 h-4" />;
                     case 'appointments': return <Calendar className="w-4 h-4" />;
                     case 'properties': return <Settings className="w-4 h-4" />;
-                    case 'images': return <Image className="w-4 h-4" />;
                     case 'content': return <Settings className="w-4 h-4" />;
                     case 'design': return <Palette className="w-4 h-4" />;
                     case 'emails': return <Mail className="w-4 h-4" />;
@@ -759,9 +758,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <PropertyManagement />
         )}
 
-        {activeTab === 'images' && canAccessModule('images') && (
-          <PresentationImageManager />
-        )}
 
         {activeTab === 'content' && canAccessModule('content') && (
           <ContentManager />

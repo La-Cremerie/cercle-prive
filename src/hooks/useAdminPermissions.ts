@@ -70,7 +70,6 @@ export const useAdminPermissions = (currentUser: AdminUser | null) => {
       { key: 'crm', label: 'CRM', module: 'crm' as AdminModule },
       { key: 'appointments', label: 'RDV', module: 'appointments' as AdminModule },
       { key: 'properties', label: 'Biens', module: 'properties' as AdminModule },
-      { key: 'images', label: 'Images', module: 'images' as AdminModule },
       { key: 'content', label: 'Contenu', module: 'content' as AdminModule },
       { key: 'design', label: 'Design', module: 'design' as AdminModule },
       { key: 'emails', label: 'Emails', module: 'emails' as AdminModule },
