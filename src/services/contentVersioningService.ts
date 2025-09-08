@@ -78,6 +78,18 @@ export interface SyncEvent {
 }
 
 export class ContentVersioningService {
+  // Utility function to validate UUID format
+  private static isValidUUID(uuid: string): boolean {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
+  }
+
+  // Sanitize author ID to ensure it's a valid UUID or null
+  private static sanitizeAuthorId(adminId: string | null): string | null {
+    if (!adminId) return null;
+    return this.isValidUUID(adminId) ? adminId : null;
+  }
+
   // Vérifier si Supabase est configuré
   private static isSupabaseConfigured(): boolean {
     const url = import.meta.env.VITE_SUPABASE_URL;
@@ -200,7 +212,7 @@ export class ContentVersioningService {
           version_number: nextVersion,
           content_data: contentData,
           is_current: true,
-          author_id: adminId || user?.id || null,
+          author_id: this.sanitizeAuthorId(adminId) || user?.id || null,
           author_name: adminName,
           author_email: adminEmail,
           change_description: changeDescription
@@ -333,6 +345,7 @@ export class ContentVersioningService {
           yield: propertyData.yield,
           is_visible: propertyData.isVisible,
           is_current: true,
+          author_id: this.sanitizeAuthorId(localStorage.getItem('currentAdminId')),
           author_name: authorName,
           author_email: authorEmail,
           change_description: changeDescription
@@ -424,7 +437,7 @@ export class ContentVersioningService {
           category,
           images_data: imagesData,
           is_current: true,
-          author_id: adminId,
+          author_id: this.sanitizeAuthorId(adminId),
           author_name: authorName,
           author_email: authorEmail,
           change_description: changeDescription
@@ -530,6 +543,7 @@ export class ContentVersioningService {
           version_number: nextVersion,
           settings_data: settingsData,
           is_current: true,
+          author_id: this.sanitizeAuthorId(localStorage.getItem('currentAdminId')),
           author_name: authorName,
           author_email: authorEmail,
           change_description: changeDescription
@@ -677,6 +691,7 @@ export class ContentVersioningService {
           action,
           target_id: targetId,
           version_number: versionNumber,
+          author_id: this.sanitizeAuthorId(localStorage.getItem('currentAdminId')),
           author_name: authorName,
           author_email: authorEmail,
           change_description: changeDescription,
