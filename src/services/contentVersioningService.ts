@@ -145,9 +145,19 @@ export class ContentVersioningService {
       const adminEmail = localStorage.getItem('currentAdminEmail') || 'admin@lacremerie.fr';
 
       if (!user || authError) {
-        console.warn('Utilisateur non authentifié, utilisation du fallback localStorage');
+        console.log('Utilisateur non authentifié, sauvegarde locale uniquement');
         localStorage.setItem('siteContent', JSON.stringify(contentData));
-        throw new Error('Authentification requise pour sauvegarder dans Supabase');
+        return {
+          id: Date.now().toString(),
+          version_number: 1,
+          content_data: contentData,
+          is_current: true,
+          author_id: adminId,
+          author_name: adminName,
+          author_email: adminEmail,
+          change_description: changeDescription || null,
+          created_at: new Date().toISOString()
+        };
       }
 
       // Obtenir le prochain numéro de version
