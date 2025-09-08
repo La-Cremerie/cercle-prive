@@ -42,6 +42,7 @@ const NicolasMorningContentViewer: React.FC = () => {
       console.log('🔍 Recherche du contenu de Nicolas ajouté ce matin via HTTPS...');
       
       const { start: morningStart, end: morningEnd } = getMorningTimeRange();
+      console.log(`📅 Recherche pour le samedi 6 septembre 2025, de ${morningStart.toLocaleString('fr-FR')} à ${morningEnd.toLocaleString('fr-FR')}`);
       const foundContent: MorningContent[] = [];
 
       // 1. Vérifier les événements de synchronisation récents depuis Supabase (HTTPS)
@@ -384,7 +385,7 @@ const NicolasMorningContentViewer: React.FC = () => {
             <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <div>🔒 Protocole: HTTPS/TLS 1.3</div>
               <div>👤 Auteur filtré: nicolas.c@lacremerie.fr</div>
-              <div>⏰ Période hier: {getMorningTimeRange().start.toLocaleTimeString('fr-FR')} - {getMorningTimeRange().end.toLocaleTimeString('fr-FR')}</div>
+              <div>⏰ Période: Samedi 6 septembre, {getMorningTimeRange().start.toLocaleTimeString('fr-FR')} - {getMorningTimeRange().end.toLocaleTimeString('fr-FR')}</div>
               <div>📊 Éléments trouvés: {morningContent.length}</div>
             </div>
           </div>
