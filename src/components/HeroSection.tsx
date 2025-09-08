@@ -26,7 +26,7 @@ const HeroSection: React.FC = () => {
     }
     
     // Image par défaut seulement si aucune image admin
-    return 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1920';
+    return 'https://i.postimg.cc/nVPWgBmx/vue-mer-1.png';
   });
   const [imageLoaded, setImageLoaded] = useState(false);
   const [heroContent, setHeroContent] = useState(() => {
