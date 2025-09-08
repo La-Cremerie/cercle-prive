@@ -162,9 +162,9 @@ const HeroSection: React.FC = () => {
       {/* Fallback pendant le chargement */}
       {!imageLoaded && (
         <div 
-          className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800 to-gray-900"
+          className="absolute inset-0 w-full h-full bg-white"
         >
-          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+          <div className="absolute inset-0 bg-white"></div>
         </div>
       )}
 
