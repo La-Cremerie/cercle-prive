@@ -279,9 +279,6 @@ const PropertyManagement: React.FC = () => {
         ...property,
         id: crypto.randomUUID(),
         name: `${property.name} (Copie)`,
-        status: 'disponible'
-      };
-      
       const updatedProperties = [...properties, duplicatedProperty];
       
       // Sauvegarder avec synchronisation automatique
