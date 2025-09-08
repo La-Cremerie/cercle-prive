@@ -211,9 +211,9 @@ export class RealTimeSyncService {
           }));
           
           // Notification pour TOUS les utilisateurs
-          toast.success(`🏠 Biens immobiliers mis à jour par ${payload.new.author_name}`, {
+          toast.success(`🏠 Catalogue immobilier mis à jour par ${payload.new.author_name}`, {
             duration: 6000,
-            icon: '🏠'
+            icon: '🔄'
           });
           
           console.log('✅ Propriétés synchronisées pour tous les utilisateurs');
@@ -354,6 +354,16 @@ export class RealTimeSyncService {
           
           if (result === 'ok') {
             console.log('📡 Changement diffusé en temps réel');
+            
+            // Notification spéciale pour les modifications de biens
+            if (fullEvent.type === 'properties') {
+              const actionText = fullEvent.action === 'create' ? 'ajouté' : 
+                               fullEvent.action === 'update' ? 'modifié' : 'supprimé';
+              toast.success(`🌐 Bien ${actionText} et diffusé à tous les utilisateurs !`, {
+                duration: 5000,
+                icon: '📡'
+              });
+            }
           } else {
             console.warn('⚠️ Diffusion temps réel échouée, mais sauvegardé');
           }
@@ -362,26 +372,37 @@ export class RealTimeSyncService {
         }
       } else {
         console.log('📦 Pas de canal temps réel, mais sauvegardé dans Supabase');
+        
+        // Notification pour mode hors ligne
+        if (fullEvent.type === 'properties') {
+          toast.success('💾 Bien sauvegardé (synchronisation différée)', {
+            duration: 4000,
+            icon: '📦'
+          });
+        }
       }
 
       // 3. Appliquer immédiatement en local
       this.handleSyncEvent(fullEvent);
       
-      // 4. Notification de succès
-      toast.success('✅ Images mises à jour avec succès !', {
-        duration: 3000,
-        icon: '💾'
-      });
 
     } catch (error) {
       console.error('❌ Erreur diffusion changement:', error);
       
       // Même en cas d'erreur réseau, appliquer les changements localement
       this.handleSyncEvent(fullEvent);
-      toast.success('✅ Images sauvegardées localement (synchronisation différée)', {
+      
+      if (fullEvent.type === 'properties') {
+        toast.success('📦 Bien sauvegardé localement (synchronisation différée)', {
+          duration: 4000,
+          icon: '📦'
+        });
+      } else {
+        toast.success('📦 Modifications sauvegardées localement (synchronisation différée)', {
         duration: 4000,
         icon: '📦'
       });
+      }
     }
   }
 

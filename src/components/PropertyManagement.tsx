@@ -271,8 +271,23 @@ const PropertyManagement: React.FC = () => {
     try {
       setProperties(updatedProperties);
       localStorage.setItem('properties', JSON.stringify(updatedProperties));
+      
+      // Synchronisation automatique pour la duplication
+      const autoSyncDuplicate = async () => {
+        try {
+          await broadcastChange('properties', 'create', duplicatedProperty);
+          console.log('📡 Duplication synchronisée automatiquement');
+        } catch (error) {
+          console.warn('⚠️ Erreur sync duplication:', error);
+        }
+      };
+      autoSyncDuplicate();
+      
       window.dispatchEvent(new Event('storage'));
-      toast.success(`Bien "${property.name}" dupliqué avec succès`);
+      toast.success(`✅ ${property.name} dupliqué et synchronisé automatiquement !`, {
+        duration: 4000,
+        icon: '📋'
+      });
     } catch (error) {
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
         toast.error('Espace de stockage insuffisant pour dupliquer ce bien.');
@@ -285,12 +300,30 @@ const PropertyManagement: React.FC = () => {
   const handleDelete = (propertyId: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce bien ?')) {
       const updatedProperties = properties.filter(p => p.id !== propertyId);
+      const deletedProperty = properties.find(p => p.id === propertyId);
+      
       setProperties(updatedProperties);
       localStorage.setItem('properties', JSON.stringify(updatedProperties));
-      // Diffuser le changement en temps réel
-      broadcastChange('properties', 'delete', { id: propertyId });
+      
+      // Synchronisation automatique pour la suppression
+      const autoSyncDelete = async () => {
+        try {
+          await broadcastChange('properties', 'delete', { 
+            id: propertyId, 
+            name: deletedProperty?.name || 'Bien supprimé' 
+          });
+          console.log('📡 Suppression synchronisée automatiquement');
+        } catch (error) {
+          console.warn('⚠️ Erreur sync suppression:', error);
+        }
+      };
+      autoSyncDelete();
+      
       window.dispatchEvent(new Event('storage'));
-      toast.success('Bien supprimé avec succès');
+      toast.success(`✅ ${deletedProperty?.name || 'Bien'} supprimé et synchronisé automatiquement !`, {
+        duration: 4000,
+        icon: '🗑️'
+      });
     }
   };
 
@@ -328,12 +361,14 @@ const PropertyManagement: React.FC = () => {
       isVisible: formData.isVisible !== false
     };
 
-    // Sauvegarder dans Supabase avec versioning
-    const saveToSupabase = async () => {
+    // Sauvegarder et synchroniser automatiquement
+    const saveAndSync = async () => {
       try {
+        console.log('🔄 Début de la synchronisation automatique...');
         const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
         const adminName = adminEmail.split('@')[0];
         
+        // 1. Sauvegarder dans Supabase avec versioning
         await ContentVersioningService.savePropertyVersion(
           propertyData,
           adminName,
@@ -341,22 +376,44 @@ const PropertyManagement: React.FC = () => {
           editingProperty ? `Modification de ${propertyData.name}` : `Création de ${propertyData.name}`
         );
         
-        console.log('✅ Propriété sauvegardée dans Supabase avec versioning');
+        console.log('✅ Propriété sauvegardée dans Supabase');
+        
+        // 2. Diffuser automatiquement le changement en temps réel
+        await broadcastChange('properties', editingProperty ? 'update' : 'create', propertyData);
+        console.log('📡 Changement diffusé en temps réel');
+        
+        // 3. Déclencher la synchronisation immédiate pour tous les utilisateurs
+        window.dispatchEvent(new CustomEvent('forceUpdate', { 
+          detail: { 
+            type: 'properties', 
+            source: 'admin-modification',
+            propertyId: propertyData.id,
+            propertyName: propertyData.name,
+            timestamp: Date.now() 
+          } 
+        }));
+        
+        console.log('🌐 Synchronisation automatique terminée');
       } catch (error) {
-        console.warn('⚠️ Erreur sauvegarde Supabase, utilisation localStorage:', error);
+        console.warn('⚠️ Erreur synchronisation Supabase, sauvegarde locale:', error);
+        // Continuer avec la sauvegarde locale même en cas d'erreur réseau
       }
     };
 
-    saveToSupabase();
+    // Lancer la synchronisation automatique
+    saveAndSync();
 
     if (editingProperty) {
       const updatedProperties = properties.map(p => p.id === editingProperty.id ? propertyData : p);
       try {
         setProperties(updatedProperties);
         localStorage.setItem('properties', JSON.stringify(updatedProperties));
-        // Diffuser le changement en temps réel
-        broadcastChange('properties', 'update', propertyData);
-        toast.success(`Property successfully updated - ID: #${propertyData.id}, Address: ${propertyData.location}, Type: ${propertyData.type}`);
+        
+        // Notification de succès avec synchronisation automatique
+        toast.success(`✅ ${propertyData.name} mis à jour et synchronisé automatiquement !`, {
+          duration: 4000,
+          icon: '🏠'
+        });
       } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
           toast.error('Espace de stockage insuffisant. Utilisez des images plus petites ou des liens externes.');
@@ -371,7 +428,12 @@ const PropertyManagement: React.FC = () => {
       try {
         setProperties(updatedProperties);
         localStorage.setItem('properties', JSON.stringify(updatedProperties));
-        toast.success(`Property successfully added - ID: #${propertyData.id}, Address: ${propertyData.location}, Type: ${propertyData.type}`);
+        
+        // Notification de succès avec synchronisation automatique
+        toast.success(`✅ ${propertyData.name} ajouté et synchronisé automatiquement !`, {
+          duration: 4000,
+          icon: '🏠'
+        });
       } catch (error) {
         if (error instanceof DOMException && error.name === 'QuotaExceededError') {
           toast.error('Espace de stockage insuffisant. Utilisez des images plus petites ou des liens externes.');
@@ -383,7 +445,7 @@ const PropertyManagement: React.FC = () => {
       }
     }
 
-    // Déclencher un événement pour synchroniser avec la galerie
+    // Déclencher la synchronisation locale immédiate
     window.dispatchEvent(new Event('storage'));
     setShowForm(false);
     resetForm();
@@ -524,8 +586,26 @@ const PropertyManagement: React.FC = () => {
                     );
                     setProperties(updatedProperties);
                     localStorage.setItem('properties', JSON.stringify(updatedProperties));
+                    
+                    // Synchronisation automatique du changement de visibilité
+                    const autoSyncVisibility = async () => {
+                      try {
+                        const updatedProperty = updatedProperties.find(p => p.id === property.id);
+                        if (updatedProperty) {
+                          await broadcastChange('properties', 'update', updatedProperty);
+                          console.log('📡 Changement de visibilité synchronisé automatiquement');
+                        }
+                      } catch (error) {
+                        console.warn('⚠️ Erreur sync visibilité:', error);
+                      }
+                    };
+                    autoSyncVisibility();
+                    
                     window.dispatchEvent(new Event('storage'));
-                    toast.success(`Bien ${property.isVisible ? 'masqué' : 'rendu visible'}`);
+                    toast.success(`✅ ${property.name} ${property.isVisible ? 'masqué' : 'rendu visible'} et synchronisé !`, {
+                      duration: 3000,
+                      icon: property.isVisible ? '👁️' : '🙈'
+                    });
                   }}
                   className={`p-2 rounded-full backdrop-blur-sm transition-colors ${
                     property.isVisible

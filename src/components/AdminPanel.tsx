@@ -390,7 +390,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <div className={`w-2 h-2 rounded-full ${
                     connectionStatus.connected ? 'bg-green-500' : 'bg-orange-500'
                   }`}></div>
-                 <span>PUBLIER POUR TOUS</span>
+                 <span>{connectionStatus.connected ? 'SYNC AUTO ACTIVE' : 'PUBLIER POUR TOUS'}</span>
                 </button>
                 
                 <div className={`w-3 h-3 rounded-full ${
@@ -400,12 +400,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <div className={`font-medium ${
                     connectionStatus.connected ? 'text-green-700' : 'text-orange-700'
                   }`}>
-                    {connectionStatus.connected ? '🟢 MISES À JOUR AUTOMATIQUES' : '🟠 MODE MANUEL'}
+                    {connectionStatus.connected ? '🟢 SYNCHRONISATION AUTOMATIQUE' : '🟠 MODE MANUEL'}
                   </div>
                   <div className="text-xs text-gray-500">
                     {connectionStatus.connected 
-                      ? `${connectionStatus.subscribers} composant(s) synchronisé(s)`
-                      : 'Synchronisation désactivée'
+                      ? `Modifications diffusées en temps réel`
+                      : 'Cliquez pour synchroniser manuellement'
                     }
                   </div>
                 </div>

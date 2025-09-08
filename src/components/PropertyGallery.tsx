@@ -79,20 +79,28 @@ const PropertyGallery: React.FC = () => {
   // Écouter les changements dans localStorage
   useEffect(() => {
     const handleStorageChange = () => {
+      console.log('🏠 PropertyGallery: Changement détecté, rechargement des propriétés...');
       setProperties(getPropertiesFromStorage());
     };
 
     const handleForceUpdate = (event: CustomEvent) => {
       if (event.detail?.type === 'properties') {
-        console.log('🏠 Mise à jour forcée des propriétés');
+        console.log('🏠 PropertyGallery: Mise à jour forcée des propriétés');
         setProperties(getPropertiesFromStorage());
+        
+        // Notification visuelle pour l'utilisateur final
+        if (event.detail?.source === 'admin-modification') {
+          toast.success('🔄 Catalogue mis à jour en temps réel !', {
+            duration: 3000,
+            icon: '✨'
+          });
+        }
       }
     };
     
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
     
-    return () => window.removeEventListener('storage', handleStorageChange);
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
