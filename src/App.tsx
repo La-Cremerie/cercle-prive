@@ -135,18 +135,6 @@ function App() {
       window.removeEventListener('propertiesReload', handlePropertiesReload);
     };
   }, []);
-          duration: 5000,
-          icon: '📡'
-        });
-      }
-    };
-
-    window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
-    
-    return () => {
-      window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
-    };
-  }, []);
 
   // Écouter les paramètres URL pour forcer l'affichage du login
   useEffect(() => {
