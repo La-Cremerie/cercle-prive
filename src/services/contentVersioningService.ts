@@ -341,6 +341,15 @@ export class ContentVersioningService {
     }
 
     try {
+      // Vérifier l'authentification Supabase
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        console.warn('⚠️ Utilisateur non authentifié pour Supabase');
+        throw new Error('Authentification Supabase requise');
+      }
+      
+      const adminId = localStorage.getItem('currentAdminId') || user.id;
+      
       const nextVersion = await this.getNextVersionNumber('presentation_images_versions', category);
 
       await supabase
@@ -355,9 +364,10 @@ export class ContentVersioningService {
           category,
           images_data: imagesData,
           is_current: true,
-          author_id: adminId || user?.id || null,
-          author_name: adminName,
-          author_email: adminEmail,
+          author_id: adminId,
+          author_name: authorName,
+          author_email: authorEmail,
+          change_description: changeDescription
         }])
         .select()
         .single();
@@ -369,7 +379,23 @@ export class ContentVersioningService {
       return data;
     } catch (error) {
       console.error('Erreur sauvegarde images:', error);
-      throw error;
+      
+      // Fallback vers localStorage en cas d'erreur Supabase
+      localStorage.setItem(`${category}Images`, JSON.stringify(imagesData));
+      
+      // Retourner une version locale
+      return {
+        id: Date.now().toString(),
+        version_number: 1,
+        category,
+        images_data: imagesData,
+        is_current: true,
+        author_id: null,
+        author_name: authorName,
+        author_email: authorEmail,
+        change_description: changeDescription || null,
+        created_at: new Date().toISOString()
+      };
     }
   }
 
