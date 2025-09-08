@@ -28,7 +28,9 @@ if (!isConfigured) {
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: false // Disable auth persistence since we're using custom login
+    persistSession: true, // Enable auth persistence for admin sessions
+    autoRefreshToken: true,
+    detectSessionInUrl: false
   },
   realtime: {
     params: {

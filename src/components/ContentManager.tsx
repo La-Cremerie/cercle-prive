@@ -106,84 +106,77 @@ const ContentManager: React.FC = () => {
 
   const saveContent = async () => {
     try {
-      console.log('💾 Début de sauvegarde du contenu:', content);
+      console.log('💾 ContentManager.saveContent - Début de sauvegarde');
+      console.log('📊 Contenu à sauvegarder:', content);
       
-      // 1. Sauvegarder dans Supabase IMMÉDIATEMENT
+      // 1. Vérifier l'authentification admin
       const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
       const adminName = adminEmail.split('@')[0];
+      const adminId = localStorage.getItem('currentAdminId');
+      const authEstablished = localStorage.getItem('supabaseAuthEstablished') === 'true';
       
+      console.log('🔐 État authentification:', { adminEmail, adminName, adminId, authEstablished });
+      
+      // 2. Sauvegarder localement IMMÉDIATEMENT (garantie de sauvegarde)
+      console.log('💾 Sauvegarde locale immédiate...');
+      localStorage.setItem('siteContent', JSON.stringify(content));
+      console.log('✅ Sauvegarde locale terminée');
+      
+      // 3. Déclencher la mise à jour locale immédiate
+      console.log('🔄 Déclenchement mise à jour locale...');
+      window.dispatchEvent(new CustomEvent('contentUpdated', { detail: content }));
+      
+      // 4. Forcer la mise à jour des images spécifiquement
+      if (content.hero?.backgroundImage) {
+        console.log('🖼️ Mise à jour image hero:', content.hero.backgroundImage);
+        window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
+          detail: content.hero.backgroundImage 
+        }));
+      }
+      
+      // 5. Déclencher une mise à jour globale
+      window.dispatchEvent(new CustomEvent('forceUpdate', { 
+        detail: { type: 'content', source: 'admin', timestamp: Date.now() } 
+      }));
+      
+      // 6. Tenter la sauvegarde Supabase (optionnelle)
       try {
-        console.log('📤 Tentative de sauvegarde Supabase...');
+        console.log('📤 Tentative sauvegarde Supabase...');
         await ContentVersioningService.saveContentVersion(
           content,
           adminName,
           adminEmail,
           'Modification du contenu du site'
         );
-        console.log('✅ Contenu sauvegardé dans Supabase avec versioning');
+        console.log('✅ Sauvegarde Supabase réussie');
+        
+        // 7. Diffuser le changement en temps réel pour TOUS les utilisateurs
+        console.log('📡 Diffusion du changement...');
+        await broadcastChange('content', 'update', content);
+        console.log('✅ Changement diffusé');
+        
+        toast.success('✅ Contenu sauvegardé et synchronisé avec succès !', {
+          duration: 4000,
+          icon: '🌐'
+        });
+        
       } catch (supabaseError) {
-        console.warn('⚠️ Erreur Supabase, sauvegarde locale uniquement:', supabaseError);
-        // Continuer avec la sauvegarde locale
-      }
-      
-      // 2. Sauvegarder localement (fallback)
-      console.log('💾 Sauvegarde locale...');
-      localStorage.setItem('siteContent', JSON.stringify(content));
-      
-      // 3. Diffuser le changement en temps réel pour TOUS les utilisateurs
-      console.log('📡 Diffusion du changement...');
-      await broadcastChange('content', 'update', content);
-      
-      // 4. Déclencher la mise à jour locale immédiate
-      console.log('🔄 Déclenchement mise à jour locale...');
-      window.dispatchEvent(new CustomEvent('contentUpdated', { detail: content }));
-      
-      // 5. Forcer la mise à jour des images spécifiquement
-      if (content.hero?.backgroundImage) {
-        window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
-          detail: content.hero.backgroundImage 
-        }));
-      }
-      
-      // 6. Déclencher une mise à jour globale
-      window.dispatchEvent(new CustomEvent('forceUpdate', { 
-        detail: { type: 'content', source: 'admin', timestamp: Date.now() } 
-      }));
-      
-      console.log('✅ Sauvegarde terminée avec succès');
-      toast.success('✅ Contenu et images sauvegardés avec succès !', {
-        duration: 4000,
-        icon: '💾'
-      });
-      
-    } catch (error) {
-      console.error('Erreur sauvegarde contenu:', error);
-      
-      try {
-        // Même en cas d'erreur Supabase, la sauvegarde locale fonctionne
-        console.log('🔄 Sauvegarde de secours...');
-        localStorage.setItem('siteContent', JSON.stringify(content));
-        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: content }));
+        console.warn('⚠️ Erreur sauvegarde Supabase:', supabaseError);
         
-        // Forcer la mise à jour des images
-        if (content.hero?.backgroundImage) {
-          window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
-            detail: content.hero.backgroundImage 
-          }));
-        }
-        
-        window.dispatchEvent(new CustomEvent('forceUpdate', { 
-          detail: { type: 'content', source: 'fallback', timestamp: Date.now() } 
-        }));
-        
-        toast.success('✅ Contenu sauvegardé localement (images incluses) !', {
+        // Même en cas d'erreur Supabase, la sauvegarde locale a réussi
+        toast.success('✅ Contenu sauvegardé localement (synchronisation différée)', {
           duration: 4000,
           icon: '📦'
         });
-      } catch (fallbackError) {
-        console.error('❌ Erreur sauvegarde de secours:', fallbackError);
-        toast.error('❌ Erreur lors de la sauvegarde du contenu');
       }
+      
+      console.log('✅ Processus de sauvegarde terminé');
+      
+    } catch (error) {
+      console.error('❌ Erreur critique sauvegarde:', error);
+      
+      // En cas d'erreur critique, au moins la sauvegarde locale a été faite
+      toast.error('❌ Erreur lors de la synchronisation, mais contenu sauvegardé localement');
     }
   };
 

@@ -1,58 +1,80 @@
 import { supabase } from '../lib/supabase';
 import type { AdminUser, AdminPermission, AdminModule } from '../types/admin';
 import { AdminEmailService } from './adminEmailService';
+import bcrypt from 'bcryptjs';
 
 export class AdminService {
   // Authentification admin
   static async loginAdmin(email: string, password: string): Promise<AdminUser> {
     try {
-      // Authentification avec Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (authError || !authData.user) {
-        throw new Error('Email ou mot de passe incorrect');
-      }
-
-      // Récupérer l'utilisateur admin depuis la base
-      const { data: adminUser, error } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('email', email)
-        .eq('is_active', true)
-        .single();
-
-      if (error || !adminUser) {
-        throw new Error('Utilisateur admin non trouvé ou inactif');
-      }
-
-      // Mettre à jour la dernière connexion
-      await supabase
-        .from('admin_users')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', adminUser.id);
-
-      // Stocker les informations admin dans le localStorage
-      localStorage.setItem('currentAdminId', adminUser.id);
-      localStorage.setItem('currentAdminEmail', adminUser.email);
-      localStorage.setItem('currentAdminName', `${adminUser.prenom} ${adminUser.nom}`);
-      localStorage.setItem('currentAdminRole', adminUser.role);
-
-      return adminUser;
-
-    } catch (error: any) {
-      console.error('Erreur authentification admin:', error);
+      console.log('🔐 Tentative de connexion admin:', email);
       
-      // Fallback pour les comptes temporaires (développement uniquement)
-      const TEMP_PASSWORDS = {
+      // 1. Vérifier d'abord avec les comptes de développement
+      const DEV_ACCOUNTS = {
         'nicolas.c@lacremerie.fr': 'lacremerie2025',
         'quentin@lacremerie.fr': '123'
       };
 
-      const expectedPassword = TEMP_PASSWORDS[email as keyof typeof TEMP_PASSWORDS];
-      if (expectedPassword && password === expectedPassword) {
+      const devPassword = DEV_ACCOUNTS[email as keyof typeof DEV_ACCOUNTS];
+      
+      if (devPassword && password === devPassword) {
+        console.log('✅ Connexion avec compte de développement');
+        
+        // Créer un utilisateur admin temporaire pour le développement
+        const devAdmin: AdminUser = {
+          id: `dev-${email.split('@')[0]}`,
+          email,
+          password_hash: await bcrypt.hash(password, 10),
+          nom: email === 'nicolas.c@lacremerie.fr' ? 'Crémerie' : 'Lacremerie',
+          prenom: email === 'nicolas.c@lacremerie.fr' ? 'Nicolas' : 'Quentin',
+          role: 'super_admin',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          created_by: null
+        };
+
+        // Établir une session Supabase pour l'authentification
+        try {
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          if (!authError && authData.user) {
+            console.log('✅ Session Supabase établie');
+          } else {
+            console.warn('⚠️ Session Supabase non établie, mode local uniquement');
+          }
+        } catch (authError) {
+          console.warn('⚠️ Erreur session Supabase:', authError);
+        }
+
+        // Stocker les informations admin
+        localStorage.setItem('currentAdminId', devAdmin.id);
+        localStorage.setItem('currentAdminEmail', devAdmin.email);
+        localStorage.setItem('currentAdminName', `${devAdmin.prenom} ${devAdmin.nom}`);
+        localStorage.setItem('currentAdminRole', devAdmin.role);
+        localStorage.setItem('supabaseAuthEstablished', 'true');
+
+        return devAdmin;
+      }
+
+      // 2. Authentification Supabase normale
+      try {
+        console.log('🔐 Tentative d\'authentification Supabase...');
+        
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (authError || !authData.user) {
+          throw new Error('Email ou mot de passe incorrect');
+        }
+
+        console.log('✅ Authentification Supabase réussie');
+
         // Récupérer l'utilisateur admin depuis la base
         const { data: adminUser, error } = await supabase
           .from('admin_users')
@@ -65,16 +87,29 @@ export class AdminService {
           throw new Error('Utilisateur admin non trouvé ou inactif');
         }
 
-        // Stocker les informations admin dans le localStorage
+        // Mettre à jour la dernière connexion
+        await supabase
+          .from('admin_users')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', adminUser.id);
+
+        // Stocker les informations admin
         localStorage.setItem('currentAdminId', adminUser.id);
         localStorage.setItem('currentAdminEmail', adminUser.email);
         localStorage.setItem('currentAdminName', `${adminUser.prenom} ${adminUser.nom}`);
         localStorage.setItem('currentAdminRole', adminUser.role);
+        localStorage.setItem('supabaseAuthEstablished', 'true');
 
         return adminUser;
+
+      } catch (supabaseError) {
+        console.error('❌ Erreur authentification Supabase:', supabaseError);
+        throw new Error('Email ou mot de passe incorrect');
       }
       
-      throw new Error('Email ou mot de passe incorrect');
+    } catch (error: any) {
+      console.error('❌ Erreur authentification admin:', error);
+      throw error;
     }
   }
 

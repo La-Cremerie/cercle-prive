@@ -387,45 +387,66 @@ export class RealTimeSyncService {
 
   // Sauvegarder le changement directement dans Supabase
   private async saveChangeToSupabase(event: SyncEvent): Promise<void> {
+    console.log('💾 RealTimeSync.saveChangeToSupabase appelé:', event.type);
+    
     if (!isSupabaseConfigured) {
+      console.log('📦 Supabase non configuré - skip sauvegarde');
       throw new Error('Supabase non configuré - impossible de synchroniser');
     }
 
-    // Vérifier l'authentification
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Vérifier l'authentification de manière plus robuste
+    const authEstablished = localStorage.getItem('supabaseAuthEstablished') === 'true';
+    const adminId = localStorage.getItem('currentAdminId');
     
-    if (!user && !localStorage.getItem('currentAdminId')) {
-      console.warn('Aucune session Supabase active pour la synchronisation');
-      // Ne pas faire échouer, juste avertir
+    console.log('🔐 État auth pour sync:', { authEstablished, adminId });
+    
+    let user = null;
+    try {
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+      user = currentUser;
+      console.log('👤 Session Supabase pour sync:', user ? 'Active' : 'Inactive');
+    } catch (authCheckError) {
+      console.warn('⚠️ Impossible de vérifier la session pour sync:', authCheckError);
+    }
+    
+    if (!user && !authEstablished && !adminId) {
+      console.warn('⚠️ Aucune authentification disponible pour la synchronisation');
+      // Ne pas faire échouer - continuer en mode local
       return;
     }
 
     try {
       const authorEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+      console.log('📤 Sauvegarde Supabase pour:', event.type, 'par', authorEmail);
       
       // Sauvegarder selon le type de changement
       switch (event.type) {
         case 'content':
+          console.log('📝 Sauvegarde contenu...');
           await ContentVersioningService.saveContentVersion(
             event.data,
             event.adminName,
             authorEmail,
             'Modification collaborative du contenu'
           );
+          console.log('✅ Contenu sauvegardé');
           break;
           
         case 'properties':
           if (event.action === 'create' || event.action === 'update') {
+            console.log('🏠 Sauvegarde propriété...');
             await ContentVersioningService.savePropertyVersion(
               event.data,
               event.adminName,
               authorEmail,
               `Modification collaborative de ${event.data.name || 'propriété'}`
             );
+            console.log('✅ Propriété sauvegardée');
           }
           break;
           
         case 'images':
+          console.log('🖼️ Sauvegarde images...');
           await ContentVersioningService.savePresentationImagesVersion(
             event.data.category,
             event.data.images,
@@ -433,22 +454,26 @@ export class RealTimeSyncService {
             authorEmail,
             'Modification collaborative des images'
           );
+          console.log('✅ Images sauvegardées');
           break;
           
         case 'design':
+          console.log('🎨 Sauvegarde design...');
           await ContentVersioningService.saveDesignSettingsVersion(
             event.data,
             event.adminName,
             authorEmail,
             'Modification collaborative du design'
           );
+          console.log('✅ Design sauvegardé');
           break;
       }
       
       console.log('✅ Changement sauvegardé dans Supabase via HTTPS');
     } catch (error) {
-      console.warn('⚠️ Erreur sauvegarde Supabase, mode local activé:', error);
-      // Ne pas faire échouer la synchronisation pour des problèmes d'auth
+      console.warn('⚠️ Erreur sauvegarde Supabase:', error);
+      // Ne pas faire échouer - la sauvegarde locale sera utilisée
+      throw error; // Laisser l'appelant gérer l'erreur
     }
   }
 
