@@ -53,6 +53,63 @@ const PropertyManagement: React.FC = () => {
         yield: 248000,
         isVisible: true
       },
+      {
+        id: '3',
+        name: 'Bastide',
+        location: 'Provence, Côte d\'Azur',
+        price: '3 800 000 €',
+        bedrooms: 5,
+        bathrooms: 3,
+        surface: 380,
+        images: [
+          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800'
+        ],
+        description: 'Bastide provençale authentique avec charme traditionnel et équipements modernes.',
+        features: ['Piscine traditionnelle', 'Oliveraie', 'Cave à vin', 'Terrasses ombragées'],
+        type: 'villa',
+        status: 'disponible',
+        yield: 152000,
+        isVisible: true
+      },
+      {
+        id: '4',
+        name: 'Villa traversante',
+        location: 'Nice, Côte d\'Azur',
+        price: '5 100 000 €',
+        bedrooms: 7,
+        bathrooms: 5,
+        surface: 520,
+        images: [
+          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800'
+        ],
+        description: 'Villa traversante avec double exposition et vues exceptionnelles.',
+        features: ['Double exposition', 'Vue mer et montagne', 'Ascenseur privé', 'Garage souterrain'],
+        type: 'villa',
+        status: 'disponible',
+        yield: 204000,
+        isVisible: true
+      },
+      {
+        id: '5',
+        name: 'Villa coeur de village',
+        location: 'Mougins, Côte d\'Azur',
+        price: '4 200 000 €',
+        bedrooms: 6,
+        bathrooms: 4,
+        surface: 420,
+        images: [
+          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
+        ],
+        description: 'Villa au cœur du village historique avec cachet authentique et modernité.',
+        features: ['Centre village', 'Cachet historique', 'Rénovation moderne', 'Jardin méditerranéen'],
+        type: 'villa',
+        status: 'disponible',
+        yield: 168000,
+        isVisible: true
+      }
     ];
   });
 
