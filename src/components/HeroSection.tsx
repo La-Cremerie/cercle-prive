@@ -26,7 +26,7 @@ const HeroSection: React.FC = () => {
     }
     
     // Image par défaut seulement si aucune image admin
-    return 'https://i.postimg.cc/nVPWgBmx/vue-mer-1.png';
+    return 'https://i.postimg.cc/dVVFMXmf/Capture-d-e-cran-2025-09-03-a-06-19-50.png';
   });
   const [imageLoaded, setImageLoaded] = useState(false);
   const [heroContent, setHeroContent] = useState(() => {
