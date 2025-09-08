@@ -96,7 +96,6 @@ const getDefaultProperties = () => {
       status: 'disponible',
       yield: 359996
     },
-    }
   ];
 };
 
