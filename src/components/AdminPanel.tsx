@@ -27,6 +27,7 @@ import ContentSyncDashboard from './ContentSyncDashboard';
 import DiagnosticPanel from './DiagnosticPanel';
 import AuthenticationTester from './AuthenticationTester';
 import HTTPSSyncMonitor from './HTTPSSyncMonitor';
+import ContentManagementDiagnostic from './ContentManagementDiagnostic';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -822,6 +823,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
        {activeTab === 'content_publisher' && canAccessModule('content') && (
          <ContentPublisher />
        )}
+
+        {activeTab === 'content_diagnostic' && canAccessModule('admin_management') && (
+          <ContentManagementDiagnostic />
+        )}
 
         {activeTab === 'https_monitor' && canAccessModule('admin_management') && (
           <HTTPSSyncMonitor />
