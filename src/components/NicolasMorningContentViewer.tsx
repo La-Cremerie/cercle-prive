@@ -28,9 +28,10 @@ const NicolasMorningContentViewer: React.FC = () => {
 
   // Définir la plage horaire du matin (avant 12:00)
   const getMorningTimeRange = () => {
-    const today = new Date();
-    const morningStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
-    const morningEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1); // Hier
+    const morningStart = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0);
+    const morningEnd = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 12, 0, 0);
     return { start: morningStart, end: morningEnd };
   };
 
@@ -292,10 +293,10 @@ const NicolasMorningContentViewer: React.FC = () => {
         <div className="text-center py-12">
           <RefreshCw className="w-8 h-8 text-yellow-600 mx-auto mb-4 animate-spin" />
           <h2 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
-            Récupération du Contenu de Nicolas
+            Chargement du contenu de Nicolas d'hier...
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Recherche des ajouts effectués ce matin via HTTPS...
+            Analyse des modifications d'hier matin en cours
           </p>
         </div>
       </div>
@@ -313,7 +314,7 @@ const NicolasMorningContentViewer: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl font-light text-gray-900 dark:text-white">
-                Contenu HTTPS de Nicolas - Ce Matin
+                Contenu HTTPS de Nicolas - Hier Matin
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
                 Récupération via endpoints HTTPS sécurisés
@@ -325,7 +326,7 @@ const NicolasMorningContentViewer: React.FC = () => {
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-blue-600">
                   <Clock className="w-4 h-4" />
-                  <span>Plage: 00:00 - 12:00</span>
+                  <span>Hier: 00:00 - 12:00</span>
                 </div>
                 {lastSync && (
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
