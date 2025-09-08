@@ -35,7 +35,6 @@ const AdminUserManagement: React.FC<AdminUserManagementProps> = ({ currentUser }
     { key: 'appointments', label: 'Rendez-vous', description: 'Planification des RDV' },
     { key: 'properties', label: 'Biens', description: 'Gestion du catalogue immobilier' },
     { key: 'images', label: 'Images', description: 'Gestion des images du site' },
-    { key: 'design', label: 'Design', description: 'Personnalisation visuelle' },
     { key: 'emails', label: 'Emails', description: 'Configuration des emails' },
     { key: 'admin_management', label: 'Administration', description: 'Gestion des administrateurs' }
   ];

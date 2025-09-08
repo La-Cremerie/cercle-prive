@@ -759,10 +759,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         )}
 
 
-        {activeTab === 'design' && canAccessModule('design') && (
-          <DesignCustomizer />
-        )}
-
         {activeTab === 'admin_management' && canAccessModule('admin_management') && currentUser && (
           <AdminUserManagement currentUser={currentUser} />
         )}
