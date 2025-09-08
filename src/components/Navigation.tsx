@@ -37,7 +37,7 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick, onLogout, onForce
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-3 lg:space-x-4 ml-auto">
+          <div className="hidden md:flex items-center space-x-2 ml-auto">
             <a href="#notre-adn" className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide">
               CONCEPT
             </a>
@@ -67,7 +67,7 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick, onLogout, onForce
             {onLogout && (
               <button
                 onClick={onLogout}
-                className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors tracking-wide"
+                className="text-xs font-light text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors tracking-wide px-2 py-1"
                 title="Se déconnecter"
               >
                 Déconnexion
@@ -78,18 +78,18 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick, onLogout, onForce
             {onAdminClick && (
               <button
                 onClick={handleAdminClick}
-                className="relative p-2 text-gray-400 hover:text-yellow-600 transition-colors"
+                className="relative p-1 text-gray-400 hover:text-yellow-600 transition-colors"
                 title="Administration"
               >
                 <svg 
-                  className="w-4 h-4" 
+                  className="w-3 h-3" 
                   fill="currentColor" 
                   viewBox="0 0 20 20"
                 >
                   <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                 </svg>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
