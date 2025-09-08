@@ -63,17 +63,6 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick, onLogout, onForce
             {/* Theme toggle only in development */}
             <ThemeToggle />
             
-            {/* Bouton Login */}
-            {onForceLogin && (
-              <button
-                onClick={onForceLogin}
-                className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
-                title="Accéder à la page de connexion"
-              >
-                LOGIN
-              </button>
-            )}
-            
             {/* Bouton Logout */}
             {onLogout && (
               <button
@@ -174,18 +163,6 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick, onLogout, onForce
               </a>
               
               {/* Boutons Login/Logout pour mobile */}
-              {onForceLogin && (
-                <button
-                  onClick={() => {
-                    onForceLogin();
-                    toggleMenu();
-                  }}
-                  className="block text-sm font-light text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors tracking-wide"
-                >
-                  LOGIN
-                </button>
-              )}
-              
               {onLogout && (
                 <button
                   onClick={() => {
