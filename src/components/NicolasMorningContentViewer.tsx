@@ -42,7 +42,6 @@ const NicolasMorningContentViewer: React.FC = () => {
       console.log('🔍 Recherche du contenu de Nicolas ajouté ce matin via HTTPS...');
       
       const { start: morningStart, end: morningEnd } = getMorningTimeRange();
-      console.log(`📅 Recherche pour le samedi 6 septembre 2025, de ${morningStart.toLocaleString('fr-FR')} à ${morningEnd.toLocaleString('fr-FR')}`);
       const foundContent: MorningContent[] = [];
 
       // 1. Vérifier les événements de synchronisation récents depuis Supabase (HTTPS)
@@ -400,10 +399,10 @@ const NicolasMorningContentViewer: React.FC = () => {
             Aucun Contenu Matinal Trouvé
           </h3>
           <p className="text-yellow-700 dark:text-yellow-300 mb-4">
-            Aucun ajout de Nicolas n'a été détecté ce matin via HTTPS.
+            Aucun ajout de Nicolas n'a été détecté hier matin via HTTPS.
           </p>
           <div className="text-sm text-yellow-600 dark:text-yellow-400 space-y-1">
-            <p>• Vérifiez que Nicolas a bien publié du contenu ce matin</p>
+            <p>• Vérifiez que Nicolas a bien publié du contenu hier matin</p>
             <p>• Assurez-vous que la synchronisation Supabase fonctionne</p>
             <p>• Vérifiez les permissions d'accès aux endpoints HTTPS</p>
           </div>
