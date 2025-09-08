@@ -59,19 +59,25 @@ const HeroSection: React.FC = () => {
   useEffect(() => {
     const handleContentChange = (event: CustomEvent) => {
       console.log('🎨 HeroSection: Changement de contenu reçu:', event.detail);
+      
+      // Mise à jour du titre hero
+      if (event.detail?.hero?.title) {
+        console.log('📝 Nouveau titre hero:', event.detail.hero.title);
+        setHeroContent({ title: event.detail.hero.title });
+      }
+      
+      // Mise à jour de l'image hero
       if (event.detail?.hero?.backgroundImage) {
         console.log('🖼️ Nouvelle image hero détectée:', event.detail.hero.backgroundImage);
         setBackgroundImage(event.detail.hero.backgroundImage);
         setImageLoaded(false);
-      }
-      if (event.detail?.hero?.title) {
-        setHeroContent({ title: event.detail.hero.title });
       }
     };
 
     const handleImageChange = (event: CustomEvent) => {
       console.log('🖼️ HeroSection: Changement d\'image direct:', event.detail);
       if (event.detail && typeof event.detail === 'string') {
+        console.log('🔄 Application immédiate de la nouvelle image:', event.detail);
         setBackgroundImage(event.detail);
         setImageLoaded(false);
       }
@@ -82,12 +88,14 @@ const HeroSection: React.FC = () => {
       if (event.detail?.type === 'content' || event.detail?.type === 'images' || event.detail?.type === 'all') {
         // Recharger le contenu depuis localStorage
         try {
+          console.log('📦 Rechargement depuis localStorage...');
           const stored = localStorage.getItem('siteContent');
           if (stored) {
             const content = JSON.parse(stored);
             console.log('📄 Contenu rechargé depuis localStorage:', content);
             
             if (content.hero?.title) {
+              console.log('📝 Mise à jour titre depuis localStorage:', content.hero.title);
               setHeroContent({ title: content.hero.title });
             }
             if (content.hero?.backgroundImage) {
@@ -108,20 +116,31 @@ const HeroSection: React.FC = () => {
               setImageLoaded(false);
             }
           }
+          
+          console.log('✅ Rechargement HeroSection terminé');
         } catch (error) {
           console.error('❌ Erreur rechargement contenu HeroSection:', error);
         }
       }
     };
 
+    // Nouvel événement pour forcer le rechargement immédiat
+    const handleImmediateUpdate = () => {
+      console.log('⚡ HeroSection: Rechargement immédiat déclenché');
+      handleForceUpdate({ detail: { type: 'content', source: 'immediate' } } as CustomEvent);
+    };
     window.addEventListener('contentUpdated', handleContentChange as EventListener);
     window.addEventListener('presentationImageChanged', handleImageChange as EventListener);
     window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
+    window.addEventListener('storage', handleImmediateUpdate);
+    window.addEventListener('heroContentUpdate', handleImmediateUpdate);
     
     return () => {
       window.removeEventListener('contentUpdated', handleContentChange as EventListener);
       window.removeEventListener('presentationImageChanged', handleImageChange as EventListener);
       window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
+      window.removeEventListener('storage', handleImmediateUpdate);
+      window.removeEventListener('heroContentUpdate', handleImmediateUpdate);
     };
   }, []);
 

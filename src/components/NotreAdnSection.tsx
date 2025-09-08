@@ -32,12 +32,18 @@ const NotreAdnSection: React.FC = () => {
       }
     };
 
+    const handleStorageUpdate = () => {
+      console.log('📦 NotreAdnSection: Événement storage détecté');
+      loadConceptImage();
+    };
     window.addEventListener('contentUpdated', handleContentChange as EventListener);
     window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
+    window.addEventListener('storage', handleStorageUpdate);
     
     return () => {
       window.removeEventListener('contentUpdated', handleContentChange as EventListener);
       window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
+      window.removeEventListener('storage', handleStorageUpdate);
     };
   }, []);
 

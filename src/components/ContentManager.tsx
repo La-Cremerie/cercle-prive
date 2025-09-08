@@ -122,11 +122,13 @@ const ContentManager: React.FC = () => {
       localStorage.setItem('siteContent', JSON.stringify(content));
       console.log('✅ Sauvegarde locale terminée');
       
-      // 3. Déclencher la mise à jour locale immédiate
+      // 3. Déclencher TOUS les événements de mise à jour nécessaires
       console.log('🔄 Déclenchement mise à jour locale...');
+      
+      // Événement principal de mise à jour du contenu
       window.dispatchEvent(new CustomEvent('contentUpdated', { detail: content }));
       
-      // 4. Forcer la mise à jour des images spécifiquement
+      // Événement spécifique pour l'image hero
       if (content.hero?.backgroundImage) {
         console.log('🖼️ Mise à jour image hero:', content.hero.backgroundImage);
         window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
@@ -134,12 +136,29 @@ const ContentManager: React.FC = () => {
         }));
       }
       
-      // 5. Déclencher une mise à jour globale
+      // Événement pour l'image concept
+      if (content.concept?.image) {
+        console.log('🖼️ Mise à jour image concept:', content.concept.image);
+        window.dispatchEvent(new CustomEvent('conceptImageChanged', { 
+          detail: content.concept.image 
+        }));
+      }
+      
+      // Événement de force update global
       window.dispatchEvent(new CustomEvent('forceUpdate', { 
         detail: { type: 'content', source: 'admin', timestamp: Date.now() } 
       }));
       
-      // 6. Tenter la sauvegarde Supabase (optionnelle)
+      // Déclencher un événement storage pour les composants qui l'écoutent
+      window.dispatchEvent(new Event('storage'));
+      
+      // Notification immédiate de succès local
+      toast.success('✅ Modifications appliquées immédiatement !', {
+        duration: 2000,
+        icon: '⚡'
+      });
+      
+      // 4. Tenter la sauvegarde Supabase (optionnelle)
       try {
         console.log('📤 Tentative sauvegarde Supabase...');
         await ContentVersioningService.saveContentVersion(
@@ -150,23 +169,23 @@ const ContentManager: React.FC = () => {
         );
         console.log('✅ Sauvegarde Supabase réussie');
         
-        // 7. Diffuser le changement en temps réel pour TOUS les utilisateurs
+        // 5. Diffuser le changement en temps réel pour TOUS les utilisateurs
         console.log('📡 Diffusion du changement...');
         await broadcastChange('content', 'update', content);
         console.log('✅ Changement diffusé');
         
-        toast.success('✅ Contenu sauvegardé et synchronisé avec succès !', {
+        toast.success('🌐 Contenu synchronisé sur tous les appareils !', {
           duration: 4000,
-          icon: '🌐'
+          icon: '📡'
         });
         
       } catch (supabaseError) {
         console.warn('⚠️ Erreur sauvegarde Supabase:', supabaseError);
         
         // Même en cas d'erreur Supabase, la sauvegarde locale a réussi
-        toast.success('✅ Contenu sauvegardé localement (synchronisation différée)', {
+        toast.success('📦 Modifications sauvegardées (mode local)', {
           duration: 4000,
-          icon: '📦'
+          icon: '💾'
         });
       }
       
@@ -176,7 +195,7 @@ const ContentManager: React.FC = () => {
       console.error('❌ Erreur critique sauvegarde:', error);
       
       // En cas d'erreur critique, au moins la sauvegarde locale a été faite
-      toast.error('❌ Erreur lors de la synchronisation, mais contenu sauvegardé localement');
+      toast.error('❌ Erreur de synchronisation - Contenu sauvegardé localement');
     }
   };
 
