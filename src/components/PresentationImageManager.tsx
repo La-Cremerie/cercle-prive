@@ -87,6 +87,13 @@ const PresentationImageManager: React.FC = () => {
           const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
           const adminName = adminEmail.split('@')[0];
           
+          // Vérifier l'authentification avant de sauvegarder
+          const { data: { user }, error: authError } = await supabase.auth.getUser();
+          if (authError || !user) {
+            console.warn('⚠️ Utilisateur non authentifié, sauvegarde locale uniquement');
+            throw new Error('Authentification requise pour Supabase');
+          }
+          
           const currentImages = activeCategory === 'hero' ? images : conceptImages;
           
           await ContentVersioningService.savePresentationImagesVersion(
@@ -108,12 +115,20 @@ const PresentationImageManager: React.FC = () => {
           
         } catch (error) {
           console.warn('⚠️ Erreur sauvegarde Supabase, utilisation localStorage:', error);
+          // Ne pas faire échouer la sauvegarde locale pour une erreur Supabase
+          throw error; // Propager l'erreur pour déclencher le fallback
         }
       };
 
       // Attendre la sauvegarde Supabase avant de continuer
       const performSave = async () => {
-        await saveToSupabase();
+        try {
+          await saveToSupabase();
+          toast.success('Images sauvegardées et synchronisées sur tous les appareils !');
+        } catch (supabaseError) {
+          console.warn('Sauvegarde Supabase échouée, utilisation du mode local:', supabaseError);
+          toast.success('Images sauvegardées localement (synchronisation différée)');
+        }
         
         // Sauvegarder localement (fallback)
         if (activeCategory === 'hero') {
@@ -134,8 +149,6 @@ const PresentationImageManager: React.FC = () => {
             window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
           }
         }
-        
-        toast.success('Images sauvegardées et synchronisées !');
       };
       
       performSave();
