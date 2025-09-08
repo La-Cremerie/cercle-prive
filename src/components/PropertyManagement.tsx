@@ -25,7 +25,7 @@ const PropertyManagement: React.FC = () => {
         surface: 300,
         images: [
           'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800',
-          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
+          'https://i.postimg.cc/XvbKDv07/Whats-App-Image-2025-09-08-at-13-05-36.jpg'
         ],
         description: '',
         features: [],
