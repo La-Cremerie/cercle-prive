@@ -1145,4 +1145,87 @@ export class ContentVersioningService {
       console.log('📦 Utilisation des données locales existantes');
     }
   }
+
+  // Forcer la publication des données locales vers la version publiée
+  static async publishLocalDataToProduction(): Promise<void> {
+    try {
+      console.log('🚀 Publication des données vers la version publiée...');
+      
+      // 1. Récupérer toutes les données locales
+      const siteContent = localStorage.getItem('siteContent');
+      const properties = localStorage.getItem('properties');
+      const presentationImages = localStorage.getItem('presentationImages');
+      const conceptImages = localStorage.getItem('conceptImages');
+      const designSettings = localStorage.getItem('designSettings');
+      
+      const authorName = localStorage.getItem('currentAdminName') || 'Nicolas';
+      const authorEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+      
+      // 2. Publier le contenu du site
+      if (siteContent) {
+        await this.saveContentVersion(
+          JSON.parse(siteContent),
+          authorName,
+          authorEmail,
+          'Publication vers version live'
+        );
+        console.log('✅ Contenu publié');
+      }
+      
+      // 3. Publier les propriétés
+      if (properties) {
+        const propertiesData = JSON.parse(properties);
+        for (const property of propertiesData) {
+          await this.savePropertyVersion(
+            property,
+            authorName,
+            authorEmail,
+            'Publication vers version live'
+          );
+        }
+        console.log('✅ Propriétés publiées');
+      }
+      
+      // 4. Publier les images de présentation
+      if (presentationImages) {
+        await this.savePresentationImagesVersion(
+          'hero',
+          JSON.parse(presentationImages),
+          authorName,
+          authorEmail,
+          'Publication images Hero vers version live'
+        );
+        console.log('✅ Images Hero publiées');
+      }
+      
+      // 5. Publier les images concept
+      if (conceptImages) {
+        await this.savePresentationImagesVersion(
+          'concept',
+          JSON.parse(conceptImages),
+          authorName,
+          authorEmail,
+          'Publication images Concept vers version live'
+        );
+        console.log('✅ Images Concept publiées');
+      }
+      
+      // 6. Publier les paramètres de design
+      if (designSettings) {
+        await this.saveDesignSettingsVersion(
+          JSON.parse(designSettings),
+          authorName,
+          authorEmail,
+          'Publication design vers version live'
+        );
+        console.log('✅ Design publié');
+      }
+      
+      console.log('🎉 Publication complète vers version live terminée !');
+      
+    } catch (error) {
+      console.error('❌ Erreur publication vers version live:', error);
+      throw error;
+    }
+  }
 }

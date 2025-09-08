@@ -393,6 +393,39 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                  <span>{connectionStatus.connected ? 'SYNC AUTO ACTIVE' : 'PUBLIER POUR TOUS'}</span>
                 </button>
                 
+                {/* Bouton de publication vers version live */}
+                <button
+                  onClick={async () => {
+                    try {
+                      toast.loading('Publication vers version live...', { id: 'publish-live' });
+                      
+                      // Importer le service de versioning
+                      const { ContentVersioningService } = await import('../services/contentVersioningService');
+                      
+                      // Publier toutes les données locales vers Supabase
+                      await ContentVersioningService.publishLocalDataToProduction();
+                      
+                      // Forcer la synchronisation
+                      await RealTimeSyncService.getInstance().reconnect();
+                      
+                      toast.success('🚀 Données publiées vers la version live !', { 
+                        id: 'publish-live',
+                        duration: 6000,
+                        icon: '🌐'
+                      });
+                      
+                    } catch (error) {
+                      console.error('Erreur publication live:', error);
+                      toast.error('Erreur lors de la publication', { id: 'publish-live' });
+                    }
+                  }}
+                  className="flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-medium transition-all duration-300 bg-blue-100 text-blue-700 hover:bg-blue-200 shadow-sm"
+                  title="Publier toutes les modifications vers la version live du site"
+                >
+                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                  <span>PUBLIER LIVE</span>
+                </button>
+                
                 <div className={`w-3 h-3 rounded-full ${
                   connectionStatus.connected ? 'bg-green-500 animate-pulse' : 'bg-red-500 animate-pulse'
                 }`}></div>
