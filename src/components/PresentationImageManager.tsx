@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Image, Upload, Link, Save, X, Eye, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -50,6 +50,8 @@ const PresentationImageManager: React.FC = () => {
   const [uploadMethod, setUploadMethod] = useState<'url' | 'file' | 'drive'>('url');
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageName, setNewImageName] = useState('');
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [versionHistory, setVersionHistory] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { broadcastChange } = useRealTimeSync('image-manager');
   
@@ -141,15 +143,6 @@ const PresentationImageManager: React.FC = () => {
     } catch (error) {
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
         toast.error('Espace de stockage insuffisant. Utilisez des images plus petites ou des liens externes.');
-      } else {
-        toast.error('Erreur lors de la sauvegarde des images');
-      }
-    }
-  };
-
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-        toast.error('Espace de stockage insuffisant. Utilisez des images plus petites ou des liens URL.');
       } else {
         toast.error('Erreur lors de la sauvegarde des images');
       }
@@ -493,30 +486,30 @@ const PresentationImageManager: React.FC = () => {
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Images {activeCategory === 'hero' ? 'Page d\'accueil' : 'Section Concept'} ({currentImages.length})
           </h3>
-          <button
-            onClick={saveImages}
-            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-          >
-            <Save className="w-4 h-4" />
-            <span>Sauvegarder</span>
-          </button>
-        </div>
-        <div className="flex space-x-3">
-          <button
-            onClick={async () => {
-              try {
-                const history = await ContentVersioningService.getVersionHistory('images', activeCategory);
-                setVersionHistory(history);
-                setShowVersionHistory(true);
-              } catch (error) {
-                toast.error('Erreur lors du chargement de l\'historique');
-              }
-            }}
-            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-          >
-            <Eye className="w-4 h-4" />
-            <span>Historique</span>
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={async () => {
+                try {
+                  const history = await ContentVersioningService.getVersionHistory('images', activeCategory);
+                  setVersionHistory(history);
+                  setShowVersionHistory(true);
+                } catch (error) {
+                  toast.error('Erreur lors du chargement de l\'historique');
+                }
+              }}
+              className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+              <span>Historique</span>
+            </button>
+            <button
+              onClick={saveImages}
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              <Save className="w-4 h-4" />
+              <span>Sauvegarder</span>
+            </button>
+          </div>
         </div>
 
         {currentImages.length === 0 ? (
