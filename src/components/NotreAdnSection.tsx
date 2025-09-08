@@ -93,7 +93,7 @@ const NotreAdnSection: React.FC = () => {
           {/* Right Image */}
           <div className="relative lg:pl-8">
             <img
-              src={conceptImage}
+              src="https://i.postimg.cc/vmb2fvJr/Capture-d-e-cran-2025-09-03-a-07-06-21.png"
               alt="Architecture moderne méditerranéenne"
               className="w-full h-80 lg:h-96 object-cover shadow-lg"
             />
