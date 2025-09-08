@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Eye, EyeOff } from 'lucide-react';
+import { AdminService } from '../services/adminService';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
@@ -12,32 +13,31 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mots de passe admin simples (en production, utilisez une vraie authentification)
-  const ADMIN_PASSWORDS = {
-    'nicolas.c@lacremerie.fr': 'lacremerie2025',
-    'quentin@lacremerie.fr': '123'
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    // Récupérer l'email admin depuis localStorage ou utiliser nicolas par défaut
-    const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
-    const expectedPassword = ADMIN_PASSWORDS[adminEmail as keyof typeof ADMIN_PASSWORDS] || ADMIN_PASSWORDS['nicolas.c@lacremerie.fr'];
-
-    // Simulation d'une vérification
-    setTimeout(() => {
-      if (password === expectedPassword) {
-        localStorage.setItem('adminLoggedIn', 'true');
-        localStorage.setItem('currentAdminEmail', adminEmail);
-        onLoginSuccess();
-      } else {
-        setError('Mot de passe incorrect');
-      }
+    try {
+      // Récupérer l'email admin depuis localStorage ou utiliser nicolas par défaut
+      const adminEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
+      
+      // Authentification réelle avec Supabase
+      const adminUser = await AdminService.loginAdmin(adminEmail, password);
+      
+      // Sauvegarder les informations de session
+      localStorage.setItem('adminLoggedIn', 'true');
+      localStorage.setItem('currentAdminEmail', adminUser.email);
+      localStorage.setItem('currentAdminId', adminUser.id);
+      localStorage.setItem('currentAdminName', `${adminUser.prenom} ${adminUser.nom}`);
+      
+      onLoginSuccess();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur de connexion');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

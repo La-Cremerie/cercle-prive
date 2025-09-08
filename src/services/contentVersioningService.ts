@@ -140,7 +140,13 @@ export class ContentVersioningService {
     try {
       // Vérifier l'authentification
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
+      const adminId = localStorage.getItem('currentAdminId');
+      const adminName = localStorage.getItem('currentAdminName') || 'Admin';
+      const adminEmail = localStorage.getItem('currentAdminEmail') || 'admin@lacremerie.fr';
+
+      const adminName = localStorage.getItem('currentAdminName') || 'Admin';
+      const adminEmail = localStorage.getItem('currentAdminEmail') || 'admin@lacremerie.fr';
+
         console.warn('Utilisateur non authentifié, utilisation du fallback localStorage');
         localStorage.setItem('siteContent', JSON.stringify(contentData));
         throw new Error('Authentification requise pour sauvegarder dans Supabase');
@@ -162,9 +168,9 @@ export class ContentVersioningService {
           version_number: nextVersion,
           content_data: contentData,
           is_current: true,
-          author_id: user.id,
-          author_name: authorName,
-          author_email: authorEmail,
+          author_id: adminId || user?.id || null,
+          author_name: adminName,
+          author_email: adminEmail,
           change_description: changeDescription
         }])
         .select()
@@ -351,9 +357,9 @@ export class ContentVersioningService {
           category,
           images_data: imagesData,
           is_current: true,
-          author_name: authorName,
-          author_email: authorEmail,
-          change_description: changeDescription
+          author_id: adminId || user?.id || null,
+          author_name: adminName,
+          author_email: adminEmail,
         }])
         .select()
         .single();

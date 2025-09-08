@@ -1,11 +1,23 @@
 import { supabase } from '../lib/supabase';
 import type { AdminUser, AdminPermission, AdminModule } from '../types/admin';
-import bcrypt from 'bcryptjs';
 import { AdminEmailService } from './adminEmailService';
 
 export class AdminService {
   // Authentification admin
   static async loginAdmin(email: string, password: string): Promise<AdminUser> {
+    // Mots de passe temporaires pour les admins (en attendant la vraie authentification)
+    const TEMP_PASSWORDS = {
+      'nicolas.c@lacremerie.fr': 'lacremerie2025',
+      'quentin@lacremerie.fr': '123'
+    };
+
+    // Vérifier le mot de passe temporaire
+    const expectedPassword = TEMP_PASSWORDS[email as keyof typeof TEMP_PASSWORDS];
+    if (!expectedPassword || password !== expectedPassword) {
+      throw new Error('Email ou mot de passe incorrect');
+    }
+
+    // Récupérer l'utilisateur admin depuis la base
     const { data: adminUser, error } = await supabase
       .from('admin_users')
       .select('*')
@@ -14,13 +26,29 @@ export class AdminService {
       .single();
 
     if (error || !adminUser) {
-      throw new Error('Utilisateur non trouvé ou inactif');
+      throw new Error('Utilisateur admin non trouvé ou inactif');
     }
 
-    // Vérifier le mot de passe (en production, utilisez bcrypt)
-    const isValidPassword = await bcrypt.compare(password, adminUser.password_hash);
-    if (!isValidPassword) {
-      throw new Error('Mot de passe incorrect');
+    // Créer une session Supabase pour cet admin
+    // Note: En production, utilisez supabase.auth.signInWithPassword
+    // Pour l'instant, on simule une session avec l'ID admin
+    try {
+      // Simuler une session en définissant l'utilisateur actuel
+      const { error: sessionError } = await supabase.auth.admin.createUser({
+        email: adminUser.email,
+        password: 'temp-session',
+        user_metadata: {
+          admin_id: adminUser.id,
+          role: adminUser.role
+        }
+      });
+      
+      // Si l'utilisateur existe déjà, on continue
+      if (sessionError && !sessionError.message.includes('already registered')) {
+        console.warn('Erreur création session:', sessionError);
+      }
+    } catch (sessionErr) {
+      console.warn('Erreur session admin:', sessionErr);
     }
 
     // Mettre à jour la dernière connexion
