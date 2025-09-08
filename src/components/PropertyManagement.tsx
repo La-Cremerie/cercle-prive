@@ -385,12 +385,114 @@ const PropertyManagement: React.FC = () => {
       {/* Liste des propriétés */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {properties.map((property) => (
-          )
-          )
-          }
           <motion.div
-            key={property.
-            }
-  )
-  )
-}
+            key={property.id}
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
+          >
+            <div className="relative">
+              {property.images && property.images.length > 0 && (
+                <img
+                  src={property.images[0]}
+                  alt={property.name}
+                  className="w-full h-48 object-cover"
+                />
+              )}
+              <div className="absolute top-2 right-2 flex space-x-1">
+                <button
+                  onClick={() => handleToggleVisibility(property.id)}
+                  className={`p-1 rounded-full ${
+                    property.isVisible
+                      ? 'bg-green-500 text-white'
+                      : 'bg-gray-500 text-white'
+                  }`}
+                  title={property.isVisible ? 'Masquer' : 'Afficher'}
+                >
+                  {property.isVisible ? (
+                    <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {property.name}
+                </h3>
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  property.status === 'disponible'
+                    ? 'bg-green-100 text-green-800'
+                    : property.status === 'vendu'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {property.status}
+                </span>
+              </div>
+              
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                {property.location}
+              </p>
+              
+              <p className="text-xl font-bold text-yellow-600 mb-3">
+                {property.price}
+              </p>
+              
+              <div className="grid grid-cols-3 gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <div className="text-center">
+                  <div className="font-semibold">{property.bedrooms}</div>
+                  <div>Chambres</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold">{property.bathrooms}</div>
+                  <div>SDB</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold">{property.surface}m²</div>
+                  <div>Surface</div>
+                </div>
+              </div>
+              
+              {property.yield && (
+                <div className="mb-4 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                  <div className="text-sm text-yellow-800 dark:text-yellow-200">
+                    Rendement: {property.yield.toLocaleString()} € / an
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleEdit(property)}
+                  className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  <Edit className="w-4 h-4" />
+                  <span>Modifier</span>
+                </button>
+                
+                <button
+                  onClick={() => handleDuplicate(property)}
+                  className="px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                  title="Dupliquer"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+                
+                <button
+                  onClick={() => handleDelete(property.id)}
+                  className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  title="Supprimer"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
