@@ -96,6 +96,25 @@ const getDefaultProperties = () => {
       status: 'disponible',
       yield: 359996
     },
+    {
+      id: '5',
+      name: 'Villa cœur de village',
+      location: 'Saint-Tropez',
+      price: '8 900 000 €',
+      bedrooms: 5,
+      bathrooms: 4,
+      surface: 380,
+      images: [
+        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800'
+      ],
+      description: 'Villa d\'exception au cœur du village de Saint-Tropez. Emplacement unique et prestations de luxe dans l\'un des lieux les plus prisés de la Côte d\'Azur.',
+      features: ['Cœur de Saint-Tropez', 'Emplacement unique', 'Prestations luxe', 'Terrasse panoramique', 'Garage sécurisé'],
+      type: 'villa',
+      status: 'vendu',
+      yield: 450000,
+      isVisible: true
+    }
   ];
 };
 

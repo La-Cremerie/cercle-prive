@@ -93,6 +93,25 @@ const PropertyManagement: React.FC = () => {
       },
       {
         id: '5',
+        name: 'Villa cœur de village',
+        location: 'Saint-Tropez',
+        price: '8 900 000 €',
+        bedrooms: 5,
+        bathrooms: 4,
+        surface: 380,
+        images: [
+          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800'
+        ],
+        description: '',
+        features: [],
+        type: 'villa',
+        status: 'vendu',
+        yield: 450000,
+        isVisible: true
+      },
+      {
+        id: '5',
         name: 'Villa coeur de village',
         location: 'Saint-Tropez',
         price: '8 900 000 €',
