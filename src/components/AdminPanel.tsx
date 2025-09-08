@@ -388,7 +388,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                   <div className={`w-2 h-2 rounded-full ${
                     connectionStatus.connected ? 'bg-green-500' : 'bg-orange-500'
                   }`}></div>
-                 <span>SAUVEGARDER & PUBLIER</span>
+                 <span>PUBLIER POUR TOUS</span>
                 </button>
                 
                 <div className={`w-3 h-3 rounded-full ${

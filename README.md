@@ -27,6 +27,14 @@ Ce projet est conçu avec une **séparation claire** entre la partie publique et
 
 ## 🚀 **Déploiement**
 
+### **🔄 Synchronisation Collaborative**
+Le site est maintenant **entièrement collaboratif** :
+- ✅ **Modifications en temps réel** - Tous les utilisateurs voient les changements instantanément
+- ✅ **Sauvegarde Supabase** - Toutes les modifications sont persistées en base
+- ✅ **Canal temps réel** - WebSocket pour diffusion immédiate
+- ✅ **Versioning complet** - Historique de toutes les modifications
+- ✅ **Notifications visuelles** - Alertes quand le contenu est mis à jour
+
 ### **Site Public** (cercle-prive.luxe)
 ```bash
 npm run build:public

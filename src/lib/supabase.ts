@@ -4,15 +4,26 @@ import type { Database } from '../types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
 
-console.log('Supabase configuration check:', {
+console.log('🔧 Configuration Supabase:', {
   hasUrl: !!supabaseUrl,
   hasKey: !!supabaseAnonKey,
   urlValid: supabaseUrl !== 'https://your-project.supabase.co',
-  keyValid: supabaseAnonKey !== 'your-anon-key'
+  keyValid: supabaseAnonKey !== 'your-anon-key',
+  url: supabaseUrl.substring(0, 30) + '...',
+  keyLength: supabaseAnonKey.length
 });
 
-if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'https://your-project.supabase.co') {
-  console.warn('Supabase not configured - using mock data');
+// Vérifier la configuration
+const isConfigured = supabaseUrl !== 'https://your-project.supabase.co' && 
+                    supabaseAnonKey !== 'your-anon-key' &&
+                    supabaseUrl.startsWith('https://') &&
+                    supabaseAnonKey.length > 20;
+
+if (!isConfigured) {
+  console.error('❌ SUPABASE NON CONFIGURÉ - Fonctionnalités limitées');
+  console.log('📋 Pour configurer Supabase :');
+  console.log('1. Cliquez sur "Connect to Supabase" en haut à droite');
+  console.log('2. Ou ajoutez vos variables d\'environnement manuellement');
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -31,16 +42,46 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   }
 });
 
+// Test de connexion Supabase
+export const testSupabaseConnection = async (): Promise<boolean> => {
+  if (!isConfigured) {
+    console.warn('⚠️ Supabase non configuré - test impossible');
+    return false;
+  }
+
+  try {
+    const { data, error } = await supabase.from('user_registrations').select('count').limit(1);
+    
+    if (error) {
+      console.error('❌ Erreur connexion Supabase:', error.message);
+      return false;
+    }
+    
+    console.log('✅ Connexion Supabase réussie');
+    return true;
+  } catch (error) {
+    console.error('❌ Test connexion Supabase échoué:', error);
+    return false;
+  }
+};
+
 // Initialiser la synchronisation temps réel
-export const initializeRealtime = () => {
+export const initializeRealtime = async (): Promise<boolean> => {
   console.log('🚀 Initialisation de la synchronisation temps réel...');
   
-  // Vérifier que Supabase est configuré
-  if (supabaseUrl === 'https://your-project.supabase.co' || !supabaseAnonKey || supabaseAnonKey === 'your-anon-key') {
+  if (!isConfigured) {
     console.warn('⚠️ Supabase non configuré - synchronisation temps réel désactivée');
     return false;
   }
   
-  console.log('✅ Supabase configuré - synchronisation temps réel disponible');
+  const connectionTest = await testSupabaseConnection();
+  if (!connectionTest) {
+    console.error('❌ Impossible d\'initialiser la synchronisation - connexion échouée');
+    return false;
+  }
+  
+  console.log('✅ Supabase configuré et connecté - synchronisation temps réel disponible');
   return true;
 };
+
+export { isConfigured as isSupabaseConfigured };

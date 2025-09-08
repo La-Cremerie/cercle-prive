@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import toast from 'react-hot-toast';
 import { ContentVersioningService } from './contentVersioningService';
 
@@ -20,6 +20,7 @@ export class RealTimeSyncService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
+  private pollingInterval: NodeJS.Timeout | null = null;
 
   static getInstance(): RealTimeSyncService {
     if (!RealTimeSyncService.instance) {
@@ -33,29 +34,26 @@ export class RealTimeSyncService {
     try {
       console.log('🔄 Initialisation de la synchronisation temps réel...');
       
-      // Synchroniser les données depuis Supabase au démarrage
-      await ContentVersioningService.syncFromSupabaseToLocal();
-      
       // Vérifier la configuration Supabase
-      if (!this.isSupabaseConfigured()) {
-        console.warn('⚠️ Supabase non configuré - synchronisation temps réel désactivée');
+      if (!isSupabaseConfigured) {
+        console.warn('⚠️ Supabase non configuré - mode local uniquement');
         this.isConnected = false;
         this.startPollingFallback();
         return;
       }
       
+      // Synchroniser les données depuis Supabase au démarrage
+      try {
+        await ContentVersioningService.syncFromSupabaseToLocal();
+        console.log('✅ Synchronisation initiale depuis Supabase terminée');
+      } catch (error) {
+        console.warn('⚠️ Erreur synchronisation initiale:', error);
+      }
+      
       try {
         // Créer le canal Supabase pour les événements temps réel
         this.channel = supabase
-          .channel('admin_changes')
-          .on('postgres_changes', {
-            event: '*',
-            schema: 'public',
-            table: 'user_registrations'
-          }, (payload) => {
-            console.log('📊 Changement utilisateur détecté:', payload);
-            this.handleUserChange(payload);
-          })
+          .channel('collaborative_changes')
           .on('postgres_changes', {
             event: '*',
             schema: 'public',
@@ -88,6 +86,14 @@ export class RealTimeSyncService {
             console.log('🎨 Changement design détecté:', payload);
             this.handleDesignVersionChange(payload);
           })
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'user_registrations'
+          }, (payload) => {
+            console.log('👤 Changement utilisateur détecté:', payload);
+            this.handleUserChange(payload);
+          })
           .on('broadcast', { event: 'admin_change' }, (payload) => {
             console.log('📡 Événement admin reçu:', payload);
             this.handleSyncEvent(payload.payload as SyncEvent);
@@ -96,22 +102,29 @@ export class RealTimeSyncService {
             if (status === 'SUBSCRIBED') {
               this.isConnected = true;
               this.reconnectAttempts = 0;
-              console.log('✅ Synchronisation temps réel ACTIVE');
+              console.log('✅ SYNCHRONISATION TEMPS RÉEL ACTIVE');
+              
+              // Arrêter le polling si actif
+              if (this.pollingInterval) {
+                clearInterval(this.pollingInterval);
+                this.pollingInterval = null;
+              }
               
               // Notifier les utilisateurs admin
               if (this.isAdminUser()) {
-                toast.success('🔄 Synchronisation temps réel ACTIVE', { 
+                toast.success('🟢 Synchronisation collaborative ACTIVE', { 
                   id: 'sync-connected',
-                  duration: 3000,
-                  icon: '🟢'
+                  duration: 4000,
+                  icon: '🔄'
                 });
               }
             } else if (status === 'CHANNEL_ERROR') {
-              console.warn('⚠️ Erreur de canal Supabase - passage en mode hors ligne');
+              console.warn('⚠️ Erreur de canal Supabase - passage en mode polling');
               this.handleConnectionError();
             } else if (status === 'CLOSED') {
               console.warn('⚠️ Canal temps réel fermé');
               this.isConnected = false;
+              this.startPollingFallback();
             }
           });
       } catch (channelError) {
@@ -127,120 +140,150 @@ export class RealTimeSyncService {
 
   // Gérer les changements de version de contenu
   private async handleContentVersionChange(payload: any): Promise<void> {
-    if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
-      console.log('📝 Nouvelle version de contenu active');
+    if (payload.eventType === 'INSERT' && payload.new?.is_current) {
+      console.log('📝 NOUVELLE VERSION DE CONTENU PUBLIÉE');
       
-      // Synchroniser depuis Supabase IMMÉDIATEMENT
       try {
+        // Synchroniser IMMÉDIATEMENT depuis Supabase
         const newContent = await ContentVersioningService.getCurrentSiteContent();
         if (newContent) {
           localStorage.setItem('siteContent', JSON.stringify(newContent));
-          window.dispatchEvent(new CustomEvent('contentUpdated', { detail: newContent }));
           
-          // Forcer le rechargement de TOUS les composants
+          // Forcer la mise à jour de TOUS les composants
+          window.dispatchEvent(new CustomEvent('contentUpdated', { detail: newContent }));
           window.dispatchEvent(new CustomEvent('forceUpdate', { 
             detail: { type: 'content', source: 'supabase', timestamp: Date.now() } 
           }));
           
-          // Notification pour TOUS les utilisateurs
-          toast.success('🔄 Contenu mis à jour par ' + payload.new.author_name, {
-            duration: 5000,
-            icon: '📝'
+          // Notification pour TOUS les utilisateurs (pas seulement admin)
+          toast.success(`📝 Contenu mis à jour par ${payload.new.author_name}`, {
+            duration: 6000,
+            icon: '🔄'
           });
+          
+          console.log('✅ Contenu synchronisé pour tous les utilisateurs');
         }
       } catch (error) {
-        console.error('Erreur sync contenu:', error);
+        console.error('❌ Erreur sync contenu:', error);
       }
     }
   }
 
   // Gérer les changements de version de propriétés
   private async handlePropertiesVersionChange(payload: any): Promise<void> {
-    if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
-      console.log('🏠 Nouvelle version de propriétés active');
+    if (payload.eventType === 'INSERT' && payload.new?.is_current) {
+      console.log('🏠 NOUVELLE VERSION DE PROPRIÉTÉS PUBLIÉE');
       
-      // Synchroniser toutes les propriétés depuis Supabase IMMÉDIATEMENT
       try {
+        // Synchroniser TOUTES les propriétés depuis Supabase
         const newProperties = await ContentVersioningService.getCurrentProperties();
         if (newProperties.length > 0) {
           localStorage.setItem('properties', JSON.stringify(newProperties));
-          window.dispatchEvent(new Event('storage'));
           
-          // Forcer le rechargement de TOUS les composants
+          // Forcer la mise à jour de TOUS les composants
+          window.dispatchEvent(new Event('storage'));
           window.dispatchEvent(new CustomEvent('forceUpdate', { 
             detail: { type: 'properties', source: 'supabase', timestamp: Date.now() } 
           }));
           
           // Notification pour TOUS les utilisateurs
-          toast.success('🏠 Biens immobiliers mis à jour par ' + payload.new.author_name, {
-            duration: 5000,
+          toast.success(`🏠 Biens immobiliers mis à jour par ${payload.new.author_name}`, {
+            duration: 6000,
             icon: '🏠'
           });
+          
+          console.log('✅ Propriétés synchronisées pour tous les utilisateurs');
         }
       } catch (error) {
-        console.error('Erreur sync propriétés:', error);
+        console.error('❌ Erreur sync propriétés:', error);
       }
     }
   }
 
   // Gérer les changements de version d'images
   private async handleImagesVersionChange(payload: any): Promise<void> {
-    if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
-      console.log('🖼️ Nouvelle version d\'images active');
+    if (payload.eventType === 'INSERT' && payload.new?.is_current) {
+      console.log('🖼️ NOUVELLES IMAGES PUBLIÉES');
       
-      const category = payload.new.category;
-      const newImages = await ContentVersioningService.getCurrentPresentationImages(category);
-      
-      if (newImages.length > 0) {
-        localStorage.setItem(`${category}Images`, JSON.stringify(newImages));
+      try {
+        const category = payload.new.category;
+        const newImages = await ContentVersioningService.getCurrentPresentationImages(category);
         
-        const activeImage = newImages.find((img: any) => img.isActive);
-        if (activeImage) {
-          if (category === 'hero') {
-            window.dispatchEvent(new CustomEvent('presentationImageChanged', { detail: activeImage.url }));
-          } else if (category === 'concept') {
-            const siteContent = JSON.parse(localStorage.getItem('siteContent') || '{}');
-            siteContent.concept = { ...siteContent.concept, image: activeImage.url };
-            localStorage.setItem('siteContent', JSON.stringify(siteContent));
-            window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
+        if (newImages.length > 0) {
+          localStorage.setItem(`${category}Images`, JSON.stringify(newImages));
+          
+          const activeImage = newImages.find((img: any) => img.isActive);
+          if (activeImage) {
+            if (category === 'hero') {
+              window.dispatchEvent(new CustomEvent('presentationImageChanged', { detail: activeImage.url }));
+            } else if (category === 'concept') {
+              const siteContent = JSON.parse(localStorage.getItem('siteContent') || '{}');
+              siteContent.concept = { ...siteContent.concept, image: activeImage.url };
+              localStorage.setItem('siteContent', JSON.stringify(siteContent));
+              window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
+            }
           }
+          
+          // Forcer la mise à jour
+          window.dispatchEvent(new CustomEvent('forceUpdate', { 
+            detail: { type: 'images', source: 'supabase', timestamp: Date.now() } 
+          }));
+          
+          // Notification pour TOUS les utilisateurs
+          toast.success(`🖼️ Images ${category} mises à jour par ${payload.new.author_name}`, {
+            duration: 6000,
+            icon: '🎨'
+          });
+          
+          console.log(`✅ Images ${category} synchronisées pour tous les utilisateurs`);
         }
-        
-        if (!this.isAdminUser()) {
-          this.showMobileUpdateNotification('images');
-        }
+      } catch (error) {
+        console.error('❌ Erreur sync images:', error);
       }
     }
   }
 
   // Gérer les changements de version de design
   private async handleDesignVersionChange(payload: any): Promise<void> {
-    if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
-      console.log('🎨 Nouvelle version de design active');
+    if (payload.eventType === 'INSERT' && payload.new?.is_current) {
+      console.log('🎨 NOUVEAUX PARAMÈTRES DE DESIGN PUBLIÉS');
       
-      const newDesignSettings = await ContentVersioningService.getCurrentDesignSettings();
-      if (newDesignSettings) {
-        localStorage.setItem('designSettings', JSON.stringify(newDesignSettings));
-        window.dispatchEvent(new CustomEvent('designSettingsChanged', { detail: newDesignSettings }));
-        
-        // Appliquer les variables CSS
-        const root = document.documentElement;
-        if (newDesignSettings.colors) {
-          Object.entries(newDesignSettings.colors).forEach(([key, value]) => {
-            root.style.setProperty(`--color-${key}`, value as string);
+      try {
+        const newDesignSettings = await ContentVersioningService.getCurrentDesignSettings();
+        if (newDesignSettings) {
+          localStorage.setItem('designSettings', JSON.stringify(newDesignSettings));
+          
+          // Appliquer immédiatement les variables CSS
+          const root = document.documentElement;
+          if (newDesignSettings.colors) {
+            Object.entries(newDesignSettings.colors).forEach(([key, value]) => {
+              root.style.setProperty(`--color-${key}`, value as string);
+            });
+          }
+          
+          // Déclencher les événements de mise à jour
+          window.dispatchEvent(new CustomEvent('designSettingsChanged', { detail: newDesignSettings }));
+          window.dispatchEvent(new CustomEvent('forceUpdate', { 
+            detail: { type: 'design', source: 'supabase', timestamp: Date.now() } 
+          }));
+          
+          // Notification pour TOUS les utilisateurs
+          toast.success(`🎨 Design mis à jour par ${payload.new.author_name}`, {
+            duration: 6000,
+            icon: '🎨'
           });
+          
+          console.log('✅ Design synchronisé pour tous les utilisateurs');
         }
-        
-        if (!this.isAdminUser()) {
-          this.showMobileUpdateNotification('design');
-        }
+      } catch (error) {
+        console.error('❌ Erreur sync design:', error);
       }
     }
   }
 
-  // Gérer les changements d'utilisateurs en temps réel
+  // Gérer les changements d'utilisateurs
   private handleUserChange(payload: any): void {
-    console.log('👤 Changement utilisateur:', payload);
+    console.log('👤 Changement utilisateur détecté:', payload);
     
     const event: SyncEvent = {
       id: Date.now().toString(),
@@ -256,9 +299,119 @@ export class RealTimeSyncService {
     this.handleSyncEvent(event);
   }
 
+  // Diffuser un changement admin avec sauvegarde Supabase OBLIGATOIRE
+  async broadcastChange(event: Omit<SyncEvent, 'id' | 'timestamp'>): Promise<void> {
+    const fullEvent: SyncEvent = {
+      ...event,
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      console.log('📤 Diffusion changement:', fullEvent.type, fullEvent.action);
+      
+      // 1. OBLIGATOIRE : Sauvegarder dans Supabase d'abord
+      await this.saveChangeToSupabase(fullEvent);
+      console.log('✅ Changement sauvegardé dans Supabase');
+      
+      // 2. Diffuser via canal temps réel si connecté
+      if (this.isConnected && this.channel) {
+        try {
+          const result = await this.channel.send({
+            type: 'broadcast',
+            event: 'admin_change',
+            payload: fullEvent
+          });
+          
+          if (result === 'ok') {
+            console.log('📡 Changement diffusé en temps réel');
+          } else {
+            console.warn('⚠️ Diffusion temps réel échouée, mais sauvegardé');
+          }
+        } catch (broadcastError) {
+          console.warn('⚠️ Erreur diffusion temps réel:', broadcastError);
+        }
+      } else {
+        console.log('📦 Pas de canal temps réel, mais sauvegardé dans Supabase');
+      }
+
+      // 3. Appliquer immédiatement en local
+      this.handleSyncEvent(fullEvent);
+      
+      // 4. Notification de succès
+      toast.success('✅ Modification sauvegardée et synchronisée !', {
+        duration: 3000,
+        icon: '💾'
+      });
+
+    } catch (error) {
+      console.error('❌ Erreur diffusion changement:', error);
+      toast.error('❌ Erreur lors de la synchronisation des modifications');
+      throw error;
+    }
+  }
+
+  // Sauvegarder le changement directement dans Supabase
+  private async saveChangeToSupabase(event: SyncEvent): Promise<void> {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase non configuré - impossible de synchroniser');
+    }
+
+    try {
+      const authorEmail = 'nicolas.c@lacremerie.fr'; // Email admin par défaut
+      
+      // Sauvegarder selon le type de changement
+      switch (event.type) {
+        case 'content':
+          await ContentVersioningService.saveContentVersion(
+            event.data,
+            event.adminName,
+            authorEmail,
+            'Modification collaborative du contenu'
+          );
+          break;
+          
+        case 'properties':
+          if (event.action === 'create' || event.action === 'update') {
+            await ContentVersioningService.savePropertyVersion(
+              event.data,
+              event.adminName,
+              authorEmail,
+              `Modification collaborative de ${event.data.name || 'propriété'}`
+            );
+          }
+          break;
+          
+        case 'images':
+          await ContentVersioningService.savePresentationImagesVersion(
+            event.data.category,
+            event.data.images,
+            event.adminName,
+            authorEmail,
+            'Modification collaborative des images'
+          );
+          break;
+          
+        case 'design':
+          await ContentVersioningService.saveDesignSettingsVersion(
+            event.data,
+            event.adminName,
+            authorEmail,
+            'Modification collaborative du design'
+          );
+          break;
+      }
+      
+      console.log('✅ Changement sauvegardé dans Supabase via HTTPS');
+    } catch (error) {
+      console.error('❌ Erreur sauvegarde Supabase:', error);
+      throw error;
+    }
+  }
+
   // Gérer les événements de synchronisation
   private handleSyncEvent(event: SyncEvent): void {
-    console.log('📡 Événement sync reçu:', event);
+    console.log('📡 Traitement événement sync:', event.type, event.action);
     
     try {
       // Appliquer les changements selon le type
@@ -278,9 +431,6 @@ export class RealTimeSyncService {
         case 'users':
           this.handleUsersUpdate(event);
           break;
-        case 'config':
-          this.handleConfigUpdate(event);
-          break;
       }
 
       // Notifier tous les abonnés
@@ -288,7 +438,7 @@ export class RealTimeSyncService {
         try {
           callback(event);
         } catch (error) {
-          console.error('Erreur callback subscriber:', error);
+          console.error('❌ Erreur callback subscriber:', error);
         }
       });
 
@@ -298,45 +448,7 @@ export class RealTimeSyncService {
       }
 
     } catch (error) {
-      console.error('Erreur traitement événement sync:', error);
-    }
-  }
-
-  // Diffuser un changement admin
-  async broadcastChange(event: Omit<SyncEvent, 'id' | 'timestamp'>): Promise<void> {
-    const fullEvent: SyncEvent = {
-      ...event,
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString()
-    };
-
-    try {
-      // 1. TOUJOURS sauvegarder dans Supabase d'abord
-      await this.saveChangeToSupabase(fullEvent);
-      
-      // 2. Diffuser via canal temps réel
-      if (this.isConnected && this.channel) {
-        const result = await this.channel.send({
-          type: 'broadcast',
-          event: 'admin_change',
-          payload: fullEvent
-        });
-        
-        if (result === 'ok') {
-          console.log('📤 Changement diffusé avec succès:', fullEvent.type);
-        } else {
-          console.warn('⚠️ Échec diffusion temps réel, mais sauvegardé dans Supabase');
-        }
-      } else {
-        console.log('📦 Pas de canal temps réel, mais sauvegardé dans Supabase');
-      }
-
-      // Appliquer immédiatement en local
-      this.handleSyncEvent(fullEvent);
-
-    } catch (error) {
-      console.error('Erreur diffusion changement:', error);
-      toast.error('Erreur lors de la synchronisation des modifications');
+      console.error('❌ Erreur traitement événement sync:', error);
     }
   }
 
@@ -345,8 +457,6 @@ export class RealTimeSyncService {
     if (event.action === 'update') {
       localStorage.setItem('siteContent', JSON.stringify(event.data));
       window.dispatchEvent(new CustomEvent('contentUpdated', { detail: event.data }));
-      
-      // Forcer le re-render des composants React
       this.forceComponentUpdate('content');
     }
   }
@@ -383,51 +493,38 @@ export class RealTimeSyncService {
       window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
         detail: event.data.activeImage 
       }));
-      this.forceComponentUpdate('images');
     } else if (event.data.category === 'concept') {
       localStorage.setItem('conceptImages', JSON.stringify(event.data.images));
       const siteContent = JSON.parse(localStorage.getItem('siteContent') || '{}');
       siteContent.concept = { ...siteContent.concept, image: event.data.activeImage };
       localStorage.setItem('siteContent', JSON.stringify(siteContent));
       window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
-      this.forceComponentUpdate('images');
     }
+    this.forceComponentUpdate('images');
   }
 
   // Gestion des mises à jour de design
   private handleDesignUpdate(event: SyncEvent): void {
     if (event.action === 'update') {
       localStorage.setItem('designSettings', JSON.stringify(event.data));
-      window.dispatchEvent(new CustomEvent('designSettingsChanged', { detail: event.data }));
       
-      // Appliquer les variables CSS
+      // Appliquer immédiatement les variables CSS
       const root = document.documentElement;
       if (event.data.colors) {
         Object.entries(event.data.colors).forEach(([key, value]) => {
           root.style.setProperty(`--color-${key}`, value as string);
         });
       }
+      
+      window.dispatchEvent(new CustomEvent('designSettingsChanged', { detail: event.data }));
       this.forceComponentUpdate('design');
     }
   }
 
   // Gestion des mises à jour d'utilisateurs
   private handleUsersUpdate(event: SyncEvent): void {
-    // Recharger la liste des utilisateurs si on est dans l'admin
     window.dispatchEvent(new CustomEvent('usersUpdated', { detail: event }));
     this.forceComponentUpdate('users');
-  }
-
-  // Gestion des mises à jour de configuration
-  private handleConfigUpdate(event: SyncEvent): void {
-    if (event.data.type === 'email') {
-      localStorage.setItem('emailSettings', JSON.stringify(event.data.settings));
-    } else if (event.data.type === 'seo') {
-      localStorage.setItem('seoSettings', JSON.stringify(event.data.settings));
-    }
-    
-    window.dispatchEvent(new CustomEvent('configUpdated', { detail: event.data }));
-    this.forceComponentUpdate('config');
   }
 
   // Forcer la mise à jour des composants React
@@ -437,70 +534,60 @@ export class RealTimeSyncService {
       detail: { type, timestamp: Date.now() } 
     }));
     
-    // Notification visuelle pour les utilisateurs mobiles
-    if (this.isMobileDevice() && !this.isAdminUser()) {
-      this.showMobileUpdateNotification(type);
-    }
+    console.log(`🔄 Mise à jour forcée des composants: ${type}`);
   }
 
-  // Détecter si c'est un appareil mobile
-  private isMobileDevice(): boolean {
-    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  // Fallback avec polling pour mode hors ligne
+  private startPollingFallback(): void {
+    console.log('🔄 Mode POLLING activé (fallback)');
+    
+    // Vérifier les changements toutes les 10 secondes
+    this.pollingInterval = setInterval(async () => {
+      try {
+        if (isSupabaseConfigured) {
+          // Tenter de synchroniser depuis Supabase
+          await ContentVersioningService.syncFromSupabaseToLocal();
+          
+          // Déclencher les mises à jour
+          window.dispatchEvent(new CustomEvent('forceUpdate', { 
+            detail: { type: 'all', source: 'polling', timestamp: Date.now() } 
+          }));
+        }
+      } catch (error) {
+        console.warn('⚠️ Erreur polling sync:', error);
+      }
+    }, 10000);
   }
 
-  // Notification spéciale pour mobile
-  private showMobileUpdateNotification(type: string): void {
+  // Afficher une notification de mise à jour
+  private showUpdateNotification(event: SyncEvent): void {
     const messages = {
       content: '📝 Contenu mis à jour',
-      properties: '🏠 Nouveaux biens disponibles',
+      properties: '🏠 Biens immobiliers mis à jour',
       images: '🖼️ Images mises à jour',
-      design: '🎨 Apparence mise à jour',
-      users: '👥 Données utilisateurs mises à jour',
+      design: '🎨 Design mis à jour',
+      users: '👤 Utilisateurs mis à jour',
       config: '⚙️ Configuration mise à jour'
     };
 
-    const message = messages[type as keyof typeof messages] || '🔄 Mise à jour effectuée';
+    const message = messages[event.type] || '🔄 Mise à jour effectuée';
     
-    // Toast spécial pour mobile avec durée plus longue
-    toast.success(message, {
-      duration: 4000,
-      icon: '📱',
-      style: {
-        background: '#1F2937',
-        color: '#F3F4F6',
-        fontSize: '14px',
-        padding: '12px 16px'
-      }
+    toast.success(`${message} par ${event.adminName}`, {
+      duration: 5000,
+      icon: '🔄'
     });
   }
 
   // S'abonner aux changements
   subscribe(id: string, callback: (event: SyncEvent) => void): void {
     this.subscribers.set(id, callback);
+    console.log(`📝 Abonnement ajouté: ${id} (${this.subscribers.size} total)`);
   }
 
   // Se désabonner
   unsubscribe(id: string): void {
     this.subscribers.delete(id);
-  }
-
-  // Afficher une notification de mise à jour
-  private showUpdateNotification(event: SyncEvent): void {
-    const messages = {
-      content: 'Contenu mis à jour',
-      properties: 'Biens immobiliers mis à jour',
-      images: 'Images mises à jour',
-      design: 'Design mis à jour',
-      users: 'Utilisateurs mis à jour',
-      config: 'Configuration mise à jour'
-    };
-
-    const message = messages[event.type] || 'Mise à jour effectuée';
-    
-    toast.success(`${message} par ${event.adminName}`, {
-      duration: 3000,
-      icon: '🔄'
-    });
+    console.log(`📝 Abonnement supprimé: ${id} (${this.subscribers.size} restant)`);
   }
 
   // Vérifier si c'est un utilisateur admin
@@ -522,79 +609,10 @@ export class RealTimeSyncService {
     }
   }
 
-  // Vérifier si Supabase est configuré
-  private isSupabaseConfigured(): boolean {
-    try {
-      const url = import.meta.env.VITE_SUPABASE_URL;
-      const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      return url && key && 
-             url !== 'https://your-project.supabase.co' && 
-             key !== 'your-anon-key';
-    } catch {
-      return false;
-    }
-  }
-
-  // Fallback avec polling
-  private startPollingFallback(): void {
-    console.log('🔄 Mode POLLING activé (fallback)');
-    
-    const pollInterval = setInterval(() => {
-      this.checkForStoredEvents();
-    }, 5000); // Vérifier toutes les 5 secondes
-    
-    // Nettoyer l'intervalle si la connexion se rétablit
-    const checkConnection = setInterval(() => {
-      if (this.isConnected) {
-        clearInterval(pollInterval);
-        clearInterval(checkConnection);
-        console.log('✅ Connexion rétablie, arrêt du polling');
-      }
-    }, 10000);
-  }
-
-  // Stocker un événement pour le polling
-  private storeEventForPolling(event: SyncEvent): void {
-    try {
-      const stored = localStorage.getItem('pendingEvents') || '[]';
-      const events = JSON.parse(stored);
-      events.push(event);
-      
-      // Garder seulement les 50 derniers événements
-      if (events.length > 50) {
-        events.splice(0, events.length - 50);
-      }
-      
-      localStorage.setItem('pendingEvents', JSON.stringify(events));
-    } catch (error) {
-      console.error('Erreur stockage événement:', error);
-    }
-  }
-
-  // Vérifier les événements stockés
-  private checkForStoredEvents(): void {
-    try {
-      const stored = localStorage.getItem('pendingEvents');
-      if (!stored) return;
-      
-      const events = JSON.parse(stored);
-      const lastProcessed = localStorage.getItem('lastProcessedEvent') || '0';
-      
-      events.forEach((event: SyncEvent) => {
-        if (event.timestamp > lastProcessed) {
-          this.handleSyncEvent(event);
-          localStorage.setItem('lastProcessedEvent', event.timestamp);
-        }
-      });
-    } catch (error) {
-      console.error('Erreur vérification événements:', error);
-    }
-  }
-
   // Gérer les erreurs de connexion
   private handleConnectionError(): void {
     this.isConnected = false;
-    console.log('⚠️ Passage en mode hors ligne');
+    console.log('⚠️ Passage en mode polling (erreur connexion)');
     
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
@@ -606,108 +624,33 @@ export class RealTimeSyncService {
         this.initialize();
       }, delay);
     } else {
-      console.warn('⚠️ Mode hors ligne permanent activé');
+      console.warn('⚠️ Mode polling permanent activé');
       this.startPollingFallback();
       
       if (this.isAdminUser()) {
-        toast('🔴 Mode hors ligne activé', {
-          duration: 3000,
+        toast('🟡 Mode synchronisation polling activé', {
+          duration: 4000,
           icon: '⚠️'
         });
       }
     }
   }
 
-  // Sauvegarder le changement directement dans Supabase
-  private async saveChangeToSupabase(event: SyncEvent): Promise<void> {
-    if (!this.isSupabaseConfigured()) {
-      console.warn('Supabase non configuré - impossible de synchroniser');
-      return;
-    }
-
-    try {
-      // Sauvegarder selon le type de changement
-      switch (event.type) {
-        case 'content':
-          await ContentVersioningService.saveContentVersion(
-            event.data,
-            event.adminName,
-            'nicolas.c@lacremerie.fr',
-            'Modification collaborative du contenu'
-          );
-          break;
-          
-        case 'properties':
-          if (event.action === 'create' || event.action === 'update') {
-            await ContentVersioningService.savePropertyVersion(
-              event.data,
-              event.adminName,
-              'nicolas.c@lacremerie.fr',
-              `Modification collaborative de ${event.data.name}`
-            );
-          }
-          break;
-          
-        case 'images':
-          await ContentVersioningService.savePresentationImagesVersion(
-            event.data.category,
-            event.data.images,
-            event.adminName,
-            'nicolas.c@lacremerie.fr',
-            'Modification collaborative des images'
-          );
-          break;
-          
-        case 'design':
-          await ContentVersioningService.saveDesignSettingsVersion(
-            event.data,
-            event.adminName,
-            'nicolas.c@lacremerie.fr',
-            'Modification collaborative du design'
-          );
-          break;
-      }
-      
-      console.log('✅ Changement sauvegardé dans Supabase via HTTPS');
-    } catch (error) {
-      console.error('❌ Erreur sauvegarde Supabase:', error);
-      throw error;
-    }
-  }
-
-  // Nettoyer les ressources
-  cleanup(): void {
-    if (this.channel) {
-      supabase.removeChannel(this.channel);
-      this.channel = null;
-    }
-    this.subscribers.clear();
-    this.isConnected = false;
-  }
-
-  // Déconnecter manuellement
-  disconnect(): void {
-    console.log('🔴 Passage en mode hors ligne (manuel)');
-    this.isConnected = false;
-    
-    if (this.channel) {
-      supabase.removeChannel(this.channel);
-      this.channel = null;
-    }
-    
-    // Démarrer le mode polling comme fallback
-    this.startPollingFallback();
-  }
-
   // Reconnecter manuellement
   async reconnect(): Promise<void> {
-    console.log('🟡 Passage en mode en ligne (manuel)');
-    this.reconnectAttempts = 0; // Reset des tentatives
+    console.log('🔄 Reconnexion manuelle...');
+    this.reconnectAttempts = 0;
     
-    // Nettoyer l'ancien canal si il existe
+    // Nettoyer l'ancien canal
     if (this.channel) {
       supabase.removeChannel(this.channel);
       this.channel = null;
+    }
+    
+    // Arrêter le polling
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
     }
     
     await this.initialize();
@@ -719,6 +662,23 @@ export class RealTimeSyncService {
       connected: this.isConnected,
       subscribers: this.subscribers.size
     };
+  }
+
+  // Nettoyer les ressources
+  cleanup(): void {
+    if (this.channel) {
+      supabase.removeChannel(this.channel);
+      this.channel = null;
+    }
+    
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
+    }
+    
+    this.subscribers.clear();
+    this.isConnected = false;
+    console.log('🧹 Service de synchronisation nettoyé');
   }
 }
 

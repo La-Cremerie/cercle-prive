@@ -72,11 +72,19 @@ function App() {
   // Écouter les mises à jour forcées pour mobile
   useEffect(() => {
     const handleForceUpdate = (event: CustomEvent) => {
-      console.log('🔄 Mise à jour forcée reçue:', event.detail);
+      console.log('🔄 MISE À JOUR COLLABORATIVE REÇUE:', event.detail);
       
-      // Forcer le re-render en mettant à jour un state
+      // Forcer le re-render immédiat pour afficher les changements
       setAppReady(false);
       setTimeout(() => setAppReady(true), 100);
+      
+      // Notification spéciale pour les modifications collaboratives
+      if (event.detail?.source === 'supabase') {
+        toast.success('🔄 Site mis à jour par un administrateur', {
+          duration: 5000,
+          icon: '📡'
+        });
+      }
     };
 
     window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
