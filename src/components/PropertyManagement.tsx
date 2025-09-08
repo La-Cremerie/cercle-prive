@@ -279,6 +279,7 @@ const PropertyManagement: React.FC = () => {
         ...property,
         id: crypto.randomUUID(),
         name: `${property.name} (Copie)`,
+      }
       const updatedProperties = [...properties, duplicatedProperty];
       
       // Sauvegarder avec synchronisation automatique
@@ -390,5 +391,6 @@ const PropertyManagement: React.FC = () => {
           <motion.div
             key={property.
             }
+  )
   )
 }
