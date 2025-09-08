@@ -109,8 +109,7 @@ const PropertyManagement: React.FC = () => {
         status: 'vendu',
         yield: 450000,
         isVisible: true
-      },
-      {
+      }
     ];
   });
 
