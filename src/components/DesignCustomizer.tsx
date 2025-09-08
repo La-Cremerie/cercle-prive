@@ -147,8 +147,6 @@ const DesignCustomizer: React.FC = () => {
     performSave();
   };
 
-  };
-
   const resetToDefaults = () => {
     if (window.confirm('Êtes-vous sûr de vouloir réinitialiser tous les paramètres de design ?')) {
       const defaultSettings: DesignSettings = {
