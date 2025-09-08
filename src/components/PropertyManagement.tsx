@@ -378,7 +378,7 @@ const PropertyManagement: React.FC = () => {
           >
             <div className="relative">
               <img
-                src={property.images[0] || 'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=400'}
+                src={property.images && property.images.length > 0 ? property.images[0] : 'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=400'}
                 alt={property.name}
                 className="w-full h-48 object-cover"
               />
