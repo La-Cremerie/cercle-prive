@@ -28,7 +28,6 @@ export type AdminModule =
   | 'appointments' 
   | 'properties' 
   | 'images' 
-  | 'content' 
   | 'design' 
   | 'emails'
   | 'admin_management';
@@ -53,7 +52,6 @@ export const ADMIN_ROLES: AdminRole[] = [
       appointments: { read: true, write: true, delete: true },
       properties: { read: true, write: true, delete: true },
       images: { read: true, write: true, delete: true },
-      content: { read: true, write: true, delete: true },
       design: { read: true, write: true, delete: true },
       emails: { read: true, write: true, delete: true },
       admin_management: { read: true, write: true, delete: true }
@@ -71,7 +69,6 @@ export const ADMIN_ROLES: AdminRole[] = [
       appointments: { read: true, write: true, delete: true },
       properties: { read: true, write: true, delete: true },
       images: { read: true, write: true, delete: true },
-      content: { read: true, write: true, delete: false },
       design: { read: true, write: true, delete: false },
       emails: { read: true, write: true, delete: false },
       admin_management: { read: false, write: false, delete: false }
@@ -89,7 +86,6 @@ export const ADMIN_ROLES: AdminRole[] = [
       appointments: { read: true, write: true, delete: false },
       properties: { read: true, write: true, delete: false },
       images: { read: true, write: true, delete: false },
-      content: { read: true, write: true, delete: false },
       design: { read: true, write: false, delete: false },
       emails: { read: false, write: false, delete: false },
       admin_management: { read: false, write: false, delete: false }
@@ -107,7 +103,6 @@ export const ADMIN_ROLES: AdminRole[] = [
       appointments: { read: true, write: false, delete: false },
       properties: { read: true, write: false, delete: false },
       images: { read: false, write: false, delete: false },
-      content: { read: false, write: false, delete: false },
       design: { read: false, write: false, delete: false },
       emails: { read: false, write: false, delete: false },
       admin_management: { read: false, write: false, delete: false }

@@ -759,10 +759,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
         )}
 
 
-        {activeTab === 'content' && canAccessModule('content') && (
-          <ContentManager />
-        )}
-
         {activeTab === 'design' && canAccessModule('design') && (
           <DesignCustomizer />
         )}
@@ -816,9 +812,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <DiagnosticPanel />
         )}
 
-       {activeTab === 'content_publisher' && canAccessModule('content') && (
-         <ContentPublisher />
-       )}
 
         {activeTab === 'content_diagnostic' && canAccessModule('admin_management') && (
           <ContentManagementDiagnostic />
@@ -832,9 +825,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <AuthenticationTester />
         )}
 
-        {activeTab === 'nicolas_content' && canAccessModule('content') && (
-          <NicolasContentViewer />
-        )}
 
         {/* Message d'accès refusé */}
         {!canAccessModule(activeTab as any) && (
