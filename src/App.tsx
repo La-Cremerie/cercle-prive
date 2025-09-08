@@ -227,7 +227,6 @@ function App() {
             </div>
           </div>
         )}
-        <Toaster position="top-right" />
       </>
     );
   }
@@ -277,7 +276,6 @@ function App() {
             </div>
           )}
         </div>
-        <Toaster position="top-right" />
       </>
     );
   }
@@ -287,7 +285,6 @@ function App() {
     return (
       <>
         <AdminPanel onLogout={handleAdminLogout} />
-        <Toaster position="top-right" />
       </>
     );
   }
@@ -300,7 +297,6 @@ function App() {
           onLoginSuccess={handleAdminLoginSuccess}
           onBack={handleBackFromAdminLogin}
         />
-        <Toaster position="top-right" />
       </>
     );
   }
