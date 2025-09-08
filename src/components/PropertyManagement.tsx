@@ -90,14 +90,21 @@ const PropertyManagement: React.FC = () => {
       localStorage.setItem('properties', JSON.stringify(updatedProperties));
       setProperties(updatedProperties);
       
+      // 2. Déclencher IMMÉDIATEMENT les événements de mise à jour
+      console.log('📡 Diffusion immédiate des nouvelles propriétés');
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('propertiesReload'));
+      window.dispatchEvent(new CustomEvent('adminPropertiesUpdate', { 
+        detail: { properties: updatedProperties } 
+      }));
+      
       // 2. Synchronisation automatique vers Supabase et diffusion temps réel
       console.log('🔄 Synchronisation automatique des propriétés...');
       
       // Diffuser le changement via le système de sync temps réel
       await broadcastChange('properties', 'update', updatedProperties);
       
-      // 3. Déclencher les événements de mise à jour pour tous les composants
-      window.dispatchEvent(new Event('storage'));
+      // 3. Déclencher les événements de mise à jour globaux
       window.dispatchEvent(new CustomEvent('forceUpdate', { 
         detail: { 
           type: 'properties', 
@@ -113,6 +120,10 @@ const PropertyManagement: React.FC = () => {
       // Même en cas d'erreur, sauvegarder localement
       localStorage.setItem('properties', JSON.stringify(updatedProperties));
       setProperties(updatedProperties);
+      
+      // Déclencher quand même les événements locaux
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('propertiesReload'));
       
       toast.success('💾 Propriétés sauvegardées localement (synchronisation différée)', {
         duration: 4000,

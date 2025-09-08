@@ -80,7 +80,61 @@ function App() {
       
       // Notification spéciale pour les modifications collaboratives
       if (event.detail?.source === 'supabase') {
-        toast.success('🔄 Site mis à jour par un administrateur', {
+        import('react-hot-toast').then(({ default: toast }) => {
+          toast.success('🔄 Site mis à jour par un administrateur', {
+            duration: 5000,
+            icon: '📡'
+          });
+        }).catch(() => {
+          console.log('🔄 Site mis à jour par un administrateur');
+        });
+      }
+      
+      // Forcer le rechargement des propriétés si c'est une mise à jour de propriétés
+      if (event.detail?.type === 'properties') {
+        console.log('🏠 Rechargement forcé des propriétés');
+        window.dispatchEvent(new CustomEvent('propertiesReload'));
+      }
+    };
+
+    // Gestionnaire pour les mises à jour de propriétés spécifiques
+    const handlePropertiesUpdate = (event: CustomEvent) => {
+      console.log('🏠 Mise à jour spécifique des propriétés:', event.detail);
+      
+      // Forcer le re-render pour les propriétés
+      if (event.detail?.properties) {
+        console.log('📊 Application des nouvelles propriétés');
+        // Les propriétés seront mises à jour via l'événement storage
+      }
+    };
+
+    window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
+    window.addEventListener('adminPropertiesUpdate', handlePropertiesUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
+      window.removeEventListener('adminPropertiesUpdate', handlePropertiesUpdate as EventListener);
+    };
+  }, []);
+
+  // Nouveau useEffect pour gérer les rechargements de propriétés
+  useEffect(() => {
+    const handlePropertiesReload = () => {
+      console.log('🔄 Rechargement des propriétés demandé');
+      // Forcer un re-render complet
+      setAppReady(false);
+      setTimeout(() => {
+        setAppReady(true);
+        console.log('✅ Propriétés rechargées');
+      }, 200);
+    };
+
+    window.addEventListener('propertiesReload', handlePropertiesReload);
+    
+    return () => {
+      window.removeEventListener('propertiesReload', handlePropertiesReload);
+    };
+  }, []);
           duration: 5000,
           icon: '📡'
         });

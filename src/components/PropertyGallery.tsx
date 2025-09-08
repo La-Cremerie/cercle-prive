@@ -7,10 +7,22 @@ import type { Property } from '../types/property';
 const getPropertiesFromStorage = () => {
   const stored = localStorage.getItem('properties');
   if (stored) {
-    return JSON.parse(stored);
+    try {
+      const properties = JSON.parse(stored);
+      console.log('🏠 Propriétés chargées depuis localStorage:', properties.length);
+      return properties;
+    } catch (error) {
+      console.error('❌ Erreur parsing propriétés localStorage:', error);
+      return getDefaultProperties();
+    }
   }
   
-  // Données par défaut
+  return getDefaultProperties();
+};
+
+// Données par défaut séparées pour réutilisation
+const getDefaultProperties = () => {
+  console.log('📦 Utilisation des propriétés par défaut');
   return [
     {
       id: '1',
@@ -80,17 +92,87 @@ const PropertyGallery: React.FC = () => {
   useEffect(() => {
     const handleStorageChange = () => {
       console.log('🏠 PropertyGallery: Changement détecté, rechargement des propriétés...');
-      setProperties(getPropertiesFromStorage());
+      const newProperties = getPropertiesFromStorage();
+      console.log('🔄 Nouvelles propriétés chargées:', newProperties.length);
+      setProperties(newProperties);
     };
 
     const handleForceUpdate = (event: CustomEvent) => {
       if (event.detail?.type === 'properties') {
         console.log('🏠 PropertyGallery: Mise à jour forcée des propriétés');
-        setProperties(getPropertiesFromStorage());
+        const newProperties = getPropertiesFromStorage();
+        console.log('⚡ Propriétés mises à jour:', newProperties.length);
+        setProperties(newProperties);
         
         // Notification visuelle pour l'utilisateur final
         if (event.detail?.source === 'admin-modification') {
-          toast.success('🔄 Catalogue mis à jour en temps réel !', {
+          import('react-hot-toast').then(({ default: toast }) => {
+            toast.success('🔄 Catalogue mis à jour en temps réel !', {
+              duration: 3000,
+              icon: '✨'
+            });
+          }).catch(() => {
+            console.log('✨ Catalogue mis à jour en temps réel !');
+          });
+        }
+      } else if (event.detail?.type === 'all') {
+        console.log('🔄 PropertyGallery: Mise à jour globale');
+        const newProperties = getPropertiesFromStorage();
+        setProperties(newProperties);
+      }
+    };
+
+    // Nouveau gestionnaire pour forcer le rechargement immédiat
+    const handleImmediateReload = () => {
+      console.log('⚡ PropertyGallery: Rechargement immédiat des propriétés');
+      const newProperties = getPropertiesFromStorage();
+      setProperties(newProperties);
+    };
+
+    // Gestionnaire pour les modifications admin
+    const handleAdminUpdate = (event: CustomEvent) => {
+      console.log('👨‍💼 PropertyGallery: Modification admin détectée:', event.detail);
+      if (event.detail?.properties) {
+        console.log('📊 Nouvelles propriétés depuis admin:', event.detail.properties.length);
+        setProperties(event.detail.properties);
+        localStorage.setItem('properties', JSON.stringify(event.detail.properties));
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('forceUpdate', handleForceUpdate as EventListener);
+    window.addEventListener('propertiesReload', handleImmediateReload);
+    window.addEventListener('adminPropertiesUpdate', handleAdminUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('forceUpdate', handleForceUpdate as EventListener);
+      window.removeEventListener('propertiesReload', handleImmediateReload);
+      window.removeEventListener('adminPropertiesUpdate', handleAdminUpdate as EventListener);
+    };
+  }, []);
+
+  // Vérifier et charger les propriétés au montage
+  useEffect(() => {
+    console.log('🏠 PropertyGallery: Vérification des propriétés au montage');
+    const currentProperties = getPropertiesFromStorage();
+    
+    if (currentProperties.length !== properties.length) {
+      console.log('🔄 Mise à jour nécessaire des propriétés');
+      setProperties(currentProperties);
+    }
+    
+    // Vérifier périodiquement les mises à jour
+    const interval = setInterval(() => {
+      const latestProperties = getPropertiesFromStorage();
+      if (JSON.stringify(latestProperties) !== JSON.stringify(properties)) {
+        console.log('🔄 Propriétés mises à jour automatiquement');
+        setProperties(latestProperties);
+      }
+    }, 5000); // Vérifier toutes les 5 secondes
+    
+    return () => clearInterval(interval);
+  }, [properties]);
             duration: 3000,
             icon: '✨'
           });
