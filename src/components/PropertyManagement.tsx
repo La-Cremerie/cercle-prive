@@ -88,7 +88,7 @@ const PropertyManagement: React.FC = () => {
         features: [],
         type: 'villa',
         status: 'disponible',
-        yield: 359996,
+        yield: 360000,
         isVisible: true
       }
     ];

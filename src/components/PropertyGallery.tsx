@@ -94,7 +94,8 @@ const getDefaultProperties = () => {
       features: [],
       type: 'villa',
       status: 'disponible',
-      yield: 359996
+      yield: 360000,
+      isVisible: true
     },
     {
       id: '5',
