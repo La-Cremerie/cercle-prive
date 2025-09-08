@@ -29,90 +29,90 @@ const getDefaultProperties = () => {
       name: 'Villa Horizon',
       location: 'Cannes, Côte d\'Azur',
       price: '4 500 000 €',
-      bedrooms: 6,
-      bathrooms: 4,
-      surface: 450,
+      bedrooms: 5,
+      bathrooms: 5,
+      surface: 300,
       images: [
         'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
       ],
-      description: 'Villa d\'exception avec vue panoramique sur la mer Méditerranée. Architecture contemporaine et finitions haut de gamme.',
-      features: ['Piscine à débordement', 'Vue mer panoramique', 'Garage 3 voitures', 'Jardin paysager'],
+      description: '',
+      features: [],
       type: 'villa',
       status: 'disponible',
-      yield: 180000
+      yield: 220000
     },
     {
       id: '2',
       name: 'Villa Azure',
-      location: 'Saint-Tropez',
+      location: 'Saint-Maxime',
       price: '6 200 000 €',
-      bedrooms: 8,
+      bedrooms: 5,
       bathrooms: 6,
-      surface: 600,
+      surface: 450,
       images: [
         'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800'
       ],
-      description: 'Propriété d\'exception dans un domaine privé sécurisé. Design architectural unique.',
-      features: ['Domaine privé', 'Spa privé', 'Court de tennis', 'Héliport'],
+      description: '',
+      features: [],
       type: 'villa',
       status: 'disponible',
-      yield: 248000
+      yield: 300000
     },
     {
       id: '3',
       name: 'Bastide',
-      location: 'Provence, Côte d\'Azur',
-      price: '3 800 000 €',
-      bedrooms: 5,
-      bathrooms: 3,
-      surface: 380,
+      location: 'Les Issambres',
+      price: '6 900 000 €',
+      bedrooms: 6,
+      bathrooms: 6,
+      surface: 550,
       images: [
         'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800'
       ],
-      description: 'Bastide provençale authentique avec charme traditionnel et équipements modernes.',
-      features: ['Piscine traditionnelle', 'Oliveraie', 'Cave à vin', 'Terrasses ombragées'],
-      type: 'villa',
+      description: '',
+      features: [],
+      type: 'penthouse',
       status: 'disponible',
-      yield: 152000
+      yield: 380000
     },
     {
       id: '4',
       name: 'Villa traversante',
-      location: 'Nice, Côte d\'Azur',
-      price: '5 100 000 €',
-      bedrooms: 7,
-      bathrooms: 5,
-      surface: 520,
+      location: 'Gassin',
+      price: '5 950 000 €',
+      bedrooms: 5,
+      bathrooms: 4,
+      surface: 300,
       images: [
         'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800'
       ],
-      description: 'Villa traversante avec double exposition et vues exceptionnelles.',
-      features: ['Double exposition', 'Vue mer et montagne', 'Ascenseur privé', 'Garage souterrain'],
+      description: '',
+      features: [],
       type: 'villa',
       status: 'disponible',
-      yield: 204000
+      yield: 359996
     },
     {
       id: '5',
       name: 'Villa coeur de village',
-      location: 'Mougins, Côte d\'Azur',
-      price: '4 200 000 €',
-      bedrooms: 6,
+      location: 'Saint-Tropez',
+      price: '8 900 000 €',
+      bedrooms: 5,
       bathrooms: 4,
-      surface: 420,
+      surface: 380,
       images: [
         'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
       ],
-      description: 'Villa au cœur du village historique avec cachet authentique et modernité.',
-      features: ['Centre village', 'Cachet historique', 'Rénovation moderne', 'Jardin méditerranéen'],
+      description: '',
+      features: [],
       type: 'villa',
-      status: 'disponible',
-      yield: 168000
+      status: 'vendu',
+      yield: 450000,
     }
   ];
 };
