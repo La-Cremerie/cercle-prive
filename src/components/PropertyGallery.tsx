@@ -248,7 +248,7 @@ const PropertyGallery: React.FC = () => {
             >
               <div className="relative overflow-hidden">
                 <img
-                  src={property.images[0]}
+                  src={property.images && property.images.length > 0 ? property.images[0] : 'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800'}
                   alt={property.name}
                   className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -361,7 +361,7 @@ const PropertyGallery: React.FC = () => {
                   {/* Image carousel */}
                   <div className="relative h-96">
                     <img
-                      src={selectedProperty.images[currentImageIndex]}
+                      src={selectedProperty.images && selectedProperty.images.length > 0 ? selectedProperty.images[currentImageIndex] : 'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800'}
                       alt={selectedProperty.name}
                       className="w-full h-full object-cover"
                     />
