@@ -70,7 +70,7 @@ const Navigation: React.FC<NavigationProps> = ({ onAdminClick, onLogout, onForce
                 className="text-sm font-light text-gray-700 dark:text-gray-300 hover:text-red-600 transition-colors tracking-wide"
                 title="Se déconnecter"
               >
-                LOGOUT
+                Déconnexion
               </button>
             )}
             
