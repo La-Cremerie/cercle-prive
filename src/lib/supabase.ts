@@ -50,7 +50,13 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
   }
 
   try {
+    // Test avec timeout pour éviter les blocages
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
     const { data, error } = await supabase.from('user_registrations').select('count').limit(1);
+    
+    clearTimeout(timeoutId);
     
     if (error) {
       console.error('❌ Erreur connexion Supabase:', error.message);
@@ -60,7 +66,13 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
     console.log('✅ Connexion Supabase réussie');
     return true;
   } catch (error) {
-    console.error('❌ Test connexion Supabase échoué:', error);
+    if (error.name === 'AbortError') {
+      console.warn('⚠️ Timeout connexion Supabase (>5s)');
+    } else if (error.message?.includes('Failed to fetch')) {
+      console.warn('⚠️ Pas de connexion internet ou Supabase inaccessible');
+    } else {
+      console.error('❌ Test connexion Supabase échoué:', error);
+    }
     return false;
   }
 };
