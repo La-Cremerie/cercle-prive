@@ -83,9 +83,9 @@ export const getAdminClient = () => {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
   
-  if (!supabaseUrl || !serviceRoleKey) {
-    console.warn('⚠️ Service role key not available, using regular client');
-    return supabase;
+  if (!supabaseUrl || !serviceRoleKey || serviceRoleKey === 'your-service-role-key') {
+    console.warn('⚠️ Service role key not configured, admin operations will use local storage');
+    return null;
   }
   
   return createClient(supabaseUrl, serviceRoleKey, {
@@ -280,7 +280,8 @@ export class ContentVersioningService {
     console.log('💾 ContentVersioningService.saveContentVersion appelé');
     console.log('📊 Données à sauvegarder:', { authorName, authorEmail, changeDescription });
     
-    if (!this.isSupabaseConfigured()) {
+    const adminClient = this.getAdminClient();
+    if (!this.isSupabaseConfigured() || !adminClient) {
       console.log('📦 Supabase non configuré - sauvegarde locale uniquement');
       // Fallback vers localStorage
       localStorage.setItem('siteContent', JSON.stringify(contentData));
@@ -443,7 +444,8 @@ export class ContentVersioningService {
     authorEmail: string,
     changeDescription?: string
   ): Promise<PropertyVersion> {
-    if (!this.isSupabaseConfigured()) {
+    const adminClient = this.getAdminClient();
+    if (!this.isSupabaseConfigured() || !adminClient) {
       // Fallback vers localStorage
       const stored = localStorage.getItem('properties');
       const properties = stored ? JSON.parse(stored) : [];
@@ -550,7 +552,8 @@ export class ContentVersioningService {
     authorEmail: string,
     changeDescription?: string
   ): Promise<ImageVersion> {
-    if (!this.isSupabaseConfigured()) {
+    const adminClient = this.getAdminClient();
+    if (!this.isSupabaseConfigured() || !adminClient) {
       localStorage.setItem(`${category}Images`, JSON.stringify(imagesData));
       return {
         id: Date.now().toString(),
@@ -578,7 +581,6 @@ export class ContentVersioningService {
       
       const nextVersion = await this.getNextVersionNumber('presentation_images_versions', category);
 
-      const adminClient = ContentVersioningService.getAdminClient();
       await adminClient
         .from('presentation_images_versions')
         .update({ is_current: false })
@@ -749,7 +751,8 @@ export class ContentVersioningService {
     authorName: string,
     authorEmail: string
   ): Promise<void> {
-    if (!this.isSupabaseConfigured()) {
+    const adminClient = this.getAdminClient();
+    if (!this.isSupabaseConfigured() || !adminClient) {
       toast.error('Rollback non disponible sans Supabase');
       return;
     }
