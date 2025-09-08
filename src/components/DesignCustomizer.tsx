@@ -124,19 +124,29 @@ const DesignCustomizer: React.FC = () => {
         );
         
         console.log('✅ Paramètres de design sauvegardés dans Supabase avec versioning');
+        
+        // Diffuser le changement en temps réel pour TOUS les utilisateurs
+        await broadcastChange('design', 'update', settings);
+        
       } catch (error) {
         console.warn('⚠️ Erreur sauvegarde Supabase, utilisation localStorage:', error);
       }
     };
 
-    saveToSupabase();
+    // Attendre la sauvegarde Supabase avant de continuer
+    const performSave = async () => {
+      await saveToSupabase();
+      
+      // Sauvegarder localement (fallback)
+      localStorage.setItem('designSettings', JSON.stringify(settings));
+      applyDesignSettings();
+      
+      toast.success('Paramètres de design sauvegardés et synchronisés !');
+    };
+    
+    performSave();
+  };
 
-    // Sauvegarder localement (fallback)
-    localStorage.setItem('designSettings', JSON.stringify(settings));
-    applyDesignSettings();
-    // Diffuser le changement en temps réel
-    broadcastChange('design', 'update', settings);
-    toast.success('Paramètres de design sauvegardés');
   };
 
   const resetToDefaults = () => {

@@ -96,47 +96,57 @@ const PresentationImageManager: React.FC = () => {
           );
           
           console.log(`✅ Images ${activeCategory} sauvegardées dans Supabase avec versioning`);
+          
+          // Diffuser le changement en temps réel pour TOUS les utilisateurs
+          await broadcastChange('images', 'update', {
+            category: activeCategory,
+            images: currentImages,
+            activeImage: currentImages.find(img => img.isActive)?.url
+          });
+          
         } catch (error) {
           console.warn('⚠️ Erreur sauvegarde Supabase, utilisation localStorage:', error);
         }
       };
 
-      saveToSupabase();
-
-      // Sauvegarder localement (fallback)
-      if (activeCategory === 'hero') {
-        localStorage.setItem('presentationImages', JSON.stringify(images));
-        // Déclencher un événement pour mettre à jour le hero
-        window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
-          detail: images.find(img => img.isActive)?.url 
-        }));
-        // Diffuser le changement en temps réel
-        broadcastChange('images', 'update', {
-          category: 'hero',
-          images,
-          activeImage: images.find(img => img.isActive)?.url
-        });
-      } else {
-        localStorage.setItem('conceptImages', JSON.stringify(conceptImages));
-        // Mettre à jour le contenu du site avec la nouvelle image
-        const siteContent = JSON.parse(localStorage.getItem('siteContent') || '{}');
-        const activeConceptImage = conceptImages.find(img => img.isActive);
-        if (activeConceptImage) {
-          siteContent.concept = {
-            ...siteContent.concept,
-            image: activeConceptImage.url
-          };
-          localStorage.setItem('siteContent', JSON.stringify(siteContent));
-          window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
-          // Diffuser le changement en temps réel
-          broadcastChange('images', 'update', {
-            category: 'concept',
-            images: conceptImages,
-            activeImage: activeConceptImage.url
-          });
+      // Attendre la sauvegarde Supabase avant de continuer
+      const performSave = async () => {
+        await saveToSupabase();
+        
+        // Sauvegarder localement (fallback)
+        if (activeCategory === 'hero') {
+          localStorage.setItem('presentationImages', JSON.stringify(images));
+          window.dispatchEvent(new CustomEvent('presentationImageChanged', { 
+            detail: images.find(img => img.isActive)?.url 
+          }));
+        } else {
+          localStorage.setItem('conceptImages', JSON.stringify(conceptImages));
+          const siteContent = JSON.parse(localStorage.getItem('siteContent') || '{}');
+          const activeConceptImage = conceptImages.find(img => img.isActive);
+          if (activeConceptImage) {
+            siteContent.concept = {
+              ...siteContent.concept,
+              image: activeConceptImage.url
+            };
+            localStorage.setItem('siteContent', JSON.stringify(siteContent));
+            window.dispatchEvent(new CustomEvent('contentUpdated', { detail: siteContent }));
+          }
         }
+        
+        toast.success('Images sauvegardées et synchronisées !');
+      };
+      
+      performSave();
+      
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        toast.error('Espace de stockage insuffisant. Utilisez des images plus petites ou des liens externes.');
+      } else {
+        toast.error('Erreur lors de la sauvegarde des images');
       }
-      toast.success('Images sauvegardées');
+    }
+  };
+
     } catch (error) {
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
         toast.error('Espace de stockage insuffisant. Utilisez des images plus petites ou des liens URL.');

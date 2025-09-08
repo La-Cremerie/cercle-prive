@@ -130,16 +130,26 @@ export class RealTimeSyncService {
     if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
       console.log('📝 Nouvelle version de contenu active');
       
-      // Synchroniser depuis Supabase
-      const newContent = await ContentVersioningService.getCurrentSiteContent();
-      if (newContent) {
-        localStorage.setItem('siteContent', JSON.stringify(newContent));
-        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: newContent }));
-        
-        // Notification pour les utilisateurs non-admin
-        if (!this.isAdminUser()) {
-          this.showMobileUpdateNotification('content');
+      // Synchroniser depuis Supabase IMMÉDIATEMENT
+      try {
+        const newContent = await ContentVersioningService.getCurrentSiteContent();
+        if (newContent) {
+          localStorage.setItem('siteContent', JSON.stringify(newContent));
+          window.dispatchEvent(new CustomEvent('contentUpdated', { detail: newContent }));
+          
+          // Forcer le rechargement de TOUS les composants
+          window.dispatchEvent(new CustomEvent('forceUpdate', { 
+            detail: { type: 'content', source: 'supabase', timestamp: Date.now() } 
+          }));
+          
+          // Notification pour TOUS les utilisateurs
+          toast.success('🔄 Contenu mis à jour par ' + payload.new.author_name, {
+            duration: 5000,
+            icon: '📝'
+          });
         }
+      } catch (error) {
+        console.error('Erreur sync contenu:', error);
       }
     }
   }
@@ -149,15 +159,26 @@ export class RealTimeSyncService {
     if (payload.eventType === 'UPDATE' && payload.new?.is_current) {
       console.log('🏠 Nouvelle version de propriétés active');
       
-      // Synchroniser toutes les propriétés depuis Supabase
-      const newProperties = await ContentVersioningService.getCurrentProperties();
-      if (newProperties.length > 0) {
-        localStorage.setItem('properties', JSON.stringify(newProperties));
-        window.dispatchEvent(new Event('storage'));
-        
-        if (!this.isAdminUser()) {
-          this.showMobileUpdateNotification('properties');
+      // Synchroniser toutes les propriétés depuis Supabase IMMÉDIATEMENT
+      try {
+        const newProperties = await ContentVersioningService.getCurrentProperties();
+        if (newProperties.length > 0) {
+          localStorage.setItem('properties', JSON.stringify(newProperties));
+          window.dispatchEvent(new Event('storage'));
+          
+          // Forcer le rechargement de TOUS les composants
+          window.dispatchEvent(new CustomEvent('forceUpdate', { 
+            detail: { type: 'properties', source: 'supabase', timestamp: Date.now() } 
+          }));
+          
+          // Notification pour TOUS les utilisateurs
+          toast.success('🏠 Biens immobiliers mis à jour par ' + payload.new.author_name, {
+            duration: 5000,
+            icon: '🏠'
+          });
         }
+      } catch (error) {
+        console.error('Erreur sync propriétés:', error);
       }
     }
   }
@@ -290,7 +311,10 @@ export class RealTimeSyncService {
     };
 
     try {
-      // Diffuser via Supabase
+      // 1. TOUJOURS sauvegarder dans Supabase d'abord
+      await this.saveChangeToSupabase(fullEvent);
+      
+      // 2. Diffuser via canal temps réel
       if (this.isConnected && this.channel) {
         const result = await this.channel.send({
           type: 'broadcast',
@@ -301,13 +325,10 @@ export class RealTimeSyncService {
         if (result === 'ok') {
           console.log('📤 Changement diffusé avec succès:', fullEvent.type);
         } else {
-          console.warn('⚠️ Échec diffusion, utilisation du fallback');
-          this.storeEventForPolling(fullEvent);
+          console.warn('⚠️ Échec diffusion temps réel, mais sauvegardé dans Supabase');
         }
       } else {
-        console.log('📦 Stockage local (pas de connexion temps réel)');
-        // Fallback: stocker localement pour le polling
-        this.storeEventForPolling(fullEvent);
+        console.log('📦 Pas de canal temps réel, mais sauvegardé dans Supabase');
       }
 
       // Appliquer immédiatement en local
@@ -315,8 +336,7 @@ export class RealTimeSyncService {
 
     } catch (error) {
       console.error('Erreur diffusion changement:', error);
-      // Fallback: stocker pour retry
-      this.storeEventForPolling(fullEvent);
+      toast.error('Erreur lors de la synchronisation des modifications');
     }
   }
 
@@ -595,6 +615,63 @@ export class RealTimeSyncService {
           icon: '⚠️'
         });
       }
+    }
+  }
+
+  // Sauvegarder le changement directement dans Supabase
+  private async saveChangeToSupabase(event: SyncEvent): Promise<void> {
+    if (!this.isSupabaseConfigured()) {
+      console.warn('Supabase non configuré - impossible de synchroniser');
+      return;
+    }
+
+    try {
+      // Sauvegarder selon le type de changement
+      switch (event.type) {
+        case 'content':
+          await ContentVersioningService.saveContentVersion(
+            event.data,
+            event.adminName,
+            'nicolas.c@lacremerie.fr',
+            'Modification collaborative du contenu'
+          );
+          break;
+          
+        case 'properties':
+          if (event.action === 'create' || event.action === 'update') {
+            await ContentVersioningService.savePropertyVersion(
+              event.data,
+              event.adminName,
+              'nicolas.c@lacremerie.fr',
+              `Modification collaborative de ${event.data.name}`
+            );
+          }
+          break;
+          
+        case 'images':
+          await ContentVersioningService.savePresentationImagesVersion(
+            event.data.category,
+            event.data.images,
+            event.adminName,
+            'nicolas.c@lacremerie.fr',
+            'Modification collaborative des images'
+          );
+          break;
+          
+        case 'design':
+          await ContentVersioningService.saveDesignSettingsVersion(
+            event.data,
+            event.adminName,
+            'nicolas.c@lacremerie.fr',
+            'Modification collaborative du design'
+          );
+          break;
+      }
+      
+      console.log('✅ Changement sauvegardé dans Supabase via HTTPS');
+    } catch (error) {
+      console.error('❌ Erreur sauvegarde Supabase:', error);
+      throw error;
     }
   }
 
