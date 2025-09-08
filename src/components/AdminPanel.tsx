@@ -27,6 +27,7 @@ import ContentSyncDashboard from './ContentSyncDashboard';
 import DiagnosticPanel from './DiagnosticPanel';
 import AuthenticationTester from './AuthenticationTester';
 import ContentManagementDiagnostic from './ContentManagementDiagnostic';
+import AuthenticationSecurityAudit from './AuthenticationSecurityAudit';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -482,6 +483,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     case 'sync_dashboard': return <RefreshCw className="w-4 h-4" />;
                     case 'diagnostic': return <Settings className="w-4 h-4" />;
                     case 'https_monitor': return <Shield className="w-4 h-4" />;
+                    case 'security_audit': return <Shield className="w-4 h-4" />;
                     default: return <Settings className="w-4 h-4" />;
                   }
                 };
@@ -816,6 +818,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
           <AuthenticationTester />
         )}
 
+        {activeTab === 'security_audit' && canAccessModule('admin_management') && (
+          <AuthenticationSecurityAudit />
+        )}
 
         {/* Message d'accès refusé */}
         {!canAccessModule(activeTab as any) && (

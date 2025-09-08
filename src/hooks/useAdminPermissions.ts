@@ -75,6 +75,7 @@ export const useAdminPermissions = (currentUser: AdminUser | null) => {
       { key: 'diagnostic', label: 'Diagnostic', module: 'admin_management' as AdminModule },
       { key: 'auth_test', label: 'Test Auth', module: 'admin_management' as AdminModule },
       { key: 'https_monitor', label: 'HTTPS Monitor', module: 'admin_management' as AdminModule },
+      { key: 'security_audit', label: 'Audit Sécurité', module: 'admin_management' as AdminModule },
       { key: 'content_diagnostic', label: 'Diagnostic Contenu', module: 'admin_management' as AdminModule }
     ];
 
