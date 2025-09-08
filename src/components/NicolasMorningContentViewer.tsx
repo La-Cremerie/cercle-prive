@@ -385,7 +385,7 @@ const NicolasMorningContentViewer: React.FC = () => {
             <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <div>🔒 Protocole: HTTPS/TLS 1.3</div>
               <div>👤 Auteur filtré: nicolas.c@lacremerie.fr</div>
-              <div>⏰ Période: Samedi 6 septembre, {getMorningTimeRange().start.toLocaleTimeString('fr-FR')} - {getMorningTimeRange().end.toLocaleTimeString('fr-FR')}</div>
+              <div>⏰ Période: {getMorningTimeRange().start.toLocaleTimeString('fr-FR')} - {getMorningTimeRange().end.toLocaleTimeString('fr-FR')}</div>
               <div>📊 Éléments trouvés: {morningContent.length}</div>
             </div>
           </div>
@@ -521,7 +521,7 @@ const NicolasMorningContentViewer: React.FC = () => {
         <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
           <p className="text-sm text-blue-800 dark:text-blue-200">
             <strong>Note :</strong> Ce système récupère le contenu depuis les endpoints HTTPS sécurisés de Supabase 
-            et affiche uniquement les modifications effectuées par Nicolas ce matin. 
+            et affiche uniquement les modifications effectuées par Nicolas le samedi 6 septembre matin. 
             Le contenu est présenté avec horodatage complet et métadonnées de transmission.
           </p>
         </div>
