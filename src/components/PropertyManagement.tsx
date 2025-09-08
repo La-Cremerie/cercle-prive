@@ -24,8 +24,7 @@ const PropertyManagement: React.FC = () => {
         bathrooms: 5,
         surface: 300,
         images: [
-          'https://i.postimg.cc/wTqzXXrw/Whats-App-Image-2025-09-08-at-13-03-17-1.jpg',
-          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
+          'https://i.postimg.cc/wTqzXXrw/Whats-App-Image-2025-09-08-at-13-03-17-1.jpg'
         ],
         description: '',
         features: [],
@@ -43,8 +42,7 @@ const PropertyManagement: React.FC = () => {
         bathrooms: 6,
         surface: 450,
         images: [
-          'https://i.postimg.cc/XvbKDv07/Whats-App-Image-2025-09-08-at-13-05-36.jpg',
-          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800'
+          'https://i.postimg.cc/XvbKDv07/Whats-App-Image-2025-09-08-at-13-05-36.jpg'
         ],
         description: '',
         features: [],
@@ -62,8 +60,7 @@ const PropertyManagement: React.FC = () => {
         bathrooms: 6,
         surface: 550,
         images: [
-          'https://i.postimg.cc/G3BGcDKS/Whats-App-Image-2025-09-08-at-13-05-37.jpg',
-          'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800'
+          'https://i.postimg.cc/G3BGcDKS/Whats-App-Image-2025-09-08-at-13-05-37.jpg'
         ],
         description: '',
         features: [],
@@ -81,8 +78,7 @@ const PropertyManagement: React.FC = () => {
         bathrooms: 4,
         surface: 300,
         images: [
-          'https://i.postimg.cc/63Y9pDfg/Whats-App-Image-2025-09-08-at-13-03-17.jpg',
-          'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800'
+          'https://i.postimg.cc/63Y9pDfg/Whats-App-Image-2025-09-08-at-13-03-17.jpg'
         ],
         description: '',
         features: [],
@@ -92,7 +88,24 @@ const PropertyManagement: React.FC = () => {
         isVisible: true
       },
       {
-    ];
+         id: '5',
+         name: 'Villa cœur de village',
+         location: 'Saint-Tropez',
+         price: '8 900 000 €',
+         bedrooms: 5,
+         bathrooms: 4,
+         surface: 380,
+         images: [
+           'https://i.postimg.cc/Qx993r8L/Whats-App-Image-2025-09-08-at-13-15-13.jpg'
+         ],
+         description: '',
+         features: [],
+         type: 'villa',
+         status: 'disponible',
+         yield: 450000,
+         isVisible: true
+       }
+     ];
   });
 
   const [showForm, setShowForm] = useState(false);
