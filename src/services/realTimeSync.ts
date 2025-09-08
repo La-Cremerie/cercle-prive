@@ -430,11 +430,8 @@ export class RealTimeSyncService {
       console.warn('⚠️ Impossible de vérifier la session pour sync:', authCheckError);
     }
     
-    if (!user && !authEstablished && !adminId) {
-      console.warn('⚠️ Aucune authentification disponible pour la synchronisation');
-      // Ne pas faire échouer - continuer en mode local
-      return;
-    }
+    // Toujours essayer de sauvegarder, même sans authentification complète
+    console.log('💾 Tentative de sauvegarde Supabase...');
 
     try {
       const authorEmail = localStorage.getItem('currentAdminEmail') || 'nicolas.c@lacremerie.fr';
@@ -456,6 +453,10 @@ export class RealTimeSyncService {
         case 'properties':
           if (event.action === 'create' || event.action === 'update') {
             console.log('🏠 Sauvegarde propriété...');
+            // S'assurer que la propriété a un ID
+            if (!event.data.id) {
+              event.data.id = crypto.randomUUID();
+            }
             await ContentVersioningService.savePropertyVersion(
               event.data,
               event.adminName,
@@ -493,8 +494,8 @@ export class RealTimeSyncService {
       console.log('✅ Changement sauvegardé dans Supabase via HTTPS');
     } catch (error) {
       console.warn('⚠️ Erreur sauvegarde Supabase:', error);
-      // Ne pas faire échouer - la sauvegarde locale sera utilisée
-      throw error; // Laisser l'appelant gérer l'erreur
+      // Ne pas faire échouer - continuer avec la sauvegarde locale
+      console.log('📦 Sauvegarde locale utilisée comme fallback');
     }
   }
 

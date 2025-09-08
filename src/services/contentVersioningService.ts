@@ -114,7 +114,7 @@ export class ContentVersioningService {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
     
-    if (serviceRoleKey && supabaseUrl) {
+    if (serviceRoleKey && supabaseUrl && serviceRoleKey !== 'your-service-role-key') {
       console.log('🔑 Using service role key for admin operations');
       return createClient(supabaseUrl, serviceRoleKey, {
         auth: {
@@ -124,8 +124,8 @@ export class ContentVersioningService {
       });
     }
     
-    console.log('⚠️ Service role key not available, using regular client');
-    return supabase;
+    console.log('⚠️ Service role key not configured, operations will use fallback');
+    return null;
   }
 
   // Vérifier si Supabase est configuré
@@ -281,9 +281,25 @@ export class ContentVersioningService {
     console.log('📊 Données à sauvegarder:', { authorName, authorEmail, changeDescription });
     
     const adminClient = this.getAdminClient();
-    if (!this.isSupabaseConfigured() || !adminClient) {
+    if (!this.isSupabaseConfigured()) {
       console.log('📦 Supabase non configuré - sauvegarde locale uniquement');
       // Fallback vers localStorage
+      localStorage.setItem('siteContent', JSON.stringify(contentData));
+      return {
+        id: Date.now().toString(),
+        version_number: 1,
+        content_data: contentData,
+        is_current: true,
+        author_id: null,
+        author_name: authorName,
+        author_email: authorEmail,
+        change_description: changeDescription || null,
+        created_at: new Date().toISOString()
+      };
+    }
+    
+    if (!adminClient) {
+      console.log('📦 Service role key non configuré - sauvegarde locale uniquement');
       localStorage.setItem('siteContent', JSON.stringify(contentData));
       return {
         id: Date.now().toString(),
@@ -444,9 +460,41 @@ export class ContentVersioningService {
     authorEmail: string,
     changeDescription?: string
   ): Promise<PropertyVersion> {
+    // Générer un UUID pour les nouvelles propriétés
+    if (!propertyData.id) {
+      propertyData.id = crypto.randomUUID();
+      console.log('🆔 UUID généré pour nouvelle propriété:', propertyData.id);
+    }
+    
     const adminClient = this.getAdminClient();
-    if (!this.isSupabaseConfigured() || !adminClient) {
+    if (!this.isSupabaseConfigured()) {
       // Fallback vers localStorage
+      const stored = localStorage.getItem('properties');
+      const properties = stored ? JSON.parse(stored) : [];
+      const updatedProperties = properties.map((p: any) => 
+        p.id === propertyData.id ? propertyData : p
+      );
+      if (!properties.find((p: any) => p.id === propertyData.id)) {
+        updatedProperties.push(propertyData);
+      }
+      localStorage.setItem('properties', JSON.stringify(updatedProperties));
+      
+      return {
+        id: Date.now().toString(),
+        property_id: propertyData.id,
+        version_number: 1,
+        ...propertyData,
+        is_current: true,
+        author_id: null,
+        author_name: authorName,
+        author_email: authorEmail,
+        change_description: changeDescription || null,
+        created_at: new Date().toISOString()
+      };
+    }
+    
+    if (!adminClient) {
+      console.log('📦 Service role key non configuré - sauvegarde locale uniquement');
       const stored = localStorage.getItem('properties');
       const properties = stored ? JSON.parse(stored) : [];
       const updatedProperties = properties.map((p: any) => 
@@ -553,7 +601,24 @@ export class ContentVersioningService {
     changeDescription?: string
   ): Promise<ImageVersion> {
     const adminClient = this.getAdminClient();
-    if (!this.isSupabaseConfigured() || !adminClient) {
+    if (!this.isSupabaseConfigured()) {
+      localStorage.setItem(`${category}Images`, JSON.stringify(imagesData));
+      return {
+        id: Date.now().toString(),
+        version_number: 1,
+        category,
+        images_data: imagesData,
+        is_current: true,
+        author_id: null,
+        author_name: authorName,
+        author_email: authorEmail,
+        change_description: changeDescription || null,
+        created_at: new Date().toISOString()
+      };
+    }
+    
+    if (!adminClient) {
+      console.log('📦 Service role key non configuré - sauvegarde locale uniquement');
       localStorage.setItem(`${category}Images`, JSON.stringify(imagesData));
       return {
         id: Date.now().toString(),
@@ -570,14 +635,7 @@ export class ContentVersioningService {
     }
 
     try {
-      // Vérifier l'authentification Supabase
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        console.warn('⚠️ Utilisateur non authentifié pour Supabase');
-        throw new Error('Authentification Supabase requise');
-      }
-      
-      const adminId = localStorage.getItem('currentAdminId') || user.id;
+      const adminId = localStorage.getItem('currentAdminId');
       
       const nextVersion = await this.getNextVersionNumber('presentation_images_versions', category);
 
@@ -670,7 +728,24 @@ export class ContentVersioningService {
     authorEmail: string,
     changeDescription?: string
   ): Promise<DesignVersion> {
+    const adminClient = this.getAdminClient();
     if (!this.isSupabaseConfigured()) {
+      localStorage.setItem('designSettings', JSON.stringify(settingsData));
+      return {
+        id: Date.now().toString(),
+        version_number: 1,
+        settings_data: settingsData,
+        is_current: true,
+        author_id: null,
+        author_name: authorName,
+        author_email: authorEmail,
+        change_description: changeDescription || null,
+        created_at: new Date().toISOString()
+      };
+    }
+    
+    if (!adminClient) {
+      console.log('📦 Service role key non configuré - sauvegarde locale uniquement');
       localStorage.setItem('designSettings', JSON.stringify(settingsData));
       return {
         id: Date.now().toString(),
@@ -688,7 +763,6 @@ export class ContentVersioningService {
     try {
       const nextVersion = await this.getNextVersionNumber('design_settings_versions');
 
-      const adminClient = ContentVersioningService.getAdminClient();
       await adminClient
         .from('design_settings_versions')
         .update({ is_current: false })
@@ -715,7 +789,21 @@ export class ContentVersioningService {
       return data;
     } catch (error) {
       console.error('Erreur sauvegarde design:', error);
-      throw error;
+      
+      // Fallback vers localStorage en cas d'erreur Supabase
+      localStorage.setItem('designSettings', JSON.stringify(settingsData));
+      
+      return {
+        id: Date.now().toString(),
+        version_number: 1,
+        settings_data: settingsData,
+        is_current: true,
+        author_id: null,
+        author_name: authorName,
+        author_email: authorEmail,
+        change_description: changeDescription || null,
+        created_at: new Date().toISOString()
+      };
     }
   }
 
@@ -752,15 +840,18 @@ export class ContentVersioningService {
     authorEmail: string
   ): Promise<void> {
     const adminClient = this.getAdminClient();
-    if (!this.isSupabaseConfigured() || !adminClient) {
+    if (!this.isSupabaseConfigured()) {
       toast.error('Rollback non disponible sans Supabase');
+      return;
+    }
+    
+    if (!adminClient) {
+      toast.error('Service role key requis pour le rollback');
       return;
     }
 
     try {
       const tableName = `${type}_versions`;
-      
-      const adminClient = ContentVersioningService.getAdminClient();
       
       // Récupérer la version à restaurer
       const { data: versionData, error: fetchError } = await adminClient
@@ -816,8 +907,13 @@ export class ContentVersioningService {
 
   // Obtenir le prochain numéro de version
   private static async getNextVersionNumber(tableName: string, targetId?: string): Promise<number> {
+    const adminClient = this.getAdminClient();
+    if (!adminClient) {
+      console.log('📦 Service role key non configuré - version par défaut');
+      return 1;
+    }
+    
     try {
-      const adminClient = ContentVersioningService.getAdminClient();
       const { data, error } = await adminClient.rpc('get_next_version_number', {
         table_name: tableName,
         category_filter: targetId
@@ -842,10 +938,14 @@ export class ContentVersioningService {
     changeDescription?: string,
     eventData?: any
   ): Promise<void> {
-    if (!this.isSupabaseConfigured()) return;
+    const adminClient = this.getAdminClient();
+    if (!this.isSupabaseConfigured() || !adminClient) {
+      console.log('📦 Logging d\'événement ignoré - Supabase non configuré');
+      return;
+    }
 
     try {
-      await supabase
+      await adminClient
         .from('content_sync_events')
         .insert([{
           event_type: eventType,
@@ -865,12 +965,12 @@ export class ContentVersioningService {
 
   // Récupérer les événements de synchronisation récents
   static async getRecentSyncEvents(limit: number = 50): Promise<SyncEvent[]> {
-    if (!this.isSupabaseConfigured()) {
+    const adminClient = this.getAdminClient();
+    if (!this.isSupabaseConfigured() || !adminClient) {
       return [];
     }
 
     try {
-      const adminClient = ContentVersioningService.getAdminClient();
       const { data, error } = await adminClient
         .from('content_sync_events')
         .select('*')
