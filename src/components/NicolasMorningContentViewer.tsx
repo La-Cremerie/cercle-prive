@@ -39,24 +39,42 @@ const NicolasMorningContentViewer: React.FC = () => {
     setIsLoading(true);
     
     try {
-      console.log('🔍 Recherche du contenu de Nicolas ajouté ce matin via HTTPS...');
+      console.log('🔍 Recherche du contenu de Nicolas ajouté le 6 septembre matin via HTTPS...');
       
-      const { start: morningStart, end: morningEnd } = getMorningTimeRange();
-      console.log(`📅 Recherche pour le samedi 6 septembre 2025, de ${morningStart.toLocaleString('fr-FR')} à ${morningEnd.toLocaleString('fr-FR')}`);
+      // Date spécifique : samedi 6 septembre 2025
+      const targetDate = new Date(2025, 8, 6); // Mois 8 = septembre (0-indexé)
+      const morningStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0);
+      const morningEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 12, 0, 0);
+      
+      console.log(`📅 Recherche HTTPS pour le samedi 6 septembre 2025, de ${morningStart.toLocaleString('fr-FR')} à ${morningEnd.toLocaleString('fr-FR')}`);
       const foundContent: MorningContent[] = [];
 
-      // 1. Vérifier les événements de synchronisation récents depuis Supabase (HTTPS)
+      // 1. RÉCUPÉRATION HTTPS DIRECTE depuis Supabase (pas localStorage)
       try {
-        const syncEvents = await ContentVersioningService.getRecentSyncEvents(100);
+        console.log('📡 Connexion HTTPS à Supabase...');
         
-        syncEvents.forEach(event => {
-          const eventDate = new Date(event.created_at);
+        // Récupération directe via API REST Supabase (HTTPS)
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        
+        if (!supabaseUrl || supabaseUrl === 'https://your-project.supabase.co') {
+          throw new Error('Supabase non configuré - impossible de récupérer via HTTPS');
+        }
+        
+        // 1.1 Récupérer les événements de sync via HTTPS
+        const syncResponse = await fetch(`${supabaseUrl}/rest/v1/content_sync_events?author_email=eq.nicolas.c@lacremerie.fr&created_at=gte.${morningStart.toISOString()}&created_at=lt.${morningEnd.toISOString()}&order=created_at.desc`, {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (syncResponse.ok) {
+          const syncEvents = await syncResponse.json();
+          console.log(`📡 ${syncEvents.length} événement(s) HTTPS récupéré(s) depuis Supabase`);
           
-          // Filtrer par auteur Nicolas et plage horaire matinale
-          if (event.author_email === 'nicolas.c@lacremerie.fr' && 
-              eventDate >= morningStart && 
-              eventDate <= morningEnd) {
-            
+          syncEvents.forEach((event: any) => {
             foundContent.push({
               id: event.id,
               type: event.event_type,
@@ -68,73 +86,159 @@ const NicolasMorningContentViewer: React.FC = () => {
                 author: event.author_name,
                 email: event.author_email,
                 version: event.version_number || 1,
-                protocol: 'HTTPS',
+                protocol: 'HTTPS REST API',
                 size: JSON.stringify(event.event_data || {}).length + ' bytes'
               }
             });
+          });
+        }
+        
+        // 1.2 Récupérer les versions de contenu via HTTPS
+        const contentResponse = await fetch(`${supabaseUrl}/rest/v1/site_content_versions?author_email=eq.nicolas.c@lacremerie.fr&created_at=gte.${morningStart.toISOString()}&created_at=lt.${morningEnd.toISOString()}&order=created_at.desc`, {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
           }
         });
-
-        console.log(`📡 ${foundContent.length} événement(s) HTTPS trouvé(s) depuis Supabase`);
-      } catch (error) {
-        console.warn('⚠️ Erreur accès Supabase, vérification locale:', error);
-      }
-
-      // 2. Vérifier le contenu local avec horodatage
-      const localContent = [
-        {
-          key: 'siteContent',
-          type: 'content' as const,
-          label: 'Contenu du Site'
-        },
-        {
-          key: 'properties',
-          type: 'properties' as const,
-          label: 'Biens Immobiliers'
-        },
-        {
-          key: 'presentationImages',
-          type: 'images' as const,
-          label: 'Images de Présentation'
-        },
-        {
-          key: 'designSettings',
-          type: 'design' as const,
-          label: 'Paramètres de Design'
-        }
-      ];
-
-      localContent.forEach(({ key, type, label }) => {
-        const stored = localStorage.getItem(key);
-        if (stored) {
-          try {
-            const content = JSON.parse(stored);
-            
-            // Simuler un timestamp de ce matin pour le contenu local
-            const morningTimestamp = new Date(
-              morningStart.getTime() + Math.random() * (morningEnd.getTime() - morningStart.getTime())
-            );
-
+        
+        if (contentResponse.ok) {
+          const contentVersions = await contentResponse.json();
+          console.log(`📝 ${contentVersions.length} version(s) de contenu HTTPS récupérée(s)`);
+          
+          contentVersions.forEach((version: any) => {
             foundContent.push({
-              id: `local-${key}-${Date.now()}`,
-              type,
-              timestamp: morningTimestamp.toISOString(),
-              content,
-              description: `Modifications locales - ${label}`,
-              source: 'local',
+              id: `content-${version.id}`,
+              type: 'content',
+              timestamp: version.created_at,
+              content: version.content_data,
+              description: version.change_description || 'Modification du contenu du site',
+              source: 'https',
               metadata: {
-                author: 'Nicolas',
-                email: 'nicolas.c@lacremerie.fr',
-                version: 1,
-                protocol: 'Local Storage',
-                size: stored.length + ' bytes'
+                author: version.author_name,
+                email: version.author_email,
+                version: version.version_number,
+                protocol: 'HTTPS REST API',
+                size: JSON.stringify(version.content_data).length + ' bytes'
               }
             });
-          } catch (error) {
-            console.warn(`Erreur parsing ${key}:`, error);
-          }
+          });
         }
-      });
+        
+        // 1.3 Récupérer les propriétés via HTTPS
+        const propertiesResponse = await fetch(`${supabaseUrl}/rest/v1/properties_versions?author_email=eq.nicolas.c@lacremerie.fr&created_at=gte.${morningStart.toISOString()}&created_at=lt.${morningEnd.toISOString()}&order=created_at.desc`, {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (propertiesResponse.ok) {
+          const propertyVersions = await propertiesResponse.json();
+          console.log(`🏠 ${propertyVersions.length} version(s) de propriété HTTPS récupérée(s)`);
+          
+          propertyVersions.forEach((version: any) => {
+            foundContent.push({
+              id: `property-${version.id}`,
+              type: 'properties',
+              timestamp: version.created_at,
+              content: {
+                id: version.property_id,
+                name: version.name,
+                location: version.location,
+                price: version.price,
+                bedrooms: version.bedrooms,
+                bathrooms: version.bathrooms,
+                surface: version.surface,
+                images: version.images,
+                description: version.description,
+                features: version.features,
+                type: version.type,
+                status: version.status,
+                yield: version.yield
+              },
+              description: version.change_description || `Modification de ${version.name}`,
+              source: 'https',
+              metadata: {
+                author: version.author_name,
+                email: version.author_email,
+                version: version.version_number,
+                protocol: 'HTTPS REST API',
+                size: JSON.stringify(version).length + ' bytes'
+              }
+            });
+          });
+        }
+        
+        // 1.4 Récupérer les images via HTTPS
+        const imagesResponse = await fetch(`${supabaseUrl}/rest/v1/presentation_images_versions?author_email=eq.nicolas.c@lacremerie.fr&created_at=gte.${morningStart.toISOString()}&created_at=lt.${morningEnd.toISOString()}&order=created_at.desc`, {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (imagesResponse.ok) {
+          const imageVersions = await imagesResponse.json();
+          console.log(`🖼️ ${imageVersions.length} version(s) d'images HTTPS récupérée(s)`);
+          
+          imageVersions.forEach((version: any) => {
+            foundContent.push({
+              id: `images-${version.id}`,
+              type: 'images',
+              timestamp: version.created_at,
+              content: version.images_data,
+              description: version.change_description || `Modification des images ${version.category}`,
+              source: 'https',
+              metadata: {
+                author: version.author_name,
+                email: version.author_email,
+                version: version.version_number,
+                protocol: 'HTTPS REST API',
+                size: JSON.stringify(version.images_data).length + ' bytes'
+              }
+            });
+          });
+        }
+        
+        // 1.5 Récupérer les paramètres de design via HTTPS
+        const designResponse = await fetch(`${supabaseUrl}/rest/v1/design_settings_versions?author_email=eq.nicolas.c@lacremerie.fr&created_at=gte.${morningStart.toISOString()}&created_at=lt.${morningEnd.toISOString()}&order=created_at.desc`, {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (designResponse.ok) {
+          const designVersions = await designResponse.json();
+          console.log(`🎨 ${designVersions.length} version(s) de design HTTPS récupérée(s)`);
+          
+          designVersions.forEach((version: any) => {
+            foundContent.push({
+              id: `design-${version.id}`,
+              type: 'design',
+              timestamp: version.created_at,
+              content: version.settings_data,
+              description: version.change_description || 'Modification des paramètres de design',
+              source: 'https',
+              metadata: {
+                author: version.author_name,
+                email: version.author_email,
+                version: version.version_number,
+                protocol: 'HTTPS REST API',
+                size: JSON.stringify(version.settings_data).length + ' bytes'
+              }
+            });
+          });
+        }
+        
+      } catch (error) {
+        console.error('❌ Erreur récupération HTTPS depuis Supabase:', error);
+        toast.error('Impossible de récupérer le contenu via HTTPS - Vérifiez la configuration Supabase');
+      }
 
       // Trier par timestamp (plus récent en premier)
       foundContent.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
@@ -143,14 +247,14 @@ const NicolasMorningContentViewer: React.FC = () => {
       setLastSync(new Date());
       
       if (foundContent.length === 0) {
-        toast.info('Aucun contenu de Nicolas trouvé pour ce matin');
+        toast.info('Aucun contenu HTTPS de Nicolas trouvé pour le 6 septembre matin');
       } else {
-        toast.success(`${foundContent.length} élément(s) de contenu trouvé(s)`);
+        toast.success(`${foundContent.length} élément(s) de contenu HTTPS récupéré(s) depuis Supabase`);
       }
 
     } catch (error) {
-      console.error('Erreur récupération contenu:', error);
-      toast.error('Erreur lors de la récupération du contenu');
+      console.error('Erreur récupération HTTPS:', error);
+      toast.error('Erreur lors de la récupération HTTPS depuis Supabase');
     } finally {
       setIsLoading(false);
     }
@@ -294,10 +398,10 @@ const NicolasMorningContentViewer: React.FC = () => {
         <div className="text-center py-12">
           <RefreshCw className="w-8 h-8 text-yellow-600 mx-auto mb-4 animate-spin" />
           <h2 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
-            Chargement du contenu de Nicolas d'hier...
+            Récupération HTTPS du contenu de Nicolas...
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Analyse des modifications d'hier matin en cours
+            Connexion aux endpoints Supabase via HTTPS pour le 6 septembre matin
           </p>
         </div>
       </div>
@@ -315,19 +419,19 @@ const NicolasMorningContentViewer: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl font-light text-gray-900 dark:text-white">
-                Contenu HTTPS de Nicolas - Hier Matin
+                Contenu HTTPS de Nicolas - 6 Septembre Matin
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
-                Récupération via endpoints HTTPS sécurisés
+                Récupération directe via API REST Supabase (HTTPS)
               </p>
               <div className="flex items-center space-x-4 mt-2">
                 <div className="flex items-center space-x-2 text-sm text-green-600">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Protocole HTTPS Vérifié</span>
+                  <span>API REST HTTPS Active</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-blue-600">
                   <Clock className="w-4 h-4" />
-                  <span>Hier: 00:00 - 12:00</span>
+                  <span>6 Sept: 00:00 - 12:00</span>
                 </div>
                 {lastSync && (
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
@@ -397,15 +501,16 @@ const NicolasMorningContentViewer: React.FC = () => {
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-yellow-600 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-yellow-800 dark:text-yellow-200 mb-2">
-            Aucun Contenu Matinal Trouvé
+            Aucun Contenu HTTPS Trouvé
           </h3>
           <p className="text-yellow-700 dark:text-yellow-300 mb-4">
-            Aucun ajout de Nicolas n'a été détecté ce matin via HTTPS.
+            Aucun contenu de Nicolas n'a été trouvé via HTTPS pour le 6 septembre matin.
           </p>
           <div className="text-sm text-yellow-600 dark:text-yellow-400 space-y-1">
-            <p>• Vérifiez que Nicolas a bien publié du contenu ce matin</p>
-            <p>• Assurez-vous que la synchronisation Supabase fonctionne</p>
-            <p>• Vérifiez les permissions d'accès aux endpoints HTTPS</p>
+            <p>• Vérifiez que Nicolas a publié du contenu le 6 septembre matin</p>
+            <p>• Assurez-vous que Supabase est configuré et accessible</p>
+            <p>• Vérifiez les permissions d'accès aux API REST HTTPS</p>
+            <p>• Contrôlez que les données sont bien dans la base Supabase</p>
           </div>
         </div>
       ) : (
@@ -510,19 +615,20 @@ const NicolasMorningContentViewer: React.FC = () => {
           <div>
             <h4 className="font-medium text-gray-900 dark:text-white mb-2">Critères de Filtrage</h4>
             <ul className="space-y-1 text-gray-600 dark:text-gray-400">
-              <li>• Auteur: nicolas.c@lacremerie.fr</li>
-              <li>• Période: Ce matin (00:00 - 12:00)</li>
-              <li>• Protocole: HTTPS uniquement</li>
-              <li>• Tri: Chronologique (plus récent en premier)</li>
+              <li>• Auteur: nicolas.c@lacremerie.fr (filtrage strict)</li>
+              <li>• Date: Samedi 6 septembre 2025</li>
+              <li>• Heure: 00:00 - 12:00 (matin uniquement)</li>
+              <li>• Protocole: HTTPS REST API Supabase</li>
+              <li>• Tri: Chronologique descendant</li>
             </ul>
           </div>
         </div>
         
         <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
           <p className="text-sm text-blue-800 dark:text-blue-200">
-            <strong>Note :</strong> Ce système récupère le contenu depuis les endpoints HTTPS sécurisés de Supabase 
-            et affiche uniquement les modifications effectuées par Nicolas le samedi 6 septembre matin. 
-            Le contenu est présenté avec horodatage complet et métadonnées de transmission.
+            <strong>Note :</strong> Ce système effectue une récupération directe via les API REST HTTPS de Supabase, 
+            en filtrant spécifiquement les modifications de Nicolas du samedi 6 septembre 2025 matin (00:00-12:00). 
+            Aucune donnée locale n'est utilisée - tout provient des endpoints HTTPS sécurisés.
           </p>
         </div>
       </div>
