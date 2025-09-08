@@ -138,6 +138,14 @@ export class ContentVersioningService {
     }
 
     try {
+      // Vérifier l'authentification
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        console.warn('Utilisateur non authentifié, utilisation du fallback localStorage');
+        localStorage.setItem('siteContent', JSON.stringify(contentData));
+        throw new Error('Authentification requise pour sauvegarder dans Supabase');
+      }
+
       // Obtenir le prochain numéro de version
       const nextVersion = await this.getNextVersionNumber('site_content_versions');
 
@@ -154,6 +162,7 @@ export class ContentVersioningService {
           version_number: nextVersion,
           content_data: contentData,
           is_current: true,
+          author_id: user.id,
           author_name: authorName,
           author_email: authorEmail,
           change_description: changeDescription
