@@ -144,9 +144,7 @@ export class ContentVersioningService {
       const adminName = localStorage.getItem('currentAdminName') || 'Admin';
       const adminEmail = localStorage.getItem('currentAdminEmail') || 'admin@lacremerie.fr';
 
-      const adminName = localStorage.getItem('currentAdminName') || 'Admin';
-      const adminEmail = localStorage.getItem('currentAdminEmail') || 'admin@lacremerie.fr';
-
+      if (!user || authError) {
         console.warn('Utilisateur non authentifié, utilisation du fallback localStorage');
         localStorage.setItem('siteContent', JSON.stringify(contentData));
         throw new Error('Authentification requise pour sauvegarder dans Supabase');
