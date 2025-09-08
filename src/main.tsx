@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Toaster } from 'react-hot-toast';
 import App from './App';
 import './index.css';
 import { syncService } from './services/realTimeSync';
@@ -77,11 +78,14 @@ try {
   
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
-    </React.StrictMode>
+    <>
+      <React.StrictMode>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </React.StrictMode>
+      <Toaster position="top-right" />
+    </>
   );
   
   console.log('✅ React app montée avec succès');

@@ -79,7 +79,7 @@ export interface SyncEvent {
 }
 
 // Create admin client with service role for bypassing RLS
-const getAdminClient = () => {
+export const getAdminClient = () => {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
   
@@ -110,7 +110,7 @@ export class ContentVersioningService {
   }
 
   // Create admin client that bypasses RLS
-  private getAdminClient() {
+  private static getAdminClient() {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
     
@@ -339,7 +339,7 @@ export class ContentVersioningService {
       console.log('💾 Tentative de sauvegarde Supabase...');
       
       // Use admin client to bypass RLS for content management operations
-      const adminClient = getAdminClient();
+      const adminClient = ContentVersioningService.getAdminClient();
       
       // Obtenir le prochain numéro de version
       const nextVersion = await this.getNextVersionNumber('site_content_versions');
@@ -473,12 +473,13 @@ export class ContentVersioningService {
       const nextVersion = await this.getNextVersionNumber('properties_versions', propertyData.id);
 
       // Désactiver les versions courantes de cette propriété
-      await supabase
+      const adminClient = ContentVersioningService.getAdminClient();
+      await adminClient
         .from('properties_versions')
         .update({ is_current: false })
         .eq('property_id', propertyData.id);
 
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('properties_versions')
         .insert([{
           property_id: propertyData.id,
@@ -577,12 +578,13 @@ export class ContentVersioningService {
       
       const nextVersion = await this.getNextVersionNumber('presentation_images_versions', category);
 
-      await supabase
+      const adminClient = ContentVersioningService.getAdminClient();
+      await adminClient
         .from('presentation_images_versions')
         .update({ is_current: false })
         .eq('category', category);
 
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('presentation_images_versions')
         .insert([{
           version_number: nextVersion,
@@ -684,12 +686,13 @@ export class ContentVersioningService {
     try {
       const nextVersion = await this.getNextVersionNumber('design_settings_versions');
 
-      await supabase
+      const adminClient = ContentVersioningService.getAdminClient();
+      await adminClient
         .from('design_settings_versions')
         .update({ is_current: false })
         .eq('is_current', true);
 
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('design_settings_versions')
         .insert([{
           version_number: nextVersion,
@@ -754,8 +757,10 @@ export class ContentVersioningService {
     try {
       const tableName = `${type}_versions`;
       
+      const adminClient = ContentVersioningService.getAdminClient();
+      
       // Récupérer la version à restaurer
-      const { data: versionData, error: fetchError } = await supabase
+      const { data: versionData, error: fetchError } = await adminClient
         .from(tableName)
         .select('*')
         .eq('id', versionId)
@@ -765,24 +770,24 @@ export class ContentVersioningService {
 
       // Désactiver toutes les versions courantes
       if (type === 'properties') {
-        await supabase
+        await adminClient
           .from(tableName)
           .update({ is_current: false })
           .eq('property_id', versionData.property_id);
       } else if (type === 'images') {
-        await supabase
+        await adminClient
           .from(tableName)
           .update({ is_current: false })
           .eq('category', versionData.category);
       } else {
-        await supabase
+        await adminClient
           .from(tableName)
           .update({ is_current: false })
           .eq('is_current', true);
       }
 
       // Activer la version sélectionnée
-      await supabase
+      await adminClient
         .from(tableName)
         .update({ is_current: true })
         .eq('id', versionId);
@@ -809,7 +814,8 @@ export class ContentVersioningService {
   // Obtenir le prochain numéro de version
   private static async getNextVersionNumber(tableName: string, targetId?: string): Promise<number> {
     try {
-      const { data, error } = await supabase.rpc('get_next_version_number', {
+      const adminClient = ContentVersioningService.getAdminClient();
+      const { data, error } = await adminClient.rpc('get_next_version_number', {
         table_name: tableName,
         category_filter: targetId
       });
@@ -861,7 +867,8 @@ export class ContentVersioningService {
     }
 
     try {
-      const { data, error } = await supabase
+      const adminClient = ContentVersioningService.getAdminClient();
+      const { data, error } = await adminClient
         .from('content_sync_events')
         .select('*')
         .order('created_at', { ascending: false })

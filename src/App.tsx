@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Toaster, toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 // Import direct des composants
 import LoginForm from './components/LoginForm';
@@ -227,7 +227,6 @@ function App() {
             </div>
           </div>
         )}
-        <BlankPageDetector />
         <Toaster position="top-right" />
       </>
     );
@@ -328,7 +327,6 @@ function App() {
       {(showUpdateSlider && updateInfo?.available && (isPWA || isMobile)) && (
         <UpdateSlider onClose={() => setShowUpdateSlider(false)} />
       )}
-      <Toaster position="top-right" />
     </>
   );
 }
