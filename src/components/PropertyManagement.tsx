@@ -36,7 +36,7 @@ const PropertyManagement: React.FC = () => {
       },
       {
         id: '2',
-        name: 'Villa Azure',
+       name: 'Villa Azurée',
         location: 'Saint-Maxime',
         price: '6 200 000 €',
         bedrooms: 5,
