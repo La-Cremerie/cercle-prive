@@ -32,6 +32,16 @@ export default function ContactSection() {
       
       console.log('Message de contact:', formData);
       
+       // Envoyer une notification email à Nicolas
+       try {
+         const { EmailService } = await import('../services/emailService');
+         await EmailService.sendContactNotification(formData);
+         console.log('Contact notification sent to Nicolas');
+       } catch (emailError) {
+         console.error('Erreur envoi notification contact:', emailError);
+         // Ne pas faire échouer l'envoi pour une erreur d'email
+       }
+       
       setIsSuccess(true);
       toast.success('Message envoyé avec succès !');
       

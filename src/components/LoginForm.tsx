@@ -147,10 +147,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         try {
           console.log('Attempting to send welcome emails');
           const { EmailService } = await import('../services/emailService');
-          await EmailService.sendWelcomeEmail(registeredUser);
-          await EmailService.sendAdminNotification(registeredUser);
+          
+          // Vérifier que les emails sont activés
+          const emailSettings = EmailService.getEmailSettings();
+          console.log('Email settings:', emailSettings);
+          
+          if (emailSettings.welcomeEmail) {
+            await EmailService.sendWelcomeEmail(registeredUser);
+            console.log('Welcome email sent successfully');
+          }
+          
+          if (emailSettings.adminNotification) {
+            await EmailService.sendAdminNotification(registeredUser);
+            console.log('Admin notification sent successfully');
+          }
+          
         } catch (emailError) {
-          console.warn('Erreur lors de l\'envoi des emails:', emailError);
+          console.error('Erreur lors de l\'envoi des emails:', emailError);
+          // Afficher l'erreur à l'utilisateur pour debug
+          toast.error('Erreur envoi email: ' + (emailError instanceof Error ? emailError.message : 'Erreur inconnue'));
           // Ne pas faire échouer l'inscription pour une erreur d'email
         }
         

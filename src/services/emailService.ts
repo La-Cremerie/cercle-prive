@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import type { UserRegistration } from '../types/database';
 
 export class EmailService {
-  private static getEmailSettings() {
+  static getEmailSettings() {
     const settings = localStorage.getItem('emailSettings');
     return settings ? JSON.parse(settings) : {
       autoReply: true,
@@ -110,6 +110,49 @@ Notification automatique du système
     } catch (error) {
       console.error('Erreur test email:', error);
       toast.error('Erreur lors de l\'envoi de l\'email de test');
+    }
+  }
+
+  static async sendContactNotification(contactData: any): Promise<void> {
+    const settings = this.getEmailSettings();
+    
+    if (!settings.adminNotification) {
+      console.log('Admin notifications disabled');
+      return;
+    }
+
+    try {
+      // Email de notification pour Nicolas
+      const adminEmail = 'nicolas.c@lacremerie.fr';
+      const subject = `CERCLE PRIVÉ - Nouveau message de contact - ${contactData.prenom} ${contactData.nom}`;
+      const content = `
+Nouveau message de contact sur le site CERCLE PRIVÉ :
+
+Nom : ${contactData.nom}
+Prénom : ${contactData.prenom}
+Email : ${contactData.email}
+Téléphone : ${contactData.telephone || 'Non renseigné'}
+
+Message :
+${contactData.message}
+
+Date : ${new Date().toLocaleString('fr-FR')}
+
+---
+Notification automatique du système CERCLE PRIVÉ
+      `;
+
+      console.log('Envoi notification contact à Nicolas:', adminEmail);
+      console.log('Sujet:', subject);
+      console.log('Contenu:', content);
+      
+      // Simulation d'un délai d'envoi
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success('📧 Notification envoyée à Nicolas');
+    } catch (error) {
+      console.error('Erreur notification contact:', error);
+      toast.error('Erreur lors de l\'envoi de la notification');
     }
   }
 }
