@@ -291,18 +291,6 @@ const PropertyGallery: React.FC = () => {
                   className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 
-                {/* Status Badge */}
-                <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium ${
-                  property.status === 'disponible' 
-                    ? 'bg-green-100 text-green-800'
-                    : property.status === 'reserve'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {property.status === 'disponible' ? 'Disponible' : 
-                   property.status === 'reserve' ? 'Réservé' : 'Vendu'}
-                </div>
-
                 {/* Actions */}
                 <div className="absolute top-4 right-4 flex space-x-2">
                   <button
@@ -361,16 +349,6 @@ const PropertyGallery: React.FC = () => {
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center">
                       <Bed className="w-4 h-4 mr-1" />
-                      <span>{property.bedrooms}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Bath className="w-4 h-4 mr-1" />
-                      <span>{property.bathrooms}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Square className="w-4 h-4 mr-1" />
-                      <span>{property.surface}m²</span>
-                    </div>
                   </div>
                 </div>
               </div>

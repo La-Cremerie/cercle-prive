@@ -10,7 +10,6 @@ export interface Property {
   description: string;
   features: string[];
   type: 'villa' | 'appartement' | 'penthouse';
-  status: 'disponible' | 'vendu' | 'reserve';
   yield?: number; // Rendement annuel en euros
   isVisible?: boolean; // Visibilité du bien sur le site
 }
