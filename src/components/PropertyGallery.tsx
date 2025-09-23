@@ -27,20 +27,20 @@ const getDefaultProperties = () => {
     {
       id: '1',
       name: 'Villa Horizon',
-      location: 'Cannes',
+      location: 'Les Issambres',
       price: '4 500 000 €',
-      bedrooms: 4,
-      bathrooms: 3,
-      surface: 350,
+      bedrooms: 5,
+      bathrooms: 5,
+      surface: 300,
       images: [
-        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://i.postimg.cc/wTqzXXrw/Whats-App-Image-2025-09-08-at-13-03-17-1.jpg',
+        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
       ],
-      description: 'Villa moderne avec vue panoramique sur la mer Méditerranée. Prestations haut de gamme dans un environnement privilégié.',
-      features: ['Vue mer panoramique', 'Piscine à débordement', 'Garage 2 voitures', 'Terrasse 100m²', 'Cuisine équipée'],
+      description: '',
+      features: [],
       type: 'villa',
-      yield: 250000,
-      isVisible: true
+      status: 'disponible',
+      yield: 220000
     },
     {
       id: '2',
@@ -291,6 +291,18 @@ const PropertyGallery: React.FC = () => {
                   className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 
+                {/* Status Badge */}
+                <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium ${
+                  property.status === 'disponible' 
+                    ? 'bg-green-100 text-green-800'
+                    : property.status === 'reserve'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {property.status === 'disponible' ? 'Disponible' : 
+                   property.status === 'reserve' ? 'Réservé' : 'Vendu'}
+                </div>
+
                 {/* Actions */}
                 <div className="absolute top-4 right-4 flex space-x-2">
                   <button
@@ -448,6 +460,16 @@ const PropertyGallery: React.FC = () => {
                     <div className="text-right">
                       <div className="text-2xl font-medium text-yellow-600 mb-2">
                         {selectedProperty.price}
+                      </div>
+                      <div className={`px-3 py-1 rounded-full text-sm ${
+                        selectedProperty.status === 'disponible' 
+                          ? 'bg-green-100 text-green-800'
+                          : selectedProperty.status === 'reserve'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {selectedProperty.status === 'disponible' ? 'Disponible' : 
+                         selectedProperty.status === 'reserve' ? 'Réservé' : 'Vendu'}
                       </div>
                     </div>
                   </div>

@@ -18,19 +18,20 @@ const PropertyManagement: React.FC = () => {
       {
         id: '1',
         name: 'Villa Horizon',
-        location: 'Cannes',
+        location: 'Cannes, Côte d\'Azur',
         price: '4 500 000 €',
-        bedrooms: 4,
-        bathrooms: 3,
-        surface: 350,
+        bedrooms: 5,
+        bathrooms: 5,
+        surface: 300,
         images: [
-          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
-          'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=800'
+          'https://i.postimg.cc/wTqzXXrw/Whats-App-Image-2025-09-08-at-13-03-17-1.jpg',
+          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
         ],
-        description: 'Villa moderne avec vue panoramique sur la mer Méditerranée. Prestations haut de gamme dans un environnement privilégié.',
-        features: ['Vue mer panoramique', 'Piscine à débordement', 'Garage 2 voitures', 'Terrasse 100m²', 'Cuisine équipée'],
+        description: '',
+        features: [],
         type: 'villa',
-        yield: 250000,
+        status: 'disponible',
+        yield: 220000,
         isVisible: true
       },
       {
@@ -424,6 +425,15 @@ const PropertyManagement: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {property.name}
                 </h3>
+                <span className={`px-2 py-1 text-xs rounded-full ${
+                  property.status === 'disponible'
+                    ? 'bg-green-100 text-green-800'
+                    : property.status === 'vendu'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {property.status}
+                </span>
               </div>
               
               <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
