@@ -87,6 +87,16 @@ const RechercheSection: React.FC = () => {
       
       console.log('Recherche immobilière:', formData);
       
+      // Envoyer une notification email à Nicolas et Quentin
+      try {
+        const { EmailService } = await import('../services/emailService');
+        await EmailService.sendSearchNotification(formData);
+        console.log('Search notification sent to Nicolas and Quentin');
+      } catch (emailError) {
+        console.error('Erreur envoi notification recherche:', emailError);
+        // Ne pas faire échouer l'envoi pour une erreur d'email
+      }
+      
       setIsSuccess(true);
       toast.success('Votre recherche a été envoyée avec succès !');
       

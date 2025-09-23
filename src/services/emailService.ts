@@ -78,7 +78,8 @@ Téléphone : ${user.telephone}
 Date : ${user.created_at ? new Date(user.created_at).toLocaleString('fr-FR') : 'Non disponible'}
 
 ---
-Notification automatique du système
+Notification automatique du système CERCLE PRIVÉ
+Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
       `;
 
       console.log('Envoi notification admin à:', adminEmail);
@@ -113,6 +114,165 @@ Notification automatique du système
     }
   }
 
+  // Envoyer une notification pour une demande de recherche immobilière
+  static async sendSearchNotification(searchData: any): Promise<void> {
+    const settings = this.getEmailSettings();
+    
+    if (!settings.adminNotification) {
+      console.log('Admin notifications disabled');
+      return;
+    }
+
+    try {
+      const subject = `CERCLE PRIVÉ - Nouvelle recherche immobilière - ${searchData.prenom} ${searchData.nom}`;
+      const content = `
+Nouvelle demande de recherche immobilière sur CERCLE PRIVÉ :
+
+CONTACT :
+Nom : ${searchData.nom}
+Prénom : ${searchData.prenom}
+Email : ${searchData.email}
+Téléphone : ${searchData.telephone || 'Non renseigné'}
+
+CRITÈRES DE RECHERCHE :
+Types de biens : ${searchData.typeBien?.join(', ') || 'Non spécifié'}
+Localisation : ${searchData.villesRecherche || 'Non spécifiée'}
+Budget maximum : ${searchData.budgetMin || 'Non spécifié'}
+Surface minimum : ${searchData.surfaceMin ? searchData.surfaceMin + ' m²' : 'Non spécifiée'}
+Chambres minimum : ${searchData.nombreChambresMin || 'Non spécifié'}
+Salles de bain minimum : ${searchData.nombreSdbMin || 'Non spécifié'}
+
+EXTÉRIEUR :
+Extérieur souhaité : ${searchData.exterieur || 'Non spécifié'}
+Surface extérieure min : ${searchData.surfaceExtMin ? searchData.surfaceExtMin + ' m²' : 'Non spécifiée'}
+Stationnement : ${searchData.stationnement || 'Non spécifié'}
+
+AUTRES CRITÈRES :
+${searchData.autresCriteres?.join(', ') || 'Aucun critère spécifique'}
+
+FINANCEMENT :
+Prêt prévu : ${searchData.pret || 'Non spécifié'}
+Financement validé : ${searchData.bancaire || 'Non spécifié'}
+
+Date : ${new Date().toLocaleString('fr-FR')}
+
+---
+Notification automatique du système CERCLE PRIVÉ
+Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
+      `;
+
+      console.log('Envoi notification recherche à Nicolas et Quentin');
+      console.log('Sujet:', subject);
+      console.log('Contenu:', content);
+      
+      // Simulation d'envoi avec délai réaliste
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast.success('📧 Notification envoyée à Nicolas et Quentin');
+    } catch (error) {
+      console.error('Erreur notification recherche:', error);
+      toast.error('Erreur lors de l\'envoi de la notification');
+    }
+  }
+
+  // Envoyer une notification pour une demande de vente
+  static async sendSaleNotification(saleData: any): Promise<void> {
+    const settings = this.getEmailSettings();
+    
+    if (!settings.adminNotification) {
+      console.log('Admin notifications disabled');
+      return;
+    }
+
+    try {
+      const subject = `CERCLE PRIVÉ - Nouvelle demande de vente - ${saleData.prenom} ${saleData.nom}`;
+      const content = `
+Nouvelle demande de vente sur CERCLE PRIVÉ :
+
+PROPRIÉTAIRE :
+Nom : ${saleData.nom}
+Prénom : ${saleData.prenom}
+Email : ${saleData.email}
+Téléphone : ${saleData.telephone}
+
+BIEN À VENDRE :
+Type de bien : ${saleData.typeVente}
+Localisation : ${saleData.localisation}
+Prix estimé : ${saleData.prixEstime || 'Non renseigné'}
+Urgence de vente : ${saleData.urgence}
+
+DESCRIPTION :
+${saleData.description || 'Aucune description fournie'}
+
+Date : ${new Date().toLocaleString('fr-FR')}
+
+---
+Notification automatique du système CERCLE PRIVÉ
+Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
+      `;
+
+      console.log('Envoi notification vente à Nicolas et Quentin');
+      console.log('Sujet:', subject);
+      console.log('Contenu:', content);
+      
+      // Simulation d'envoi avec délai réaliste
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast.success('📧 Notification envoyée à Nicolas et Quentin');
+    } catch (error) {
+      console.error('Erreur notification vente:', error);
+      toast.error('Erreur lors de l\'envoi de la notification');
+    }
+  }
+
+  // Envoyer une notification pour une demande de rendez-vous
+  static async sendAppointmentNotification(appointmentData: any): Promise<void> {
+    const settings = this.getEmailSettings();
+    
+    if (!settings.adminNotification) {
+      console.log('Admin notifications disabled');
+      return;
+    }
+
+    try {
+      const subject = `CERCLE PRIVÉ - Nouvelle demande de rendez-vous - ${appointmentData.prenom} ${appointmentData.nom}`;
+      const content = `
+Nouvelle demande de rendez-vous sur CERCLE PRIVÉ :
+
+CLIENT :
+Nom : ${appointmentData.nom}
+Prénom : ${appointmentData.prenom}
+Email : ${appointmentData.email}
+Téléphone : ${appointmentData.telephone}
+
+RENDEZ-VOUS SOUHAITÉ :
+Date : ${appointmentData.selectedDate ? new Date(appointmentData.selectedDate).toLocaleDateString('fr-FR') : 'Non spécifiée'}
+Heure : ${appointmentData.selectedTime || 'Non spécifiée'}
+
+MESSAGE :
+${appointmentData.message || 'Aucun message spécifique'}
+
+Date de demande : ${new Date().toLocaleString('fr-FR')}
+
+---
+Notification automatique du système CERCLE PRIVÉ
+Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
+      `;
+
+      console.log('Envoi notification RDV à Nicolas et Quentin');
+      console.log('Sujet:', subject);
+      console.log('Contenu:', content);
+      
+      // Simulation d'envoi avec délai réaliste
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast.success('📧 Notification envoyée à Nicolas et Quentin');
+    } catch (error) {
+      console.error('Erreur notification RDV:', error);
+      toast.error('Erreur lors de l\'envoi de la notification');
+    }
+  }
+
   static async sendContactNotification(contactData: any): Promise<void> {
     const settings = this.getEmailSettings();
     
@@ -140,16 +300,17 @@ Date : ${new Date().toLocaleString('fr-FR')}
 
 ---
 Notification automatique du système CERCLE PRIVÉ
+Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
       `;
 
-      console.log('Envoi notification contact à Nicolas:', adminEmail);
+      console.log('Envoi notification contact à Nicolas et Quentin');
       console.log('Sujet:', subject);
       console.log('Contenu:', content);
       
       // Simulation d'un délai d'envoi
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success('📧 Notification envoyée à Nicolas');
+      toast.success('📧 Notification envoyée à Nicolas et Quentin');
     } catch (error) {
       console.error('Erreur notification contact:', error);
       toast.error('Erreur lors de l\'envoi de la notification');

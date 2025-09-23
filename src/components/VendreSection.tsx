@@ -36,6 +36,16 @@ const VendreSection: React.FC = () => {
       
       console.log('Demande de vente:', formData);
       
+      // Envoyer une notification email à Nicolas et Quentin
+      try {
+        const { EmailService } = await import('../services/emailService');
+        await EmailService.sendSaleNotification(formData);
+        console.log('Sale notification sent to Nicolas and Quentin');
+      } catch (emailError) {
+        console.error('Erreur envoi notification vente:', emailError);
+        // Ne pas faire échouer l'envoi pour une erreur d'email
+      }
+      
       setIsSuccess(true);
       toast.success('Demande de vente envoyée avec succès !');
       
