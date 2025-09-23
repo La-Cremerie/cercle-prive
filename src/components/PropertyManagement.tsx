@@ -425,15 +425,6 @@ const PropertyManagement: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {property.name}
                 </h3>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  property.status === 'disponible'
-                    ? 'bg-green-100 text-green-800'
-                    : property.status === 'vendu'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {property.status}
-                </span>
               </div>
               
               <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
