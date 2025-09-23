@@ -62,6 +62,8 @@ const AppointmentBooking: React.FC = () => {
       try {
         const { EnhancedEmailService } = await import('../services/enhancedEmailService');
         const emailSent = await EnhancedEmailService.sendEmailWithRetry('contact', formData);
+        if (emailSent) {
+          console.log('✅ Email de contact envoyé avec succès');
         } else {
           console.warn('⚠️ Email de contact ajouté à la queue pour retry');
           toast.warning('📧 Message enregistré - notification en cours de traitement', {
