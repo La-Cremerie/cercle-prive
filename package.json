@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@supabase/supabase-js": "^2.57.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/nodemailer": "^7.0.1",

@@ -61,25 +61,21 @@ const AppointmentBooking: React.FC = () => {
       // Envoyer une notification email à Nicolas et Quentin
       try {
         const { EmailService } = await import('../services/emailService');
-        const emailSent = await EmailService.sendSaleNotification(formData);
-        
-        if (emailSent) {
-          console.log('✅ Email de vente envoyé avec succès');
-        } else {
-          console.warn('⚠️ Problème envoi email de vente');
-          toast.error('📧 Email en attente d\'envoi manuel. Vérifiez la configuration.', {
-            duration: 6000
-          });
-        }
-        
-        await EmailService.sendAppointmentNotification({
+        const emailSent = await EmailService.sendSaleNotification({
+          nom: formData.nom,
+          prenom: formData.prenom,
+          email: formData.email,
+          telephone: formData.telephone,
+          message: formData.message
+        });
           ...formData,
           selectedDate,
           selectedTime
         });
-        console.log('Appointment notification sent to Nicolas and Quentin');
+        
+        if (emailSent) {
       } catch (emailError) {
-        console.error('Erreur envoi notification RDV:', emailError);
+        console.error('Erreur envoi notification vente:', emailError);
         toast.error('📧 Problème d\'envoi email. Notification stockée pour envoi manuel.', {
           duration: 6000
         });

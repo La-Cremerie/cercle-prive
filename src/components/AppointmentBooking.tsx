@@ -62,9 +62,13 @@ const AppointmentBooking: React.FC = () => {
       try {
         const { EmailService } = await import('../services/emailService');
         const emailSent = await EmailService.sendAppointmentNotification({
-          ...formData,
+          nom: formData.nom,
+          prenom: formData.prenom,
+          email: formData.email,
+          telephone: formData.telephone,
           selectedDate,
-          selectedTime
+          selectedTime,
+          message: formData.message
         });
         
         if (emailSent) {

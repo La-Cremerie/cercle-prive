@@ -61,7 +61,7 @@ const AppointmentBooking: React.FC = () => {
       // Envoyer une notification email à Nicolas et Quentin
       try {
         const { EmailService } = await import('../services/emailService');
-        const emailSent = await EmailService.sendConnectionNotification({
+        const emailSent = await EmailService.sendConnectionNotification(formData);
           ...formData,
           selectedDate,
           selectedTime
@@ -71,13 +71,15 @@ const AppointmentBooking: React.FC = () => {
           console.log('✅ Email de connexion envoyé avec succès');
         } else {
           console.warn('⚠️ Problème envoi email de connexion');
-          // Afficher les emails en attente à l'utilisateur
-          // this.showPendingEmailsNotification();
+          toast.error('📧 Email en attente d\'envoi manuel. Vérifiez la configuration.', {
+            duration: 6000
+          });
         }
-        console.log('Appointment notification sent to Nicolas and Quentin');
       } catch (emailError) {
-        console.error('Erreur envoi notification RDV:', emailError);
-        // this.showPendingEmailsNotification();
+        console.error('Erreur envoi email de connexion:', emailError);
+        toast.error('📧 Problème d\'envoi email. Notification stockée pour envoi manuel.', {
+          duration: 6000
+        });
       }
 
       setIsSuccess(true);
