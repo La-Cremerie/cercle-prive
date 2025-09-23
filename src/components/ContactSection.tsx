@@ -60,27 +60,18 @@ const AppointmentBooking: React.FC = () => {
       
       // Envoyer une notification email à Nicolas et Quentin
       try {
-        const { EmailService } = await import('../services/emailService');
-        const emailSent = await EmailService.sendContactNotification({
-          nom: formData.nom,
-          prenom: formData.prenom,
-          email: formData.email,
-          telephone: formData.telephone,
-          message: formData.message
-        });
-        
-        if (emailSent) {
-          console.log('✅ Email de RDV envoyé avec succès');
+        const { EnhancedEmailService } = await import('../services/enhancedEmailService');
+        const emailSent = await EnhancedEmailService.sendEmailWithRetry('contact', formData);
         } else {
-          console.warn('⚠️ Problème envoi email de RDV');
-          toast.error('📧 Email en attente d\'envoi manuel. Vérifiez la configuration.', {
-            duration: 6000
+          console.warn('⚠️ Email de contact ajouté à la queue pour retry');
+          toast.warning('📧 Message enregistré - notification en cours de traitement', {
+            duration: 4000
           });
         }
       } catch (emailError) {
-        console.error('Erreur envoi notification contact:', emailError);
-        toast.error('📧 Problème d\'envoi email. Notification stockée pour envoi manuel.', {
-          duration: 6000
+        console.error('Erreur envoi notification RDV:', emailError);
+        toast.warning('📧 Message sauvegardé - retry automatique activé', {
+          duration: 4000
         });
       }
 
