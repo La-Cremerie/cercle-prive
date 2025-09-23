@@ -66,14 +66,15 @@ const AppointmentBooking: React.FC = () => {
           prenom: formData.prenom,
           email: formData.email,
           telephone: formData.telephone,
-          message: formData.message
-        });
+          message: formData.message,
           ...formData,
           selectedDate,
           selectedTime
         });
         
         if (emailSent) {
+          console.log('Email sent successfully');
+        }
       } catch (emailError) {
         console.error('Erreur envoi notification vente:', emailError);
         toast.error('📧 Problème d\'envoi email. Notification stockée pour envoi manuel.', {
