@@ -221,6 +221,13 @@ function App() {
     setForceShowLogin(false);
     toast.success('Déconnexion réussie');
   };
+
+  // Force l'affichage de la page de login
+  const forceShowLoginPage = () => {
+    setIsUserLoggedIn(false);
+    setForceShowLogin(true);
+  };
+
   // Fallback d'erreur
   if (hasError) {
     return (
@@ -302,15 +309,21 @@ function App() {
   };
 
   // Si l'utilisateur n'est pas connecté, afficher le formulaire de connexion
-  if (!isUserLoggedIn || forceShowLogin) {
+  if (!isUserLoggedIn || forceShowLogin || window.location.search.includes('show-login')) {
     return (
       <>
         <div className="relative">
           <LoginForm onLoginSuccess={handleLoginSuccess} />
-          {forceShowLogin && isUserLoggedIn && (
+          {(forceShowLogin || window.location.search.includes('show-login')) && isUserLoggedIn && (
             <div className="absolute top-4 right-4">
               <button
-                onClick={() => setForceShowLogin(false)}
+                onClick={() => {
+                  setForceShowLogin(false);
+                  // Nettoyer l'URL
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete('show-login');
+                  window.history.replaceState({}, '', url.toString());
+                }}
                 className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
               >
                 Retour au site
