@@ -1,319 +1,309 @@
+import React, { useState } from 'react';
+import { Calendar, Clock, User, Phone, Mail, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import type { UserRegistration } from '../types/database';
 
-export class EmailService {
-  static getEmailSettings() {
-    const settings = localStorage.getItem('emailSettings');
-    return settings ? JSON.parse(settings) : {
-      autoReply: true,
-      welcomeEmail: true,
-      adminNotification: true,
-      emailTemplate: `Bonjour {prenom} {nom},
+interface TimeSlot {
+  time: string;
+  available: boolean;
+}
 
-Merci pour votre inscription sur OFF MARKET.
+const AppointmentBooking: React.FC = () => {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [formData, setFormData] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-Nous sommes ravis de vous compter parmi nos clients privilégiés. Vous recevrez prochainement des informations exclusives sur nos biens immobiliers de prestige en off-market.
+  // Créneaux horaires disponibles
+  const timeSlots: TimeSlot[] = [
+    { time: '09:00', available: true },
+    { time: '10:00', available: true },
+    { time: '11:00', available: false },
+    { time: '14:00', available: true },
+    { time: '15:00', available: true },
+    { time: '16:00', available: true },
+    { time: '17:00', available: false }
+  ];
 
-Notre équipe vous contactera sous peu pour discuter de vos projets immobiliers.
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDate(new Date(e.target.value));
+    setSelectedTime(''); // Reset time when date changes
+  };
 
-Cordialement,
-L'équipe OFF MARKET
-
----
-Ce message a été envoyé automatiquement. Pour toute question, contactez-nous à nicolas.c@lacremerie.fr`
-    };
-  }
-
-  private static replaceTemplateVariables(template: string, user: UserRegistration): string {
-    return template
-      .replace(/{prenom}/g, user.prenom)
-      .replace(/{nom}/g, user.nom)
-      .replace(/{email}/g, user.email)
-      .replace(/{telephone}/g, user.telephone);
-  }
-
-  static async sendWelcomeEmail(user: UserRegistration): Promise<void> {
-    const settings = this.getEmailSettings();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    if (!settings.welcomeEmail) {
+    if (!selectedDate || !selectedTime) {
+      toast.error('Veuillez sélectionner une date et une heure');
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
-      // Simulation d'envoi d'email (en production, utilisez un service comme SendGrid, Mailgun, etc.)
-      const emailContent = this.replaceTemplateVariables(settings.emailTemplate, user);
+      // Simulation d'envoi de demande de RDV
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Ici vous intégreriez votre service d'email réel
-      console.log('Envoi email de bienvenue à:', user.email);
-      console.log('Contenu:', emailContent);
+      // Ici vous intégreriez votre système de calendrier (Google Calendar, Calendly, etc.)
+      console.log('Demande de RDV:', {
+        date: selectedDate,
+        time: selectedTime,
+        client: formData
+      });
+
+      setIsSuccess(true);
+      toast.success('Demande de rendez-vous envoyée avec succès !');
       
-      // Simulation d'un délai d'envoi
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success(`Email de bienvenue envoyé à ${user.prenom} ${user.nom}`);
     } catch (error) {
-      console.error('Erreur envoi email:', error);
-      toast.error('Erreur lors de l\'envoi de l\'email de bienvenue');
+      toast.error('Erreur lors de l\'envoi de la demande');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  if (isSuccess) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 text-center"
+      >
+        <Check className="w-16 h-16 text-green-500 mx-auto mb-6" />
+        <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-4">
+          Demande envoyée !
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          Nous vous contacterons sous 24h pour confirmer votre rendez-vous.
+        </p>
+        <button
+          onClick={() => {
+            setIsSuccess(false);
+            setSelectedDate(null);
+            setSelectedTime('');
+            setFormData({
+              nom: '',
+              prenom: '',
+              email: '',
+              telephone: '',
+              message: ''
+            });
+          }}
+          className="bg-yellow-600 text-white px-6 py-3 rounded-md hover:bg-yellow-700 transition-colors"
+        >
+          Prendre un autre rendez-vous
+        </button>
+      </motion.div>
+    );
   }
 
-  static async sendAdminNotification(user: UserRegistration): Promise<void> {
+  // Envoyer une notification de connexion avec informations IP
+  static async sendConnectionNotification(user: UserRegistration, ipAddress?: string): Promise<void> {
     const settings = this.getEmailSettings();
     
     if (!settings.adminNotification) {
+      console.log('Admin notifications disabled');
       return;
     }
 
     try {
-      // Email de notification pour l'admin
-      const adminEmail = 'nicolas.c@lacremerie.fr';
-      const subject = `OFF MARKET - Nouvelle inscription - ${user.prenom} ${user.nom}`;
+      const subject = `CERCLE PRIVÉ - Nouvelle connexion - ${user.prenom} ${user.nom}`;
       const content = `
-Nouvelle inscription sur le site OFF MARKET :
+Nouvelle connexion sur le site CERCLE PRIVÉ :
 
+UTILISATEUR CONNECTÉ :
 Nom : ${user.nom}
 Prénom : ${user.prenom}
 Email : ${user.email}
 Téléphone : ${user.telephone}
-Date : ${user.created_at ? new Date(user.created_at).toLocaleString('fr-FR') : 'Non disponible'}
+
+INFORMATIONS DE CONNEXION :
+Adresse IP : ${ipAddress || 'Non disponible'}
+Date/Heure : ${new Date().toLocaleString('fr-FR')}
+Navigateur : ${navigator.userAgent}
+URL de connexion : ${window.location.href}
+
+DONNÉES UTILISATEUR :
+Date d'inscription : ${user.created_at ? new Date(user.created_at).toLocaleString('fr-FR') : 'Non disponible'}
 
 ---
 Notification automatique du système CERCLE PRIVÉ
-Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
+Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie cachée)
       `;
 
-      console.log('Envoi notification admin à:', adminEmail);
-      console.log('Sujet:', subject);
-      console.log('Contenu:', content);
-      
-      // Simulation d'un délai d'envoi
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      toast.success('Notification admin envoyée');
-    } catch (error) {
-      console.error('Erreur notification admin:', error);
-      toast.error('Erreur lors de l\'envoi de la notification admin');
-    }
-  }
-
-  static async sendTestEmail(email: string): Promise<void> {
-    try {
-      const testUser: UserRegistration = {
-        id: 'test-id',
-        nom: 'Test',
-        prenom: 'Utilisateur',
-        email: email,
-        telephone: '01 23 45 67 89',
-        created_at: new Date().toISOString()
-      };
-
-      await this.sendWelcomeEmail(testUser);
-    } catch (error) {
-      console.error('Erreur test email:', error);
-      toast.error('Erreur lors de l\'envoi de l\'email de test');
-    }
-  }
-
-  // Envoyer une notification pour une demande de recherche immobilière
-  static async sendSearchNotification(searchData: any): Promise<void> {
-    const settings = this.getEmailSettings();
-    
-    if (!settings.adminNotification) {
-      console.log('Admin notifications disabled');
-      return;
-    }
-
-    try {
-      const subject = `CERCLE PRIVÉ - Nouvelle recherche immobilière - ${searchData.prenom} ${searchData.nom}`;
-      const content = `
-Nouvelle demande de recherche immobilière sur CERCLE PRIVÉ :
-
-CONTACT :
-Nom : ${searchData.nom}
-Prénom : ${searchData.prenom}
-Email : ${searchData.email}
-Téléphone : ${searchData.telephone || 'Non renseigné'}
-
-CRITÈRES DE RECHERCHE :
-Types de biens : ${searchData.typeBien?.join(', ') || 'Non spécifié'}
-Localisation : ${searchData.villesRecherche || 'Non spécifiée'}
-Budget maximum : ${searchData.budgetMin || 'Non spécifié'}
-Surface minimum : ${searchData.surfaceMin ? searchData.surfaceMin + ' m²' : 'Non spécifiée'}
-Chambres minimum : ${searchData.nombreChambresMin || 'Non spécifié'}
-Salles de bain minimum : ${searchData.nombreSdbMin || 'Non spécifié'}
-
-EXTÉRIEUR :
-Extérieur souhaité : ${searchData.exterieur || 'Non spécifié'}
-Surface extérieure min : ${searchData.surfaceExtMin ? searchData.surfaceExtMin + ' m²' : 'Non spécifiée'}
-Stationnement : ${searchData.stationnement || 'Non spécifié'}
-
-AUTRES CRITÈRES :
-${searchData.autresCriteres?.join(', ') || 'Aucun critère spécifique'}
-
-FINANCEMENT :
-Prêt prévu : ${searchData.pret || 'Non spécifié'}
-Financement validé : ${searchData.bancaire || 'Non spécifié'}
-
-Date : ${new Date().toLocaleString('fr-FR')}
-
----
-Notification automatique du système CERCLE PRIVÉ
-Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
-      `;
-
-      console.log('Envoi notification recherche à Nicolas et Quentin');
+      console.log('Envoi notification connexion à Nicolas et Quentin');
       console.log('Sujet:', subject);
       console.log('Contenu:', content);
       
       // Simulation d'envoi avec délai réaliste
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast.success('📧 Notification envoyée à Nicolas et Quentin');
-    } catch (error) {
-      console.error('Erreur notification recherche:', error);
-      toast.error('Erreur lors de l\'envoi de la notification');
-    }
-  }
-
-  // Envoyer une notification pour une demande de vente
-  static async sendSaleNotification(saleData: any): Promise<void> {
-    const settings = this.getEmailSettings();
-    
-    if (!settings.adminNotification) {
-      console.log('Admin notifications disabled');
-      return;
-    }
-
-    try {
-      const subject = `CERCLE PRIVÉ - Nouvelle demande de vente - ${saleData.prenom} ${saleData.nom}`;
-      const content = `
-Nouvelle demande de vente sur CERCLE PRIVÉ :
-
-PROPRIÉTAIRE :
-Nom : ${saleData.nom}
-Prénom : ${saleData.prenom}
-Email : ${saleData.email}
-Téléphone : ${saleData.telephone}
-
-BIEN À VENDRE :
-Type de bien : ${saleData.typeVente}
-Localisation : ${saleData.localisation}
-Prix estimé : ${saleData.prixEstime || 'Non renseigné'}
-Urgence de vente : ${saleData.urgence}
-
-DESCRIPTION :
-${saleData.description || 'Aucune description fournie'}
-
-Date : ${new Date().toLocaleString('fr-FR')}
-
----
-Notification automatique du système CERCLE PRIVÉ
-Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
-      `;
-
-      console.log('Envoi notification vente à Nicolas et Quentin');
-      console.log('Sujet:', subject);
-      console.log('Contenu:', content);
-      
-      // Simulation d'envoi avec délai réaliste
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast.success('📧 Notification envoyée à Nicolas et Quentin');
-    } catch (error) {
-      console.error('Erreur notification vente:', error);
-      toast.error('Erreur lors de l\'envoi de la notification');
-    }
-  }
-
-  // Envoyer une notification pour une demande de rendez-vous
-  static async sendAppointmentNotification(appointmentData: any): Promise<void> {
-    const settings = this.getEmailSettings();
-    
-    if (!settings.adminNotification) {
-      console.log('Admin notifications disabled');
-      return;
-    }
-
-    try {
-      const subject = `CERCLE PRIVÉ - Nouvelle demande de rendez-vous - ${appointmentData.prenom} ${appointmentData.nom}`;
-      const content = `
-Nouvelle demande de rendez-vous sur CERCLE PRIVÉ :
-
-CLIENT :
-Nom : ${appointmentData.nom}
-Prénom : ${appointmentData.prenom}
-Email : ${appointmentData.email}
-Téléphone : ${appointmentData.telephone}
-
-RENDEZ-VOUS SOUHAITÉ :
-Date : ${appointmentData.selectedDate ? new Date(appointmentData.selectedDate).toLocaleDateString('fr-FR') : 'Non spécifiée'}
-Heure : ${appointmentData.selectedTime || 'Non spécifiée'}
-
-MESSAGE :
-${appointmentData.message || 'Aucun message spécifique'}
-
-Date de demande : ${new Date().toLocaleString('fr-FR')}
-
----
-Notification automatique du système CERCLE PRIVÉ
-Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
-      `;
-
-      console.log('Envoi notification RDV à Nicolas et Quentin');
-      console.log('Sujet:', subject);
-      console.log('Contenu:', content);
-      
-      // Simulation d'envoi avec délai réaliste
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast.success('📧 Notification envoyée à Nicolas et Quentin');
-    } catch (error) {
-      console.error('Erreur notification RDV:', error);
-      toast.error('Erreur lors de l\'envoi de la notification');
-    }
-  }
-
-  static async sendContactNotification(contactData: any): Promise<void> {
-    const settings = this.getEmailSettings();
-    
-    if (!settings.adminNotification) {
-      console.log('Admin notifications disabled');
-      return;
-    }
-
-    try {
-      // Email de notification pour Nicolas
-      const adminEmail = 'nicolas.c@lacremerie.fr';
-      const subject = `CERCLE PRIVÉ - Nouveau message de contact - ${contactData.prenom} ${contactData.nom}`;
-      const content = `
-Nouveau message de contact sur le site CERCLE PRIVÉ :
-
-Nom : ${contactData.nom}
-Prénom : ${contactData.prenom}
-Email : ${contactData.email}
-Téléphone : ${contactData.telephone || 'Non renseigné'}
-
-Message :
-${contactData.message}
-
-Date : ${new Date().toLocaleString('fr-FR')}
-
----
-Notification automatique du système CERCLE PRIVÉ
-Destinataires : nicolas.c@lacremerie.fr (principal), quentin@lacremerie.fr (copie)
-      `;
-
-      console.log('Envoi notification contact à Nicolas et Quentin');
-      console.log('Sujet:', subject);
-      console.log('Contenu:', content);
-      
-      // Simulation d'un délai d'envoi
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success('📧 Notification envoyée à Nicolas et Quentin');
+      toast.success('📧 Notification de connexion envoyée à Nicolas et Quentin');
     } catch (error) {
-      console.error('Erreur notification contact:', error);
-      toast.error('Erreur lors de l\'envoi de la notification');
+      console.error('Erreur notification connexion:', error);
+      toast.error('Erreur lors de l\'envoi de la notification de connexion');
     }
   }
-}
+
+  return (
+    <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+      <div className="text-center mb-8">
+        <Calendar className="w-12 h-12 text-yellow-600 mx-auto mb-4" />
+        <h2 className="text-2xl font-light text-gray-900 dark:text-white mb-2">
+          Prendre Rendez-vous
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400">
+          Planifiez une consultation personnalisée avec nos experts
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Informations personnelles */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Nom *
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                value={formData.nom}
+                onChange={(e) => setFormData(prev => ({ ...prev, nom: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Prénom *
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                value={formData.prenom}
+                onChange={(e) => setFormData(prev => ({ ...prev, prenom: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email *
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Téléphone *
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="tel"
+                value={formData.telephone}
+                onChange={(e) => setFormData(prev => ({ ...prev, telephone: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Sélection de date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Date souhaitée *
+          </label>
+          <input
+            type="date"
+            min={new Date().toISOString().split('T')[0]}
+            onChange={handleDateChange}
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            required
+          />
+        </div>
+
+        {/* Sélection d'heure */}
+        {selectedDate && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="space-y-3"
+          >
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Heure souhaitée *
+            </label>
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+              {timeSlots.map((slot) => (
+                <button
+                  key={slot.time}
+                  type="button"
+                  disabled={!slot.available}
+                  onClick={() => setSelectedTime(slot.time)}
+                  className={`p-3 rounded-md text-sm font-medium transition-colors ${
+                    selectedTime === slot.time
+                      ? 'bg-yellow-600 text-white'
+                      : slot.available
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-50 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <Clock className="w-4 h-4 mx-auto mb-1" />
+                  {slot.time}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Message */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Message (optionnel)
+          </label>
+          <textarea
+            value={formData.message}
+            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+            rows={4}
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            placeholder="Décrivez votre projet immobilier..."
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting || !selectedDate || !selectedTime}
+          className="w-full bg-yellow-600 text-white py-3 px-4 rounded-md hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? 'Envoi en cours...' : 'Confirmer le rendez-vous'}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default AppointmentBooking;
