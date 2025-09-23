@@ -57,6 +57,20 @@ const AppointmentBooking: React.FC = () => {
         time: selectedTime,
         client: formData
       });
+      
+      // Envoyer une notification email à Nicolas et Quentin
+      try {
+        const { EmailService } = await import('../services/emailService');
+        await EmailService.sendAppointmentNotification({
+          ...formData,
+          selectedDate,
+          selectedTime
+        });
+        console.log('Appointment notification sent to Nicolas and Quentin');
+      } catch (emailError) {
+        console.error('Erreur envoi notification RDV:', emailError);
+        // Ne pas faire échouer l'envoi pour une erreur d'email
+      }
 
       setIsSuccess(true);
       toast.success('Demande de rendez-vous envoyée avec succès !');
