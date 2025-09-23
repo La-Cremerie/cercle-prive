@@ -3,6 +3,7 @@ import { User, Phone, Mail, UserCheck, Eye, EyeOff, LogIn, UserPlus } from 'luci
 import { UserService } from '../services/userService';
 import type { NewUserRegistration } from '../types/database';
 import toast from 'react-hot-toast';
+import { privacyMonitoring } from '../services/privacyCompliantMonitoring';
 
 interface LoginFormProps {
   onLoginSuccess: () => void;
@@ -114,6 +115,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         localStorage.setItem('userLoggedIn', 'true');
         localStorage.setItem('userData', JSON.stringify(user));
         
+        // Logger la connexion réussie (anonymisée)
+        privacyMonitoring.logLoginAttempt(true);
+        
         toast.success(`Welcome back, ${user.prenom}!`);
         
         onLoginSuccess();
@@ -142,6 +146,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         console.log('User registered successfully, storing session');
         localStorage.setItem('userLoggedIn', 'true');
         localStorage.setItem('userData', JSON.stringify(registeredUser));
+        
+        // Logger l'inscription réussie (anonymisée)
+        privacyMonitoring.logSecurityEvent({
+          event_type: 'registration',
+          status: 'success',
+          details: { form_type: 'user_registration' }
+        });
         
         // Envoyer les emails automatiques (simulation)
         try {
@@ -182,6 +193,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     } catch (err) {
       console.error('Login/Registration error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
+      
+      // Logger la tentative échouée (anonymisée)
+      privacyMonitoring.logLoginAttempt(false);
+      
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Shield, Eye, EyeOff } from 'lucide-react';
 import { AdminService } from '../services/adminService';
+import { privacyMonitoring } from '../services/privacyCompliantMonitoring';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
@@ -32,8 +33,13 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBack }) => {
       localStorage.setItem('currentAdminId', adminUser.id);
       localStorage.setItem('currentAdminName', `${adminUser.prenom} ${adminUser.nom}`);
       
+      // Logger l'accès admin réussi (anonymisé)
+      privacyMonitoring.logAdminAccess(true);
+      
       onLoginSuccess();
     } catch (err) {
+      // Logger la tentative d'accès admin échouée (anonymisée)
+      privacyMonitoring.logAdminAccess(false);
       setError(err instanceof Error ? err.message : 'Erreur de connexion');
     } finally {
       setIsLoading(false);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, Phone, Mail, Send, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { privacyMonitoring } from '../services/privacyCompliantMonitoring';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -42,6 +43,9 @@ export default function ContactSection() {
          // Ne pas faire échouer l'envoi pour une erreur d'email
        }
        
+      // Logger la soumission de formulaire (anonymisée)
+      privacyMonitoring.logFormSubmission('contact', true);
+      
       setIsSuccess(true);
       toast.success('Message envoyé avec succès !');
       
@@ -58,6 +62,8 @@ export default function ContactSection() {
       }, 3000);
       
     } catch (error) {
+      // Logger l'échec de soumission (anonymisée)
+      privacyMonitoring.logFormSubmission('contact', false);
       toast.error('Erreur lors de l\'envoi du message');
     } finally {
       setIsSubmitting(false);
