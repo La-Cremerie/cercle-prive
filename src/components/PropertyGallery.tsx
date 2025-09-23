@@ -349,6 +349,15 @@ const PropertyGallery: React.FC = () => {
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center">
                       <Bed className="w-4 h-4 mr-1" />
+                      <span>{property.bedrooms}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Bath className="w-4 h-4 mr-1" />
+                      <span>{property.bathrooms}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Square className="w-4 h-4 mr-1" />
+                      <span>{property.surface}m²</span>
                   </div>
                 </div>
               </div>
