@@ -284,5 +284,6 @@ const AppointmentBooking: React.FC = () => {
       </form>
     </div>
   );
+};
 
 export default AppointmentBooking;
