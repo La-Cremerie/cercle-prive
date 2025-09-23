@@ -61,7 +61,7 @@ const AppointmentBooking: React.FC = () => {
       // Envoyer une notification email à Nicolas et Quentin
       try {
         const { EnhancedEmailService } = await import('../services/enhancedEmailService');
-        const emailSent = await EnhancedEmailService.sendEmailWithRetry('connection', formData);
+        const emailSent = await EnhancedEmailService.sendEmailWithRetry('connection', {
           nom: formData.nom,
           prenom: formData.prenom,
           email: formData.email,
