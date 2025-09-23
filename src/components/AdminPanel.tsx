@@ -1,7 +1,279 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, User, Phone, Mail, Check } from 'lucide-react';
+import { Calendar, Clock, User, Phone, Mail, Check, Settings, Users, BarChart3, MessageSquare, Home, Image, FileText, Palette, Shield, Activity, TestTube, Globe, Eye, Database, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import EmailJSSetupGuide from './EmailJSSetupGuide';
+
+// Import des composants admin (lazy loading pour optimisation)
+const UserManagement = React.lazy(() => import('./UserManagement'));
+const StatsCharts = React.lazy(() => import('./StatsCharts'));
+const CRMSystem = React.lazy(() => import('./CRMSystem'));
+const PropertyManagement = React.lazy(() => import('./PropertyManagement'));
+const ContentManager = React.lazy(() => import('./ContentManager'));
+const PresentationImageManager = React.lazy(() => import('./PresentationImageManager'));
+const DesignCustomizer = React.lazy(() => import('./DesignCustomizer'));
+const AdminUserManagement = React.lazy(() => import('./AdminUserManagement'));
+const AdvancedAnalytics = React.lazy(() => import('./AdvancedAnalytics'));
+const AuthenticationTester = React.lazy(() => import('./AuthenticationTester'));
+const ContentManagementDiagnostic = React.lazy(() => import('./ContentManagementDiagnostic'));
+const AuthenticationSecurityAudit = React.lazy(() => import('./AuthenticationSecurityAudit'));
+const PrivacyCompliantDashboard = React.lazy(() => import('./PrivacyCompliantDashboard'));
+const ContentSyncDashboard = React.lazy(() => import('./ContentSyncDashboard'));
+
+interface AdminPanelProps {
+  onLogout: () => void;
+}
+
+const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
+  const [activeTab, setActiveTab] = useState('users');
+  const [users, setUsers] = useState(() => {
+    const stored = localStorage.getItem('localUsers');
+    return stored ? JSON.parse(stored) : [];
+  });
+  const [showEmailSetup, setShowEmailSetup] = useState(false);
+  const [pendingEmails, setPendingEmails] = useState(() => {
+    const stored = localStorage.getItem('pendingEmails');
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // Simuler un utilisateur admin pour les composants qui en ont besoin
+  const currentUser = {
+    id: '1',
+    email: 'nicolas.c@lacremerie.fr',
+    nom: 'Crémerie',
+    prenom: 'Nicolas',
+    role: 'super_admin' as const,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    last_login: new Date().toISOString(),
+    created_by: null
+  };
+
+  const tabs = [
+    { key: 'users', label: 'Utilisateurs', icon: Users },
+    { key: 'stats', label: 'Statistiques', icon: BarChart3 },
+    { key: 'crm', label: 'CRM', icon: MessageSquare },
+    { key: 'properties', label: 'Biens', icon: Home },
+    { key: 'content', label: 'Contenu', icon: FileText },
+    { key: 'images', label: 'Images', icon: Image },
+    { key: 'design', label: 'Design', icon: Palette },
+    { key: 'emails', label: 'Emails', icon: Mail },
+    { key: 'admin_users', label: 'Admins', icon: Shield },
+    { key: 'analytics', label: 'Analytics', icon: Activity },
+    { key: 'auth_test', label: 'Test Auth', icon: TestTube },
+    { key: 'content_diagnostic', label: 'Diagnostic', icon: Database },
+    { key: 'security_audit', label: 'Audit Sécurité', icon: Shield },
+    { key: 'privacy_monitoring', label: 'Surveillance', icon: Eye },
+    { key: 'sync_dashboard', label: 'Synchronisation', icon: Globe }
+  ];
+
+  const clearPendingEmails = () => {
+    localStorage.removeItem('pendingEmails');
+    setPendingEmails([]);
+    toast.success('Emails en attente supprimés');
+  };
+
+  const renderTabContent = () => {
+    const LoadingSpinner = () => (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-8 h-8 border-2 border-gray-300 border-t-yellow-600 rounded-full animate-spin"></div>
+        <span className="ml-3 text-gray-600">Chargement...</span>
+      </div>
+    );
+
+    return (
+      <React.Suspense fallback={<LoadingSpinner />}>
+        {(() => {
+          switch (activeTab) {
+            case 'users':
+              return <UserManagement users={users} onUsersChange={setUsers} />;
+            case 'stats':
+              return <StatsCharts users={users} />;
+            case 'crm':
+              return <CRMSystem users={users} />;
+            case 'properties':
+              return <PropertyManagement />;
+            case 'content':
+              return <ContentManager />;
+            case 'images':
+              return <PresentationImageManager />;
+            case 'design':
+              return <DesignCustomizer />;
+            case 'emails':
+              return showEmailSetup ? (
+                <EmailJSSetupGuide />
+              ) : (
+                <div className="space-y-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                      📧 Configuration des Emails Automatiques
+                    </h3>
+                    
+                    {pendingEmails.length > 0 && (
+                      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+                        <h4 className="text-yellow-800 dark:text-yellow-200 font-medium mb-2">
+                          📦 {pendingEmails.length} email(s) en attente d'envoi
+                        </h4>
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                          {pendingEmails.slice(-5).map((email: any, index: number) => (
+                            <div key={index} className="text-sm text-yellow-700 dark:text-yellow-300">
+                              <strong>{email.subject}</strong> - {email.to} - {new Date(email.timestamp).toLocaleString('fr-FR')}
+                            </div>
+                          ))}
+                        </div>
+                        <button
+                          onClick={clearPendingEmails}
+                          className="mt-3 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors text-sm"
+                        >
+                          Vider la liste
+                        </button>
+                      </div>
+                    )}
+                    
+                    <div className="space-y-4">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <h4 className="text-blue-800 dark:text-blue-200 font-medium mb-2">
+                          📧 État actuel du système d'emails
+                        </h4>
+                        <ul className="text-blue-700 dark:text-blue-300 space-y-1 text-sm">
+                          <li>✅ Emails de connexion (avec IP) - Configuré</li>
+                          <li>✅ Emails de recherche immobilière - Configuré</li>
+                          <li>✅ Emails de demande de vente - Configuré</li>
+                          <li>✅ Emails de prise de RDV - Configuré</li>
+                          <li>✅ Emails de contact - Configuré</li>
+                          <li>⚠️ Service d'envoi - À configurer (EmailJS)</li>
+                        </ul>
+                      </div>
+                      
+                      <button
+                        onClick={() => setShowEmailSetup(true)}
+                        className="w-full bg-green-600 text-white py-3 px-6 rounded-md hover:bg-green-700 transition-colors font-medium"
+                      >
+                        🚀 Configurer EmailJS pour l'envoi automatique
+                      </button>
+                      
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <p><strong>Destinataires configurés :</strong></p>
+                        <p>• Principal : nicolas.c@lacremerie.fr</p>
+                        <p>• Copie cachée : quentin@lacremerie.fr</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            case 'admin_users':
+              return <AdminUserManagement currentUser={currentUser} />;
+            case 'analytics':
+              return <AdvancedAnalytics users={users} />;
+            case 'auth_test':
+              return <AuthenticationTester />;
+            case 'content_diagnostic':
+              return <ContentManagementDiagnostic />;
+            case 'security_audit':
+              return <AuthenticationSecurityAudit />;
+            case 'privacy_monitoring':
+              return <PrivacyCompliantDashboard />;
+            case 'sync_dashboard':
+              return <ContentSyncDashboard />;
+            default:
+              return <UserManagement users={users} onUsersChange={setUsers} />;
+          }
+        })()}
+      </React.Suspense>
+    );
+  };
+
+  if (showEmailSetup && activeTab === 'emails') {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <h1 className="text-xl font-light text-gray-900 dark:text-white">
+                CERCLE PRIVÉ - Configuration EmailJS
+              </h1>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => setShowEmailSetup(false)}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                >
+                  Retour au panel
+                </button>
+                <button
+                  onClick={onLogout}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                >
+                  Déconnexion
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <EmailJSSetupGuide />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <h1 className="text-xl font-light text-gray-900 dark:text-white">
+              CERCLE PRIVÉ - Administration
+            </h1>
+            <div className="flex items-center space-x-4">
+              {pendingEmails.length > 0 && (
+                <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 rounded-full text-sm">
+                  <Mail className="w-4 h-4" />
+                  <span>{pendingEmails.length} email(s) en attente</span>
+                </div>
+              )}
+              <button
+                onClick={onLogout}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              >
+                Déconnexion
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar */}
+          <div className="lg:w-64 flex-shrink-0">
+            <nav className="space-y-2">
+              {tabs.map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${
+                    activeTab === key
+                      ? 'bg-yellow-600 text-white'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="font-medium">{label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            {renderTabContent()}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminPanel;
 
 interface TimeSlot {
   time: string;
@@ -61,15 +333,25 @@ const AppointmentBooking: React.FC = () => {
       // Envoyer une notification email à Nicolas et Quentin
       try {
         const { EmailService } = await import('../services/emailService');
-        await EmailService.sendAppointmentNotification({
+        const emailSent = await EmailService.sendAppointmentNotification({
           ...formData,
           selectedDate,
           selectedTime
         });
-        console.log('Appointment notification sent to Nicolas and Quentin');
+        
+        if (emailSent) {
+          console.log('✅ Email de RDV envoyé avec succès');
+        } else {
+          console.warn('⚠️ Problème envoi email de RDV');
+          toast.error('📧 Email en attente d\'envoi manuel. Vérifiez la configuration.', {
+            duration: 6000
+          });
+        }
       } catch (emailError) {
         console.error('Erreur envoi notification RDV:', emailError);
-        // Ne pas faire échouer l'envoi pour une erreur d'email
+        toast.error('📧 Problème d\'envoi email. Notification stockée pour envoi manuel.', {
+          duration: 6000
+        });
       }
 
       setIsSuccess(true);

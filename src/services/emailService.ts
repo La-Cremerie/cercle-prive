@@ -8,110 +8,6 @@ interface TimeSlot {
   available: boolean;
 }
 
-// Service d'envoi d'emails automatiques
-export class EmailService {
-  private static readonly RECIPIENTS = {
-    primary: 'nicolas.c@lacremerie.fr',
-    bcc: 'quentin@lacremerie.fr',
-    // Configuration pour service d'email réel
-    apiEndpoint: '/api/send-email' // Endpoint à configurer côté serveur
-  };
-
-  // Obtenir l'adresse IP de l'utilisateur
-  private static async getUserIP(): Promise<string> {
-    try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip;
-    } catch (error) {
-      return 'IP non disponible';
-    }
-  }
-
-  // Envoyer un email générique
-  private static async sendEmail(subject: string, content: string): Promise<boolean> {
-    try {
-      console.log('📧 Tentative d\'envoi email:', {
-        to: this.RECIPIENTS.primary,
-        bcc: this.RECIPIENTS.bcc,
-        subject,
-        timestamp: new Date().toISOString()
-      });
-
-      // Méthode 1: Essayer avec un service d'email API (recommandé)
-      try {
-        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'User-ID': 'YOUR_USER_ID' // À remplacer par votre User ID EmailJS
-          },
-          body: JSON.stringify({
-            service_id: 'YOUR_SERVICE_ID', // À remplacer par votre Service ID
-            template_id: 'YOUR_TEMPLATE_ID', // À remplacer par votre Template ID
-            user_id: 'YOUR_USER_ID',
-            template_params: {
-              to_email: this.RECIPIENTS.primary,
-              bcc_email: this.RECIPIENTS.bcc,
-              subject: subject,
-              message: content,
-              from_name: 'CERCLE PRIVÉ'
-            }
-          })
-        });
-        
-        if (response.ok) {
-          console.log('✅ Email envoyé via EmailJS');
-          return true;
-        }
-      } catch (emailJSError) {
-        console.warn('⚠️ EmailJS non configuré ou erreur:', emailJSError);
-      }
-
-      // Méthode 2: Essayer avec mailto (fallback)
-      try {
-        const mailtoLink = `mailto:${this.RECIPIENTS.primary}?bcc=${this.RECIPIENTS.bcc}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(content.replace(/<[^>]*>/g, ''))}`;
-        
-        // Créer un lien invisible et le cliquer
-        const link = document.createElement('a');
-        link.href = mailtoLink;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        console.log('📧 Email ouvert via client mail par défaut');
-        return true;
-      } catch (mailtoError) {
-        console.warn('⚠️ Erreur mailto:', mailtoError);
-      }
-
-      // Méthode 3: Notification à l'utilisateur pour envoi manuel
-      const emailData = {
-        to: this.RECIPIENTS.primary,
-        bcc: this.RECIPIENTS.bcc,
-        subject,
-        content: content.replace(/<[^>]*>/g, '') // Supprimer les balises HTML
-      };
-      
-      // Stocker pour envoi manuel si nécessaire
-      const pendingEmails = JSON.parse(localStorage.getItem('pendingEmails') || '[]');
-      pendingEmails.push({
-        ...emailData,
-        timestamp: new Date().toISOString()
-      });
-      localStorage.setItem('pendingEmails', JSON.stringify(pendingEmails));
-      
-      console.log('📦 Email stocké pour envoi manuel');
-
-      return true;
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi de l\'email:', error);
-      return false;
-    }
-  }
-}
-
 const AppointmentBooking: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>('');
@@ -149,6 +45,13 @@ const AppointmentBooking: React.FC = () => {
       return;
     }
 
+  // Configuration EmailJS - À REMPLACER par vos vraies clés
+  private static readonly EMAILJS_CONFIG = {
+    USER_ID: 'YOUR_EMAILJS_USER_ID',        // Remplacez par votre User ID
+    SERVICE_ID: 'YOUR_EMAILJS_SERVICE_ID',  // Remplacez par votre Service ID
+    TEMPLATE_ID: 'YOUR_EMAILJS_TEMPLATE_ID' // Remplacez par votre Template ID
+  };
+
     setIsSubmitting(true);
 
     try {
@@ -161,6 +64,20 @@ const AppointmentBooking: React.FC = () => {
         time: selectedTime,
         client: formData
       });
+      
+      // Envoyer une notification email à Nicolas et Quentin
+      try {
+        const { EmailService } = await import('../services/emailService');
+        await EmailService.sendAppointmentNotification({
+          ...formData,
+          selectedDate,
+          selectedTime
+        });
+        console.log('Appointment notification sent to Nicolas and Quentin');
+      } catch (emailError) {
+        console.error('Erreur envoi notification RDV:', emailError);
+        // Ne pas faire échouer l'envoi pour une erreur d'email
+      }
 
       setIsSuccess(true);
       toast.success('Demande de rendez-vous envoyée avec succès !');
@@ -175,6 +92,12 @@ const AppointmentBooking: React.FC = () => {
   if (isSuccess) {
     return (
       <motion.div
+      // Vérifier si EmailJS est configuré
+      if (this.EMAILJS_CONFIG.USER_ID === 'YOUR_EMAILJS_USER_ID') {
+        console.warn('⚠️ EmailJS non configuré - utilisez les instructions ci-dessous');
+        return false;
+      }
+
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 text-center"
@@ -182,9 +105,9 @@ const AppointmentBooking: React.FC = () => {
         <Check className="w-16 h-16 text-green-500 mx-auto mb-6" />
         <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-4">
           Demande envoyée !
-        </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
-          Nous vous contacterons sous 24h pour confirmer votre rendez-vous.
+          service_id: this.EMAILJS_CONFIG.SERVICE_ID,
+          template_id: this.EMAILJS_CONFIG.TEMPLATE_ID,
+          user_id: this.EMAILJS_CONFIG.USER_ID,
         </p>
         <button
           onClick={() => {

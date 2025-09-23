@@ -71,6 +71,9 @@ const AppointmentBooking: React.FC = () => {
             duration: 6000
           });
         }
+        
+        await EmailService.sendAppointmentNotification({
+          ...formData,
           selectedDate,
           selectedTime
         });
