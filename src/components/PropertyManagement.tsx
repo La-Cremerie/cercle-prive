@@ -16,25 +16,6 @@ const PropertyManagement: React.FC = () => {
     // Données par défaut si aucune propriété stockée
     return [
       {
-        id: '1',
-        name: 'Villa Horizon',
-        location: 'Cannes, Côte d\'Azur',
-        price: '4 500 000 €',
-        bedrooms: 5,
-        bathrooms: 5,
-        surface: 300,
-        images: [
-          'https://i.postimg.cc/wTqzXXrw/Whats-App-Image-2025-09-08-at-13-03-17-1.jpg',
-          'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
-        ],
-        description: '',
-        features: [],
-        type: 'villa',
-        status: 'disponible',
-        yield: 220000,
-        isVisible: true
-      },
-      {
         id: '2',
        name: 'Villa Azurée',
         location: 'Saint-Maxime',
