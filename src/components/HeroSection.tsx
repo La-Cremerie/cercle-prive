@@ -26,7 +26,7 @@ const HeroSection: React.FC = () => {
     }
     
     // Image par défaut seulement si aucune image admin
-    return 'https://i.postimg.cc/dVVFMXmf/Capture-d-e-cran-2025-09-03-a-06-19-50.png';
+    return 'https://i.postimg.cc/nVPWgBmx/vue-mer-1.png';
   });
   const [imageLoaded, setImageLoaded] = useState(false);
   const [heroContent, setHeroContent] = useState(() => {
@@ -164,7 +164,7 @@ const HeroSection: React.FC = () => {
         <div 
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url(https://i.postimg.cc/dVVFMXmf/Capture-d-e-cran-2025-09-03-a-06-19-50.png)`
+            backgroundImage: `url(https://i.postimg.cc/nVPWgBmx/vue-mer-1.png)`
           }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
