@@ -11,7 +11,7 @@ export class AdminService {
       
       // 1. Vérifier d'abord avec les comptes de développement
       const DEV_ACCOUNTS = {
-        'nicolas.c@lacremerie.fr': 'lacremerie2025',
+        'nicolas.c@lacremerie.fr': 'admin123',
         'quentin@lacremerie.fr': '123'
       };
 
@@ -36,28 +36,15 @@ export class AdminService {
           created_by: null
         };
 
-        // Établir une session Supabase pour l'authentification
-        try {
-          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
-          
-          if (!authError && authData.user) {
-            console.log('✅ Session Supabase établie');
-          } else {
-            console.warn('⚠️ Session Supabase non établie, mode local uniquement');
-          }
-        } catch (authError) {
-          console.warn('⚠️ Erreur session Supabase:', authError);
-        }
+        // Mode développement - pas besoin d'authentification Supabase
+        console.log('✅ Mode développement - authentification locale');
 
         // Stocker les informations admin
         localStorage.setItem('currentAdminId', devAdmin.id);
         localStorage.setItem('currentAdminEmail', devAdmin.email);
         localStorage.setItem('currentAdminName', `${devAdmin.prenom} ${devAdmin.nom}`);
         localStorage.setItem('currentAdminRole', devAdmin.role);
-        localStorage.setItem('supabaseAuthEstablished', 'true');
+        localStorage.setItem('supabaseAuthEstablished', 'dev');
 
         return devAdmin;
       }

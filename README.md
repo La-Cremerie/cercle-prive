@@ -61,7 +61,7 @@ npm run dev
 
 ### **Accès Admin** (Développement uniquement)
 - **Email** : `nicolas.c@lacremerie.fr`
-- **Mot de passe** : `lacremerie2025`
+- **Mot de passe** : `admin123`
 
 ## 📱 **Fonctionnalités**
 
