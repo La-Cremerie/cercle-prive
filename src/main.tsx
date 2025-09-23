@@ -1,150 +1,284 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { Toaster } from 'react-hot-toast';
-import App from './App';
-import './index.css';
-import { syncService } from './services/realTimeSync';
-import { BlankPageDiagnostics } from './utils/diagnostics';
-import { privacyMonitoring } from './services/privacyCompliantMonitoring';
+import React, { useState } from 'react';
+import { Calendar, Clock, User, Phone, Mail, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
-// Composant d'erreur de fallback
-const ErrorFallback = ({ error }: { error: Error }) => (
-  <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-    <div className="text-center max-w-md">
-      <h1 className="text-2xl font-light text-yellow-600 tracking-wider mb-4">
-        CERCLE PRIVÉ
-      </h1>
-      <p className="text-gray-400 mb-6">
-        Erreur de chargement de l'application
-      </p>
-      <div className="space-y-3">
-        <button
-          onClick={() => window.location.reload()}
-          className="w-full px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
-        >
-          Recharger la page
-        </button>
+interface TimeSlot {
+  time: string;
+  available: boolean;
+}
+
+const AppointmentBooking: React.FC = () => {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [formData, setFormData] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  // Créneaux horaires disponibles
+  const timeSlots: TimeSlot[] = [
+    { time: '09:00', available: true },
+    { time: '10:00', available: true },
+    { time: '11:00', available: false },
+    { time: '14:00', available: true },
+    { time: '15:00', available: true },
+    { time: '16:00', available: true },
+    { time: '17:00', available: false }
+  ];
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDate(new Date(e.target.value));
+    setSelectedTime(''); // Reset time when date changes
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedDate || !selectedTime) {
+      toast.error('Veuillez sélectionner une date et une heure');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Simulation d'envoi de demande de RDV
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Ici vous intégreriez votre système de calendrier (Google Calendar, Calendly, etc.)
+      console.log('Demande de RDV:', {
+        date: selectedDate,
+        time: selectedTime,
+        client: formData
+      });
+      
+      // Envoyer une notification email à Nicolas et Quentin
+      try {
+        const { EnhancedEmailService } = await import('../services/enhancedEmailService');
+        const emailSent = await EnhancedEmailService.sendEmailWithRetry('appointment', formData, {
+          selectedDate,
+          selectedTime
+        });
+        
+        if (emailSent) {
+          console.log('✅ Email de RDV envoyé avec succès');
+        } else {
+          console.warn('⚠️ Email de RDV ajouté à la queue pour retry');
+          toast.warning('📧 RDV enregistré - notification en cours de traitement', {
+            duration: 4000
+          });
+        }
+      } catch (emailError) {
+        console.error('Erreur envoi notification RDV:', emailError);
+        toast.warning('📧 RDV sauvegardé - retry automatique activé', {
+          duration: 4000
+        });
+      }
+
+      setIsSuccess(true);
+      toast.success('Demande de rendez-vous envoyée avec succès !');
+      
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi de la demande');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isSuccess) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 text-center"
+      >
+        <Check className="w-16 h-16 text-green-500 mx-auto mb-6" />
+        <h3 className="text-2xl font-light text-gray-900 dark:text-white mb-4">
+          Demande envoyée !
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          Nous vous contacterons sous 24h pour confirmer votre rendez-vous.
+        </p>
         <button
           onClick={() => {
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.reload();
+            setIsSuccess(false);
+            setSelectedDate(null);
+            setSelectedTime('');
+            setFormData({
+              nom: '',
+              prenom: '',
+              email: '',
+              telephone: '',
+              message: ''
+            });
           }}
-          className="w-full px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+          className="bg-yellow-600 text-white px-6 py-3 rounded-md hover:bg-yellow-700 transition-colors"
         >
-          Vider le cache et recharger
+          Prendre un autre rendez-vous
         </button>
-      </div>
-      <p className="text-xs text-gray-500 mt-4">
-        Erreur: {error.message}
-      </p>
-    </div>
-  </div>
-);
-
-// Boundary d'erreur React
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; error: Error | null }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null };
+      </motion.div>
+    );
   }
 
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('React Error Boundary:', error, errorInfo);
-    BlankPageDiagnostics.logError(error, 'React.ErrorBoundary');
-  }
-
-  render() {
-    if (this.state.hasError && this.state.error) {
-      return <ErrorFallback error={this.state.error} />;
-    }
-
-    return this.props.children;
-  }
-}
-
-// Rendu ultra-robuste avec gestion d'erreur complète
-try {
-  const rootElement = document.getElementById('root');
-  if (!rootElement) {
-    throw new Error('Element root non trouvé');
-  }
-  
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <>
-      <React.StrictMode>
-        <ErrorBoundary>
-          <App />
-        </ErrorBoundary>
-      </React.StrictMode>
-      <Toaster position="top-right" />
-    </>
-  );
-  
-  console.log('✅ React app montée avec succès');
-  
-  // Initialiser la synchronisation temps réel
-  try {
-    syncService.initialize();
-    
-    // Initialiser la surveillance conforme à la confidentialité
-    privacyMonitoring.logPageAccess('app_initialization');
-    console.log('🔄 Service de synchronisation initialisé');
-  } catch (error) {
-    console.warn('⚠️ Erreur initialisation sync service:', error);
-    BlankPageDiagnostics.logError(error, 'SyncService.initialize');
-  }
-  
-  // Masquer le loader après le montage réussi
-  setTimeout(() => {
-    document.body.classList.add('app-loaded');
-    const loader = document.getElementById('initial-loader');
-    if (loader) {
-      loader.style.display = 'none';
-    }
-  }, 100);
-  
-} catch (error) {
-  console.error('❌ Erreur critique lors du montage React:', error);
-  BlankPageDiagnostics.logError(error, 'React.mount');
-  
-  // Fallback d'urgence
-  const rootElement = document.getElementById('root');
-  if (rootElement) {
-    rootElement.innerHTML = `
-      <div style="min-height: 100vh; background: #111827; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center;">
-        <h1 style="color: #D97706; font-size: 2rem; font-weight: 300; letter-spacing: 0.1em; margin-bottom: 2rem;">CERCLE PRIVÉ</h1>
-        <p style="color: #9CA3AF; margin-bottom: 2rem;">Erreur critique de chargement</p>
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-          <button onclick="window.location.reload()" style="background: #D97706; color: white; border: none; padding: 1rem 2rem; border-radius: 0.5rem; cursor: pointer; font-weight: 500;">
-            Recharger la page
-          </button>
-          <button onclick="localStorage.clear(); sessionStorage.clear(); window.location.reload();" style="background: #6B7280; color: white; border: none; padding: 1rem 2rem; border-radius: 0.5rem; cursor: pointer; font-weight: 500;">
-            Vider le cache
-          </button>
-          <button onclick="window.location.href='mailto:nicolas.c@lacremerie.fr?subject=Erreur technique site'" style="background: transparent; color: #D97706; border: 1px solid #D97706; padding: 1rem 2rem; border-radius: 0.5rem; cursor: pointer; font-weight: 500;">
-            Signaler le problème
-          </button>
-        </div>
-        <p style="color: #6B7280; font-size: 0.8rem; margin-top: 2rem;">
-          Erreur: ${error.message}
+  return (
+    <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+      <div className="text-center mb-8">
+        <Calendar className="w-12 h-12 text-yellow-600 mx-auto mb-4" />
+        <h2 className="text-2xl font-light text-gray-900 dark:text-white mb-2">
+          Prendre Rendez-vous
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400">
+          Planifiez une consultation personnalisée avec nos experts
         </p>
       </div>
-    `;
-  }
-  
-  // Masquer le loader même en cas d'erreur
-  document.body.classList.add('app-loaded');
-  const loader = document.getElementById('initial-loader');
-  if (loader) {
-    loader.style.display = 'none';
-  }
-}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Informations personnelles */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Nom *
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                value={formData.nom}
+                onChange={(e) => setFormData(prev => ({ ...prev, nom: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Prénom *
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                value={formData.prenom}
+                onChange={(e) => setFormData(prev => ({ ...prev, prenom: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email *
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Téléphone *
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="tel"
+                value={formData.telephone}
+                onChange={(e) => setFormData(prev => ({ ...prev, telephone: e.target.value }))}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Sélection de date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Date souhaitée *
+          </label>
+          <input
+            type="date"
+            min={new Date().toISOString().split('T')[0]}
+            onChange={handleDateChange}
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            required
+          />
+        </div>
+
+        {/* Sélection d'heure */}
+        {selectedDate && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="space-y-3"
+          >
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Heure souhaitée *
+            </label>
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+              {timeSlots.map((slot) => (
+                <button
+                  key={slot.time}
+                  type="button"
+                  disabled={!slot.available}
+                  onClick={() => setSelectedTime(slot.time)}
+                  className={`p-3 rounded-md text-sm font-medium transition-colors ${
+                    selectedTime === slot.time
+                      ? 'bg-yellow-600 text-white'
+                      : slot.available
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-50 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <Clock className="w-4 h-4 mx-auto mb-1" />
+                  {slot.time}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Message */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Message (optionnel)
+          </label>
+          <textarea
+            value={formData.message}
+            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+            rows={4}
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            placeholder="Décrivez votre projet immobilier..."
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting || !selectedDate || !selectedTime}
+          className="w-full bg-yellow-600 text-white py-3 px-4 rounded-md hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? 'Envoi en cours...' : 'Confirmer le rendez-vous'}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default AppointmentBooking;
