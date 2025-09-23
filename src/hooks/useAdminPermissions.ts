@@ -77,6 +77,7 @@ export const useAdminPermissions = (currentUser: AdminUser | null) => {
       { key: 'https_monitor', label: 'HTTPS Monitor', module: 'admin_management' as AdminModule },
       { key: 'security_audit', label: 'Audit Sécurité', module: 'admin_management' as AdminModule },
       { key: 'content_diagnostic', label: 'Diagnostic Contenu', module: 'admin_management' as AdminModule }
+      { key: 'privacy_monitoring', label: 'Surveillance Conforme', module: 'admin_management' as AdminModule }
     ];
 
     return allTabs.filter(tab => canAccessModule(tab.module));

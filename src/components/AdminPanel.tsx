@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Download, RefreshCw, LogOut, Search, Filter, Mail, BarChart3, Settings, Calendar, MessageSquare, TrendingUp, Image, Palette, Shield, Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { Users, Download, RefreshCw, LogOut, Search, Filter, Mail, BarChart3, Settings, Calendar, MessageSquare, TrendingUp, Image, Palette, Shield, Plus, Edit, Trash2, Save, X, Eye } from 'lucide-react';
 import { UserService } from '../services/userService';
 import { EmailService } from '../services/emailService';
 import { AdminService } from '../services/adminService';
@@ -28,6 +28,7 @@ import DiagnosticPanel from './DiagnosticPanel';
 import AuthenticationTester from './AuthenticationTester';
 import ContentManagementDiagnostic from './ContentManagementDiagnostic';
 import AuthenticationSecurityAudit from './AuthenticationSecurityAudit';
+import PrivacyCompliantDashboard from './PrivacyCompliantDashboard';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -517,6 +518,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
                     case 'diagnostic': return <Settings className="w-4 h-4" />;
                     case 'https_monitor': return <Shield className="w-4 h-4" />;
                     case 'security_audit': return <Shield className="w-4 h-4" />;
+                    case 'privacy_monitoring': return <Eye className="w-4 h-4" />;
                     default: return <Settings className="w-4 h-4" />;
                   }
                 };
@@ -853,6 +855,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onLogout }) => {
 
         {activeTab === 'security_audit' && canAccessModule('admin_management') && (
           <AuthenticationSecurityAudit />
+        )}
+
+        {activeTab === 'privacy_monitoring' && canAccessModule('admin_management') && (
+          <PrivacyCompliantDashboard />
         )}
 
         {/* Message d'accès refusé */}

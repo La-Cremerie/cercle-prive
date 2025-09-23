@@ -5,6 +5,7 @@ import App from './App';
 import './index.css';
 import { syncService } from './services/realTimeSync';
 import { BlankPageDiagnostics } from './utils/diagnostics';
+import { privacyMonitoring } from './services/privacyCompliantMonitoring';
 
 // Composant d'erreur de fallback
 const ErrorFallback = ({ error }: { error: Error }) => (
@@ -93,6 +94,9 @@ try {
   // Initialiser la synchronisation temps réel
   try {
     syncService.initialize();
+    
+    // Initialiser la surveillance conforme à la confidentialité
+    privacyMonitoring.logPageAccess('app_initialization');
     console.log('🔄 Service de synchronisation initialisé');
   } catch (error) {
     console.warn('⚠️ Erreur initialisation sync service:', error);
