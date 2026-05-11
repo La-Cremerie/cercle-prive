@@ -1,0 +1,30 @@
+{
+  "name": "prospection-engine",
+  "version": "0.1.0",
+  "description": "Pipeline V1 - scraping legal + scoring + export pour audit de valorisation immobiliere Gironde",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scrape": "tsx src/index.ts scrape",
+    "import:csv": "tsx src/index.ts import:csv",
+    "score": "tsx src/index.ts score",
+    "export": "tsx src/index.ts export",
+    "all": "tsx src/index.ts all",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "airtable": "^0.12.2",
+    "apify-client": "^2.9.7",
+    "csv-parse": "^5.5.6",
+    "csv-stringify": "^6.5.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=18.18"
+  }
+}
