@@ -1,0 +1,32 @@
+{
+  "name": "cercle-prive-prospection",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Brique 2 - Module d'enrichissement et de qualification IA de leads immobiliers (Gironde)",
+  "type": "module",
+  "main": "dist/cli/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "enrich": "tsx src/cli/index.ts",
+    "enrich:csv": "tsx src/cli/index.ts --input data/sample_scored_leads.csv --output exports/enriched_leads.csv",
+    "enrich:ai": "tsx src/cli/index.ts --ai",
+    "enrich:no-ai": "tsx src/cli/index.ts --no-ai",
+    "enrich:airtable": "tsx src/cli/index.ts --airtable",
+    "all": "tsx src/cli/index.ts --pipeline",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.6",
+    "csv-stringify": "^6.5.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "tsx": "^4.7.2",
+    "typescript": "^5.5.3"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
