@@ -1,0 +1,305 @@
+id,created_at,source_url,city,agency_name,seller_type,commercial_priority,outreach_allowed_status,human_review_required,risk_flags,recommended_channel,recommended_tone,email_short_subject,email_short_body,email_premium_subject,email_premium_body,linkedin_message,call_script,contact_form_message,crm_note,sequence_step_1_message,sequence_step_1_delay,sequence_step_2_message,sequence_step_2_delay,sequence_step_3_message,sequence_step_3_delay,sequence_step_4_message,sequence_step_4_delay,gdpr_disclaimer_included,validation_status,reviewer_notes
+outreach_lead_001,2026-05-11T08:46:36.476Z,https://example.com/annonce/001,Bordeaux,Agence Patrimoine Bordeaux,agence,A,allowed_b2b_contextual,true,,email_premium,partenaire_agence,Bordeaux — une lecture rapide pour vos mandats ?,"Bonjour,
+
+Sur Bordeaux, nous avons identifié quelques leviers possibles autour de maison_pierre (~180 m²), sans remettre en cause le travail déjà réalisé.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",Bordeaux — une lecture rapide pour vos mandats ?,"Bonjour Agence Patrimoine Bordeaux,
+
+En parcourant des annonces sur Bordeaux, nous avons remarqué maison_pierre (~180 m²) qui pourrait gagner en lisibilité à la commercialisation.
+
+Sans remettre en cause le travail déjà réalisé, notre approche consiste à améliorer la perception, la valeur et la lisibilité du bien (mise en scène, ameublement léger, ajustements éditoriaux).
+Quelques leviers possibles : lisibilité éditoriale, mise en scène, ameublement léger.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]","Bonjour, nous intervenons en amont d’une vente, rénovation ou mise en location sur Bordeaux. Sans remettre en cause votre travail, souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?","Accroche (20s) : Bonjour Agence Patrimoine Bordeaux, [Prénom] de [Société]. Nous intervenons en Gironde sur la valorisation de biens avant vente, rénovation ou mise en location. Je vous appelle au sujet de Bordeaux, est-ce que je vous prends 60 secondes ?
+
+Question d’ouverture : Sur vos mandats actuels, est-ce qu’il y a des biens qui mettent plus de temps que prévu à se positionner ou à se vendre ?
+
+Proposition de valeur : Nous identifions, sans critiquer le travail déjà fait, 2 ou 3 leviers de lisibilité, perception et ameublement. C’est court, factuel, sans engagement.
+
+Sortie polie : Si ce n’est pas le bon moment ou pas le bon sujet, je n’insiste pas. Je peux vous laisser mes coordonnées et vous me rappelez si pertinent.","Bonjour, je vous contacte au sujet de votre activité sur Bordeaux. Nous accompagnons des professionnels et investisseurs sur la valorisation de biens avant vente ou mise en location (lecture rapide, leviers concrets, sans remettre en cause le travail déjà réalisé). Sur maison_pierre (~180 m²), Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ? Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.","Angle : partenaire_agence — valorisation patrimoniale, rénovation premium, optimisation avant vente, modernisation sans dénaturer.
+Pourquoi contacter : Maison de caractère bien située, présentation perfectible.
+Précautions : B2B contextuel — joindre disclaimer opposition.
+Action recommandée : préparer message Bordeaux — une lecture rapide pour vos mandats ? puis valider avant envoi.","Bonjour Agence Patrimoine Bordeaux,
+
+En parcourant des annonces sur Bordeaux, nous avons remarqué maison_pierre (~180 m²) qui pourrait gagner en lisibilité à la commercialisation.
+
+Sans remettre en cause le travail déjà réalisé, notre approche consiste à améliorer la perception, la valeur et la lisibilité du bien (mise en scène, ameublement léger, ajustements éditoriaux).
+Quelques leviers possibles : lisibilité éditoriale, mise en scène, ameublement léger.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",0,"Bonjour,
+
+Je me permets une courte relance, sans insister.
+Pour préciser : il s’agit simplement d’une lecture rapide à titre indicatif sur Bordeaux, deux ou trois points concrets, sans engagement.
+
+Est-ce que cela vaut le coup que je vous transmette cette lecture ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",4,"Bonjour,
+
+Pour rendre les choses plus concrètes, voici le type de leviers que nous regardons sur Bordeaux :
+• lisibilité visuelle et éditoriale du bien ;
+• perception premium (mise en scène, ameublement léger) ;
+• arbitrages travaux à fort impact perçu.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",10,"Bonjour,
+
+Sans nouvelle de votre côté, j’en déduis que ce n’est pas le bon moment. Je ne vous relancerai pas.
+
+Si la question revient plus tard, vous savez où me trouver. Bonne continuation sur Bordeaux.
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",21,true,pending_human_review,
+outreach_lead_002,2026-05-11T08:46:36.476Z,https://example.com/annonce/002,Talence,,investisseur_locatif,B,allowed_b2b_contextual,true,,email_short,investisseur_roi,Talence — leviers de rendement ?,"Bonjour,
+
+Sur Talence, nous avons identifié quelques leviers possibles autour de appartement (~55 m²), sans remettre en cause le travail déjà réalisé.
+
+Je peux vous envoyer une première note synthétique si cela vous intéresse.
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",Talence — leviers de rendement ?,"Bonjour Julien Moreau,
+
+Nous intervenons en amont d’une mise en location ou d’une transformation locative sur Talence : ameublement, agencement, optimisation surface, LMNP, réduction de la vacance.
+
+Il pourrait être intéressant d’étudier appartement (~55 m²) sous l’angle optimisation locative, ameublement, rendement, budget maîtrisé.
+Quelques leviers possibles : LMNP, ameublement, optimisation surface.
+
+Je peux vous envoyer une première note synthétique si cela vous intéresse.
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]","Bonjour, nous intervenons en amont d’une vente, rénovation ou mise en location sur Talence. Sans remettre en cause votre travail, je peux vous envoyer une première note synthétique si cela vous intéresse.","Accroche (20s) : Bonjour Julien Moreau, [Prénom] de [Société]. Nous intervenons en Gironde sur la valorisation de biens avant vente, rénovation ou mise en location. Je vous appelle au sujet de Talence, est-ce que je vous prends 60 secondes ?
+
+Question d’ouverture : Sur vos mandats actuels, est-ce qu’il y a des biens qui mettent plus de temps que prévu à se positionner ou à se vendre ?
+
+Proposition de valeur : Nous identifions, sans critiquer le travail déjà fait, 2 ou 3 leviers de lisibilité, perception et ameublement. C’est court, factuel, sans engagement.
+
+Sortie polie : Si ce n’est pas le bon moment ou pas le bon sujet, je n’insiste pas. Je peux vous laisser mes coordonnées et vous me rappelez si pertinent.","Bonjour, je vous contacte au sujet de votre activité sur Talence. Nous accompagnons des professionnels et investisseurs sur la valorisation de biens avant vente ou mise en location (lecture rapide, leviers concrets, sans remettre en cause le travail déjà réalisé). Sur appartement (~55 m²), Je peux vous envoyer une première note synthétique si cela vous intéresse. Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.","Angle : investisseur_roi — optimisation locative, ameublement, rendement, budget maîtrisé.
+Pourquoi contacter : Investisseur locatif, optimisation rendement et ameublement.
+Précautions : B2B contextuel — joindre disclaimer opposition.
+Action recommandée : préparer message Talence — leviers de rendement ? puis valider avant envoi.","Bonjour Julien Moreau,
+
+Nous intervenons en amont d’une mise en location ou d’une transformation locative sur Talence : ameublement, agencement, optimisation surface, LMNP, réduction de la vacance.
+
+Il pourrait être intéressant d’étudier appartement (~55 m²) sous l’angle optimisation locative, ameublement, rendement, budget maîtrisé.
+Quelques leviers possibles : LMNP, ameublement, optimisation surface.
+
+Je peux vous envoyer une première note synthétique si cela vous intéresse.
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",0,"Bonjour,
+
+Je me permets une courte relance, sans insister.
+Pour préciser : il s’agit simplement d’une lecture rapide à titre indicatif sur Talence, deux ou trois points concrets, sans engagement.
+
+Est-ce que cela vaut le coup que je vous transmette cette lecture ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",4,"Bonjour,
+
+Pour rendre les choses plus concrètes, voici le type de leviers que nous regardons sur Talence :
+• lisibilité visuelle et éditoriale du bien ;
+• perception premium (mise en scène, ameublement léger) ;
+• arbitrages travaux à fort impact perçu.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",10,"Bonjour,
+
+Sans nouvelle de votre côté, j’en déduis que ce n’est pas le bon moment. Je ne vous relancerai pas.
+
+Si la question revient plus tard, vous savez où me trouver. Bonne continuation sur Talence.
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",21,true,pending_human_review,
+outreach_lead_003,2026-05-11T08:46:36.477Z,https://example.com/annonce/003,Arcachon,Cap Ferret Properties,agence,A,allowed_b2b_contextual,true,,email_premium,partenaire_agence,Arcachon — une lecture rapide pour vos mandats ?,"Bonjour,
+
+Sur Arcachon, nous avons identifié quelques leviers possibles autour de villa (~220 m²), sans remettre en cause le travail déjà réalisé.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",Arcachon — une lecture rapide pour vos mandats ?,"Bonjour Cap Ferret Properties,
+
+En parcourant des annonces sur Arcachon, nous avons remarqué villa (~220 m²) qui pourrait gagner en lisibilité à la commercialisation.
+
+Sans remettre en cause le travail déjà réalisé, notre approche consiste à améliorer la perception, la valeur et la lisibilité du bien (mise en scène, ameublement léger, ajustements éditoriaux).
+Quelques leviers possibles : perception premium, aménagement extérieur, mise en scène.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]","Bonjour, nous intervenons en amont d’une vente, rénovation ou mise en location sur Arcachon. Sans remettre en cause votre travail, souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?","Accroche (20s) : Bonjour Cap Ferret Properties, [Prénom] de [Société]. Nous intervenons en Gironde sur la valorisation de biens avant vente, rénovation ou mise en location. Je vous appelle au sujet de Arcachon, est-ce que je vous prends 60 secondes ?
+
+Question d’ouverture : Sur vos mandats actuels, est-ce qu’il y a des biens qui mettent plus de temps que prévu à se positionner ou à se vendre ?
+
+Proposition de valeur : Nous identifions, sans critiquer le travail déjà fait, 2 ou 3 leviers de lisibilité, perception et ameublement. C’est court, factuel, sans engagement.
+
+Sortie polie : Si ce n’est pas le bon moment ou pas le bon sujet, je n’insiste pas. Je peux vous laisser mes coordonnées et vous me rappelez si pertinent.","Bonjour, je vous contacte au sujet de votre activité sur Arcachon. Nous accompagnons des professionnels et investisseurs sur la valorisation de biens avant vente ou mise en location (lecture rapide, leviers concrets, sans remettre en cause le travail déjà réalisé). Sur villa (~220 m²), Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ? Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.","Angle : partenaire_agence — résidence secondaire, expérience premium, perception émotionnelle, aménagement intérieur/extérieur.
+Pourquoi contacter : Villa premium, perception émotionnelle à renforcer.
+Précautions : B2B contextuel — joindre disclaimer opposition.
+Action recommandée : préparer message Arcachon — une lecture rapide pour vos mandats ? puis valider avant envoi.","Bonjour Cap Ferret Properties,
+
+En parcourant des annonces sur Arcachon, nous avons remarqué villa (~220 m²) qui pourrait gagner en lisibilité à la commercialisation.
+
+Sans remettre en cause le travail déjà réalisé, notre approche consiste à améliorer la perception, la valeur et la lisibilité du bien (mise en scène, ameublement léger, ajustements éditoriaux).
+Quelques leviers possibles : perception premium, aménagement extérieur, mise en scène.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",0,"Bonjour,
+
+Je me permets une courte relance, sans insister.
+Pour préciser : il s’agit simplement d’une lecture rapide à titre indicatif sur Arcachon, deux ou trois points concrets, sans engagement.
+
+Est-ce que cela vaut le coup que je vous transmette cette lecture ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",4,"Bonjour,
+
+Pour rendre les choses plus concrètes, voici le type de leviers que nous regardons sur Arcachon :
+• lisibilité visuelle et éditoriale du bien ;
+• perception premium (mise en scène, ameublement léger) ;
+• arbitrages travaux à fort impact perçu.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",10,"Bonjour,
+
+Sans nouvelle de votre côté, j’en déduis que ce n’est pas le bon moment. Je ne vous relancerai pas.
+
+Si la question revient plus tard, vous savez où me trouver. Bonne continuation sur Arcachon.
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",21,true,pending_human_review,
+outreach_lead_004,2026-05-11T08:46:36.477Z,https://example.com/annonce/004,Mérignac,,particulier,C,manual_review_only,true,particulier_sans_consentement,crm_note,investisseur_roi,Mérignac — lecture rapide de valorisation,"Bonjour,
+
+Sur Mérignac, nous avons identifié quelques leviers possibles autour de maison (~110 m²), sans remettre en cause le travail déjà réalisé.
+
+Est-ce que cela vaut le coup que je vous transmette une première lecture rapide ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",Mérignac — lecture rapide de valorisation,"Bonjour Bonjour,
+
+Nous intervenons en amont d’une vente, d’une rénovation ou d’une mise en location sur Mérignac.
+Notre approche consiste à améliorer la perception, la valeur et la lisibilité du bien, sans dénaturer ce qui fonctionne déjà.
+
+L’idée serait de vous transmettre une première lecture rapide, à titre indicatif.
+
+Est-ce que cela vaut le coup que je vous la transmette ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]","Bonjour, nous intervenons en amont d’une vente, rénovation ou mise en location sur Mérignac. Sans remettre en cause votre travail, est-ce que cela vaut le coup que je vous transmette une première lecture rapide ?","Accroche (20s) : Bonjour Bonjour, [Prénom] de [Société]. Nous intervenons en Gironde sur la valorisation de biens avant vente, rénovation ou mise en location. Je vous appelle au sujet de Mérignac, est-ce que je vous prends 60 secondes ?
+
+Question d’ouverture : Sur vos mandats actuels, est-ce qu’il y a des biens qui mettent plus de temps que prévu à se positionner ou à se vendre ?
+
+Proposition de valeur : Nous identifions, sans critiquer le travail déjà fait, 2 ou 3 leviers de lisibilité, perception et ameublement. C’est court, factuel, sans engagement.
+
+Sortie polie : Si ce n’est pas le bon moment ou pas le bon sujet, je n’insiste pas. Je peux vous laisser mes coordonnées et vous me rappelez si pertinent.","Bonjour, je vous contacte au sujet de votre activité sur Mérignac. Nous accompagnons des professionnels et investisseurs sur la valorisation de biens avant vente ou mise en location (lecture rapide, leviers concrets, sans remettre en cause le travail déjà réalisé). Sur maison (~110 m²), Est-ce que cela vaut le coup que je vous transmette une première lecture rapide ? Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.","Angle : premium_sobre — optimisation locative, ameublement, rendement, budget maîtrisé.
+Pourquoi contacter : Annonce particulier, à conserver en veille.
+Précautions : particulier — validation humaine obligatoire.
+Action recommandée : préparer message Mérignac — lecture rapide de valorisation puis valider avant envoi.","Priorité C : pas de séquence directe. Garder en surveillance, relance humaine si nouvel élément (changement de prix, nouveau mandat, etc.).",0,,,,,,,true,pending_human_review,
+outreach_lead_005,2026-05-11T08:46:36.477Z,https://example.com/annonce/005,Pessac,,marchand_de_biens,B,allowed_b2b_contextual,true,,email_short,investisseur_roi,Pessac — lecture rapide avant revente,"Bonjour,
+
+Sur Pessac, nous avons identifié quelques leviers possibles autour de immeuble (~260 m²), sans remettre en cause le travail déjà réalisé.
+
+Est-ce pertinent d’en discuter 10 minutes ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",Pessac — lecture rapide avant revente,"Bonjour Sophie Durand,
+
+Nous intervenons en amont d’une revente sur Pessac : lisibilité du bien, perception premium, ajustements éditoriaux et arbitrages travaux à fort impact.
+
+Il pourrait être intéressant d’étudier immeuble (~260 m²) sous l’angle optimisation locative, ameublement, rendement, budget maîtrisé.
+
+Est-ce pertinent d’en discuter 10 minutes ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]","Bonjour, nous intervenons en amont d’une vente, rénovation ou mise en location sur Pessac. Sans remettre en cause votre travail, est-ce pertinent d’en discuter 10 minutes ?","Accroche (20s) : Bonjour Sophie Durand, [Prénom] de [Société]. Nous intervenons en Gironde sur la valorisation de biens avant vente, rénovation ou mise en location. Je vous appelle au sujet de Pessac, est-ce que je vous prends 60 secondes ?
+
+Question d’ouverture : Sur vos mandats actuels, est-ce qu’il y a des biens qui mettent plus de temps que prévu à se positionner ou à se vendre ?
+
+Proposition de valeur : Nous identifions, sans critiquer le travail déjà fait, 2 ou 3 leviers de lisibilité, perception et ameublement. C’est court, factuel, sans engagement.
+
+Sortie polie : Si ce n’est pas le bon moment ou pas le bon sujet, je n’insiste pas. Je peux vous laisser mes coordonnées et vous me rappelez si pertinent.","Bonjour, je vous contacte au sujet de votre activité sur Pessac. Nous accompagnons des professionnels et investisseurs sur la valorisation de biens avant vente ou mise en location (lecture rapide, leviers concrets, sans remettre en cause le travail déjà réalisé). Sur immeuble (~260 m²), Est-ce pertinent d’en discuter 10 minutes ? Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.","Angle : direct_business — optimisation locative, ameublement, rendement, budget maîtrisé.
+Pourquoi contacter : Marchand de biens connu, opérations régulières.
+Précautions : B2B contextuel — joindre disclaimer opposition.
+Action recommandée : préparer message Pessac — lecture rapide avant revente puis valider avant envoi.","Bonjour Sophie Durand,
+
+Nous intervenons en amont d’une revente sur Pessac : lisibilité du bien, perception premium, ajustements éditoriaux et arbitrages travaux à fort impact.
+
+Il pourrait être intéressant d’étudier immeuble (~260 m²) sous l’angle optimisation locative, ameublement, rendement, budget maîtrisé.
+
+Est-ce pertinent d’en discuter 10 minutes ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.
+
+— [Prénom Nom]
+[Société] — Audit de Valorisation Immobilière
+[Téléphone] · [Email]",0,"Bonjour,
+
+Je me permets une courte relance, sans insister.
+Pour préciser : il s’agit simplement d’une lecture rapide à titre indicatif sur Pessac, deux ou trois points concrets, sans engagement.
+
+Est-ce que cela vaut le coup que je vous transmette cette lecture ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",4,"Bonjour,
+
+Pour rendre les choses plus concrètes, voici le type de leviers que nous regardons sur Pessac :
+• lisibilité visuelle et éditoriale du bien ;
+• perception premium (mise en scène, ameublement léger) ;
+• arbitrages travaux à fort impact perçu.
+
+Souhaitez-vous que je vous partage les 2 ou 3 leviers que nous avons identifiés ?
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",10,"Bonjour,
+
+Sans nouvelle de votre côté, j’en déduis que ce n’est pas le bon moment. Je ne vous relancerai pas.
+
+Si la question revient plus tard, vous savez où me trouver. Bonne continuation sur Pessac.
+
+Si ce sujet n’est pas pertinent pour vous, indiquez-le-moi simplement et je ne vous recontacterai pas.",21,true,pending_human_review,
+outreach_lead_006,2026-05-11T08:46:36.477Z,https://example.com/annonce/006,Cap Ferret,Bassin Prestige,agence,D,not_recommended,true,priorite_d,crm_note,ultra_court,,,,,,,,,,,,,,,,,false,pending_human_review,

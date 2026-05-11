@@ -9,7 +9,14 @@
     "build:public": "vite build --mode production",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "outreach": "tsx scripts/runOutreach.ts",
+    "outreach:csv": "tsx scripts/runOutreach.ts --input data/sample_enriched_leads.csv --out-csv exports/outreach/outreach_messages.csv",
+    "outreach:ai": "tsx scripts/runOutreach.ts --ai",
+    "outreach:no-ai": "tsx scripts/runOutreach.ts --no-ai",
+    "outreach:md": "tsx scripts/runOutreach.ts --md-only",
+    "outreach:test": "tsx scripts/runOutreachTests.ts",
+    "all": "npm run lint && npm run outreach"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -45,6 +52,8 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
     "vite": "^5.4.2",
-    "vite-plugin-pwa": "^1.0.3"
+    "vite-plugin-pwa": "^1.0.3",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.5.0"
   }
 }

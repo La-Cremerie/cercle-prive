@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Brique 3 — sorties outreach générées (on garde .gitkeep et le sample)
+exports/outreach/*.csv
+exports/outreach/*.json
+exports/outreach/markdown/*.md

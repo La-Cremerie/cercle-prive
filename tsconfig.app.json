@@ -20,5 +20,11 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/outreach",
+    "src/crm",
+    "src/exports",
+    "src/types/Outreach.ts"
+  ]
 }
