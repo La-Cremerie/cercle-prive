@@ -132,6 +132,7 @@ def agreger(lignes) -> dict[str, dict]:
                 "id_mutation": identifiant,
                 "date_mutation": ligne.get("date_mutation", ""),
                 "nature_mutation": ligne.get("nature_mutation", ""),
+                "nom_commune": ligne.get("nom_commune", ""),
                 "valeur_fonciere": _flottant(ligne.get("valeur_fonciere", "")),
                 "surface_bati": 0.0,
                 "pieces": 0,

@@ -78,3 +78,45 @@ suivent une autre logique de prix). Les mutations sans surface bâtie sont écar
   déplace le €/m² de 10 % — à vérifier bien par bien sur les comparables retenus.
 - Les millésimes récents sont publiés avec un décalage de plusieurs mois ; le dernier millésime
   disponible est souvent incomplet.
+
+---
+
+# Comptage par tranche de prix — `volumes_tranche_prix.py`
+
+Répond à la question « combien de ventes ont réellement été actées entre 7 et 12 M€ sur le
+Golfe de Saint-Tropez, et à quel rythme ? ». Aucune source publique ne publie ce chiffre.
+
+Contrairement au script précédent qui travaille commune par commune, celui-ci télécharge le
+fichier DVF du **département entier** (un gzip par millésime) et compte les mutations par
+commune et par année dans la tranche demandée — sans qu'il faille relever à l'avance le code
+INSEE de chaque commune du Golfe.
+
+```bash
+# Tranche 7–12 M€ sur les communes du Golfe, 7 derniers millésimes
+python3 tools/dvf/volumes_tranche_prix.py --min 7000000 --max 12000000 --detail
+
+# Tout le Var, au-delà de 10 M€
+python3 tools/dvf/volumes_tranche_prix.py --min 10000000 --max 99000000 --communes TOUTES
+
+# Alpes-Maritimes
+python3 tools/dvf/volumes_tranche_prix.py --departement 06 --min 7000000
+```
+
+| Option | Défaut | Rôle |
+|---|---|---|
+| `--departement` | `83` | département balayé |
+| `--annees` | 7 derniers millésimes | millésimes DVF |
+| `--min` / `--max` | `7 000 000` / `12 000 000` | bornes de la tranche |
+| `--communes` | les 12 communes du Golfe | noms séparés par des virgules, ou `TOUTES` |
+| `--detail` | — | liste chaque mutation retenue |
+| `--csv` | `volumes_tranche.csv` | fichier de sortie |
+
+**Sorties :** un tableau croisé commune × année avec, pour chaque commune, le nombre de
+mutations dans la tranche, le nombre total de ventes et la part que la tranche représente ;
+le rythme annuel moyen ; et le détail de chaque mutation.
+
+**Le comptage est un plancher, jamais un total.** Sur cette tranche, une part importante des
+biens est détenue en SCI et cédée par cession de parts sociales : l'opération ne change pas
+le propriétaire au fichier immobilier et n'apparaît jamais dans DVF. S'y ajoutent les ventes
+off-market, majoritaires sur le haut du Golfe. Toute conclusion tirée de ce comptage doit
+énoncer cette limite.
