@@ -1,0 +1,676 @@
+<title>Front de mer La Nartelle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+/* ── Tokens : palette de carte marine ───────────────────────────────────── */
+:root{
+  --ground:      #F1F3F1;
+  --paper:       #FBFCFB;
+  --land:        #EDE7D6;   /* teinte « terre » des cartes marines */
+  --ink:         #16211F;
+  --ink-soft:    #4A5854;
+  --ink-faint:   #7C8985;
+  --rule:        #D3D9D5;
+  --rule-soft:   #E3E7E4;
+  --deep:        #0B4F53;   /* accent : bathymétrie */
+  --deep-wash:   #E2ECEB;
+  --chart:       #A81D63;   /* magenta réglementaire des cartes marines */
+  --chart-wash:  #F7E6EF;
+  --shadow:      0 1px 2px rgba(11,79,83,.06), 0 8px 28px -18px rgba(11,79,83,.28);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:     #0C1416;
+    --paper:      #111C1E;
+    --land:       #1B2422;
+    --ink:        #E3EAE8;
+    --ink-soft:   #A3B2AE;
+    --ink-faint:  #74837F;
+    --rule:       #24322F;
+    --rule-soft:  #1B2725;
+    --deep:       #64BAB6;
+    --deep-wash:  #14292B;
+    --chart:      #ED74A8;
+    --chart-wash: #2B1622;
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 28px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:     #0C1416;
+  --paper:      #111C1E;
+  --land:       #1B2422;
+  --ink:        #E3EAE8;
+  --ink-soft:   #A3B2AE;
+  --ink-faint:  #74837F;
+  --rule:       #24322F;
+  --rule-soft:  #1B2725;
+  --deep:       #64BAB6;
+  --deep-wash:  #14292B;
+  --chart:      #ED74A8;
+  --chart-wash: #2B1622;
+  --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 28px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Spectral",Georgia,"Times New Roman",serif;
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.sans{font-family:"IBM Plex Sans",-apple-system,"Segoe UI",sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,"SFMono-Regular",monospace}
+
+/* ── Grille : rail de numérotation + colonne de texte ────────────────────── */
+.sheet{max-width:1120px;margin:0 auto;padding:0 24px 96px}
+section{
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr);
+  gap:0 28px;
+  padding-block:44px;
+  border-top:1px solid var(--rule-soft);
+}
+section > .num{
+  font-family:"IBM Plex Mono",monospace;
+  font-size:12px;letter-spacing:.08em;
+  color:var(--chart);
+  padding-top:.55em;
+}
+section > .body{min-width:0;display:flex;flex-direction:column;gap:20px}
+.prose{max-width:66ch}
+@media (max-width:720px){
+  section{grid-template-columns:1fr;gap:8px}
+  section > .num{padding-top:0}
+}
+
+/* ── Typographie ─────────────────────────────────────────────────────────── */
+h1,h2,h3{text-wrap:balance;margin:0;font-weight:600;line-height:1.18}
+h1{font-size:clamp(2.2rem,5.4vw,3.5rem);font-weight:700;letter-spacing:-.018em}
+h2{font-size:clamp(1.4rem,2.6vw,1.85rem);letter-spacing:-.01em}
+h3{font-size:1.06rem;font-weight:600;letter-spacing:.005em;color:var(--ink)}
+p{margin:0}
+.eyebrow{
+  font-family:"IBM Plex Sans",sans-serif;
+  font-size:11.5px;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-faint);
+}
+.lede{font-size:1.16rem;color:var(--ink-soft);max-width:60ch}
+strong{font-weight:600}
+a{color:var(--deep);text-decoration:underline;text-underline-offset:.18em;text-decoration-thickness:.06em}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--chart);outline-offset:3px;border-radius:3px}
+ul,ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:.5em;max-width:64ch}
+
+/* ── En-tête ─────────────────────────────────────────────────────────────── */
+header{
+  padding:clamp(56px,9vw,104px) 0 40px;
+  display:flex;flex-direction:column;gap:22px;
+}
+.meta{
+  display:flex;flex-wrap:wrap;gap:8px 26px;
+  font-family:"IBM Plex Sans",sans-serif;font-size:13px;color:var(--ink-faint);
+}
+.meta b{color:var(--ink-soft);font-weight:500}
+
+/* ── Bandeau de relevés ──────────────────────────────────────────────────── */
+.releve{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
+  gap:1px;background:var(--rule);
+  border:1px solid var(--rule);border-radius:4px;overflow:hidden;
+  margin-top:8px;
+}
+.releve div{background:var(--paper);padding:16px 18px;display:flex;flex-direction:column;gap:5px}
+.releve dt{
+  font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint);
+}
+.releve dd{
+  margin:0;font-family:"IBM Plex Mono",monospace;font-size:1.24rem;font-weight:500;
+  font-variant-numeric:tabular-nums;color:var(--ink);
+}
+.releve dd small{display:block;font-family:"Spectral",serif;font-size:.72rem;color:var(--ink-faint);font-weight:400;letter-spacing:0}
+.releve .hi dd{color:var(--chart)}
+
+/* ── Tableaux ────────────────────────────────────────────────────────────── */
+.scroller{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-family:"IBM Plex Sans",sans-serif;font-size:14px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+thead th{
+  font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-faint);background:var(--land);white-space:nowrap;
+  border-bottom:1px solid var(--rule);
+}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr.mark{background:var(--chart-wash)}
+tbody tr.mark td{color:var(--ink)}
+tbody tr.mark td.n b{color:var(--chart)}
+caption{
+  caption-side:bottom;text-align:left;padding:10px 14px;
+  font-family:"IBM Plex Sans",sans-serif;font-size:12.5px;color:var(--ink-faint);
+  border-top:1px solid var(--rule-soft);
+}
+
+/* ── Encarts ─────────────────────────────────────────────────────────────── */
+.callout{
+  background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--deep);
+  border-radius:3px;padding:18px 22px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow);
+}
+.callout.warn{border-left-color:var(--chart)}
+.callout .eyebrow{color:var(--deep)}
+.callout.warn .eyebrow{color:var(--chart)}
+blockquote{
+  margin:0;padding:18px 24px;background:var(--deep-wash);border-radius:3px;
+  font-size:1.04rem;font-style:italic;color:var(--ink);max-width:64ch;
+}
+blockquote p + p{margin-top:.7em}
+
+/* ── Figure : courbe €/m² ────────────────────────────────────────────────── */
+figure{margin:0;background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:22px 20px 16px;box-shadow:var(--shadow)}
+figure svg{display:block;width:100%;height:auto}
+figcaption{
+  font-family:"IBM Plex Sans",sans-serif;font-size:12.5px;color:var(--ink-faint);
+  margin-top:14px;padding-top:12px;border-top:1px solid var(--rule-soft);max-width:70ch;
+}
+.legend{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;color:var(--ink-soft);margin-bottom:14px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.swatch{width:16px;height:2px;border-radius:2px;display:inline-block}
+
+/* ── Faisceaux de preuve ─────────────────────────────────────────────────── */
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.level{background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:7px}
+.level .tag{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;color:var(--chart);letter-spacing:.04em}
+.level h3{font-size:.98rem}
+.level p{font-size:.9rem;color:var(--ink-soft);line-height:1.5}
+.level.n1{border-color:var(--chart);border-width:1px 1px 1px 3px}
+
+/* ── Objections ──────────────────────────────────────────────────────────── */
+details{background:var(--paper);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+details + details{margin-top:8px}
+summary{
+  cursor:pointer;padding:14px 18px;list-style:none;
+  font-family:"IBM Plex Sans",sans-serif;font-size:14.5px;font-weight:500;
+  display:flex;gap:12px;align-items:baseline;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";margin-left:auto;color:var(--chart);font-family:"IBM Plex Mono",monospace;font-size:15px}
+details[open] summary::after{content:"−"}
+details[open] summary{border-bottom:1px solid var(--rule-soft)}
+summary .q{color:var(--ink-faint);font-family:"IBM Plex Mono",monospace;font-size:12px}
+details .ans{padding:15px 18px 17px 46px;font-size:.97rem;color:var(--ink-soft);max-width:70ch}
+@media (max-width:600px){details .ans{padding-left:18px}}
+
+/* ── Checklist ───────────────────────────────────────────────────────────── */
+.check{list-style:none;padding:0;gap:.4em}
+.check li{display:flex;gap:11px;align-items:baseline;font-family:"IBM Plex Sans",sans-serif;font-size:14px;color:var(--ink-soft)}
+.check li::before{content:"";flex:0 0 11px;height:11px;border:1.5px solid var(--rule);border-radius:2px;transform:translateY(1px)}
+
+footer{border-top:1px solid var(--rule);padding:32px 0 0;font-family:"IBM Plex Sans",sans-serif;font-size:13px;color:var(--ink-faint);display:flex;flex-direction:column;gap:10px}
+.srcs{font-size:13px;line-height:1.75;max-width:80ch}
+
+@media print{
+  body{background:#fff;font-size:11pt}
+  section{break-inside:auto;padding-block:22px}
+  figure,.callout,.releve,.scroller{break-inside:avoid}
+  details{break-inside:avoid}
+  details .ans{display:block !important}
+  summary::after{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+
+<div class="sheet">
+
+<header>
+  <p class="eyebrow">Étude de marché · Cercle Privé · Septembre 2026</p>
+  <h1>Le front de mer de La&nbsp;Nartelle</h1>
+  <p class="lede">Pourquoi une valeur supérieure à 18&nbsp;000&nbsp;€/m² est justifiable à Sainte-Maxime — et comment l'établir dans un dossier opposable.</p>
+  <div class="meta">
+    <span><b>Périmètre</b> La Nartelle · Les Éléphants · Pointe des Sardinaux, Sainte-Maxime (83120)</span>
+    <span><b>Segments</b> villa pieds dans l'eau · villa 1<sup>re</sup> ligne vue mer</span>
+    <span><b>Usage</b> avis de valeur · dossier bancaire et fiscal</span>
+  </div>
+  <dl class="releve">
+    <div><dt>Moyenne communale</dt><dd>6 100 €<small>tous biens, toutes zones</small></dd></div>
+    <div><dt>Moyenne de quartier</dt><dd>8 568 €<small>maisons, Nartelle-Sardinaux</small></dd></div>
+    <div><dt>Borne haute chemin de la Nartelle</dt><dd>16 573 €<small>maisons, outil grand public</small></dd></div>
+    <div class="hi"><dt>Offre front de mer constatée</dt><dd>18 625 €<small>villa à accès plage privatif</small></dd></div>
+  </dl>
+</header>
+
+<section>
+  <p class="num">§ 0</p>
+  <div class="body">
+    <h2>Avant tout usage externe</h2>
+    <p class="prose">Ce document est un cadre d'analyse et d'argumentation. Il doit être complété par des termes de comparaison réels avant d'être produit devant une banque, un notaire ou l'administration fiscale. Trois niveaux de preuve, à ne jamais confondre&nbsp;:</p>
+    <div class="levels">
+      <div class="level n1">
+        <span class="tag">N1</span>
+        <h3>Mutations enregistrées</h3>
+        <p>Ventes publiées au fichier immobilier — DVF, Patrim, Perval. <strong>Seul niveau opposable</strong> en contradictoire fiscal (art.&nbsp;L.17 du LPF) et attendu par un expert bancaire.</p>
+      </div>
+      <div class="level">
+        <span class="tag">N2</span>
+        <h3>Transactions confidentielles</h3>
+        <p>Ventes off-market et cessions de parts de SCI connues du réseau. Recevables si attestées par le professionnel qui les a réalisées.</p>
+      </div>
+      <div class="level">
+        <span class="tag">N3</span>
+        <h3>Prix d'offre</h3>
+        <p>Prix affichés en annonce. Indicatifs uniquement&nbsp;: jamais suffisants seuls. Les comparables du §6.1 relèvent de ce niveau.</p>
+      </div>
+    </div>
+    <div class="callout warn">
+      <p class="eyebrow">Pièce manquante</p>
+      <p class="prose">Le dossier reste argumentatif tant qu'il ne contient pas <strong>trois comparables N1</strong> et le <strong>comptage cadastral</strong> du §5. Avec eux, il devient opposable. La procédure d'extraction et le script sont fournis au §10.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 1—2</p>
+  <div class="body">
+    <h2>Sainte-Maxime n'a pas un marché, mais trois</h2>
+    <p class="prose">Toute contestation d'un prix supérieur à 18&nbsp;000&nbsp;€/m² repose sur une seule et même erreur&nbsp;: comparer un ratio de micro-marché à une moyenne communale. Il faut donc établir en ouverture que les trois marchés de la commune sont emboîtés et non substituables.</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Marché</th><th>Référence</th><th class="n">Bas</th><th class="n">Moyen</th><th class="n">Haut</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Communal</strong><br><span style="color:var(--ink-faint)">collines, arrière-pays, parc ancien inclus</span></td><td>Base notariale, tous biens</td><td class="n">—</td><td class="n">6 103 €</td><td class="n">—</td></tr>
+          <tr><td>Communal, maisons</td><td>Base notariale</td><td class="n">—</td><td class="n">7 230 €</td><td class="n">—</td></tr>
+          <tr><td><strong>Quartier</strong> Nartelle-Noyer-Bellevue-Sardinaux</td><td>SeLoger, tous biens</td><td class="n">5 861 €</td><td class="n">7 814 €</td><td class="n">11 721 €</td></tr>
+          <tr><td>Quartier, maisons</td><td>SeLoger</td><td class="n">6 426 €</td><td class="n">8 568 €</td><td class="n">12 852 €</td></tr>
+          <tr class="mark"><td><strong>Voie</strong> chemin de la Nartelle, maisons</td><td>MeilleursAgents</td><td class="n">4 078 €</td><td class="n">8 287 €</td><td class="n"><b>16 573 €</b></td></tr>
+          <tr class="mark"><td><strong>Micro-marché front de mer</strong></td><td>Offre constatée (§6.1)</td><td class="n">13 460 €</td><td class="n">—</td><td class="n"><b>18 625 €</b></td></tr>
+        </tbody>
+        <caption>Valeurs indicatives relevées en 2026, à revérifier et horodater à la date d'émission du rapport final.</caption>
+      </table>
+    </div>
+    <p class="prose">L'outil MeilleursAgents affiche lui-même, sur la seule voie du chemin de la Nartelle, une borne haute de <strong>16&nbsp;573&nbsp;€/m²</strong> — soit le double de sa propre moyenne de voie. Cet écart intra-voie de 1 à 4 est la signature statistique d'un micro-marché littoral que les modèles automatisés ne savent pas isoler.</p>
+    <blockquote><p>La valeur de 18&nbsp;000&nbsp;€/m² ne se situe pas au-dessus du marché de Sainte-Maxime&nbsp;: elle se situe à l'intérieur du micro-marché du front de mer, qui représente moins de 2&nbsp;% du parc communal et qui n'a jamais partagé le régime de prix du reste de la commune.</p></blockquote>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 3</p>
+  <div class="body">
+    <h2>Le €/m² n'est pas un prix, c'est un quotient</h2>
+    <p class="prose">C'est le cœur de la démonstration, et la partie qui tient devant un expert bancaire ou un vérificateur. Toute maison individuelle se décompose en trois termes&nbsp;:</p>
+    <p class="mono prose" style="font-size:14px;color:var(--deep);background:var(--deep-wash);padding:14px 16px;border-radius:3px">Valeur vénale = valeur de situation (foncier) + valeur du bâti + aménagements extérieurs</p>
+    <ul class="prose">
+      <li>La <strong>valeur du bâti est plafonnée</strong> par son coût de reconstruction — sur le Golfe, 3&nbsp;500 à 5&nbsp;000&nbsp;€/m² en haut de gamme. Un bâti ne vaut jamais durablement plus que ce qu'il coûte à refaire.</li>
+      <li>La <strong>valeur de situation n'est pas plafonnée</strong>&nbsp;: elle porte sur un actif non reproductible, la position sur le rivage.</li>
+    </ul>
+    <p class="prose">Le ratio affiché n'est donc que <span class="mono" style="font-size:14px">(situation + aménagements) ÷ SHAB + coût du bâti au m²</span>. À situation identique, <strong>plus la surface bâtie est faible, plus le €/m² est élevé</strong>. Le ratio ne mesure pas la cherté, il mesure la densité de bâti posée sur un foncier rare.</p>
+
+    <h3>Calage de la valeur de situation — compte à rebours foncier</h3>
+    <p class="prose">Point d'appui&nbsp;: villa réellement proposée à la vente entre la plage de la Nartelle et la Pointe des Sardinaux, pieds dans l'eau, 177,17&nbsp;m², rénovée contemporaine, affichée 2&nbsp;950&nbsp;000&nbsp;€.</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Poste</th><th>Hypothèse</th><th class="n">Montant</th></tr></thead>
+        <tbody>
+          <tr><td>Prix affiché</td><td>—</td><td class="n">2 950 000 €</td></tr>
+          <tr><td>Prix net vendeur retenu</td><td>négociation −5 %</td><td class="n">2 800 000 €</td></tr>
+          <tr><td>Valeur du bâti</td><td>177 m² × 4 500 €/m² × 0,85 (vétusté)</td><td class="n">− 677 000 €</td></tr>
+          <tr><td>Aménagements extérieurs</td><td>piscine, terrasses, soutènement littoral, paysagisme</td><td class="n">− 200 000 €</td></tr>
+          <tr class="mark"><td><strong>Valeur de situation résiduelle</strong></td><td>par emprise résidentielle pieds dans l'eau</td><td class="n"><b>≈ 1 920 000 €</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Le résultat décisif</h3>
+    <p class="prose">À valeur de situation constante (1,9&nbsp;M€), bâti équivalent-neuf à 4&nbsp;500&nbsp;€/m², aménagements 200&nbsp;000&nbsp;€ — le prix au m² ne dépend plus que de la surface bâtie&nbsp;:</p>
+
+    <figure>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--deep)"></i> €/m² sur emprise pieds dans l'eau (situation 1,9 M€)</span>
+        <span><i class="swatch" style="background:var(--chart)"></i> seuil de 18 000 €/m²</span>
+      </div>
+      <svg id="courbe" viewBox="0 0 720 340" role="img" aria-label="Courbe du prix au mètre carré en fonction de la surface habitable : le seuil de 18 000 €/m² est franchi en deçà d'environ 155 m²."></svg>
+      <figcaption>Sur une même emprise, de qualité et d'état identiques, le prix au m² varie de 11 500 € à 25 500 € selon la seule surface bâtie. Le franchissement des 18 000 €/m² intervient en deçà d'environ <strong>155 m² habitables</strong>.</figcaption>
+    </figure>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th class="n">SHAB</th><th class="n">Valeur bâti</th><th class="n">+ extérieurs</th><th class="n">+ situation</th><th class="n">Valeur vénale</th><th class="n">€/m²</th></tr></thead>
+        <tbody id="tbl-sensi"></tbody>
+      </table>
+    </div>
+
+    <h3>Seuil de franchissement selon la qualité de situation</h3>
+    <p class="prose mono" style="font-size:14px;color:var(--ink-soft)">SHAB<sub>seuil</sub> = (situation + aménagements) ÷ (18 000 − 4 500)</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Situation</th><th class="n">Valeur de situation</th><th class="n">Dépasse 18 000 €/m² en deçà de</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Segment B</strong> — 1<sup>re</sup> ligne vue mer, sans accès direct</td><td class="n">1 200 000 €</td><td class="n"><b>≈ 104 m²</b></td></tr>
+          <tr class="mark"><td><strong>Segment A</strong> — pieds dans l'eau standard Nartelle</td><td class="n">1 900 000 €</td><td class="n"><b>≈ 156 m²</b></td></tr>
+          <tr><td>Pieds dans l'eau, exposition sud + vue Saint-Tropez</td><td class="n">2 500 000 €</td><td class="n"><b>≈ 200 m²</b></td></tr>
+          <tr><td>Pieds dans l'eau avec plage privative ou ponton</td><td class="n">3 500 000 €</td><td class="n"><b>≈ 274 m²</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <blockquote>
+      <p>Un dépassement de 18&nbsp;000&nbsp;€/m² n'est pas une anomalie de prix&nbsp;: c'est la conséquence arithmétique d'une valeur de situation de l'ordre de 1,9&nbsp;M€ portée par une surface bâtie inférieure à 155&nbsp;m².</p>
+      <p>Sur la même parcelle, une villa de 250&nbsp;m² afficherait 12&nbsp;900&nbsp;€/m² pour une valeur vénale <em>supérieure</em> de 425&nbsp;000&nbsp;€. Le €/m² le plus élevé correspond au bien le moins cher.</p>
+    </blockquote>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 4</p>
+  <div class="body">
+    <h2>Contrôle par capitalisation locative</h2>
+    <p class="prose">Méthode de recoupement entièrement indépendante, utile en dossier bancaire. Une villa pieds dans l'eau à Sainte-Maxime se loue <strong>à partir de 10&nbsp;000&nbsp;€ la semaine</strong> en haute saison. Sur le même quartier, une villa « aperçu mer » au Domaine de la Nartelle, sans front de mer, se loue 2&nbsp;640 à 2&nbsp;980&nbsp;€ la semaine en très haute saison — <strong>un rapport de 1 à 3,5</strong> entre le front de mer et l'arrière-plage.</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Période</th><th class="n">Semaines</th><th class="n">Tarif</th><th class="n">Produit</th></tr></thead>
+        <tbody>
+          <tr><td>Très haute et haute saison</td><td class="n">8</td><td class="n">9 000 €</td><td class="n">72 000 €</td></tr>
+          <tr><td>Moyenne saison</td><td class="n">6</td><td class="n">4 500 €</td><td class="n">27 000 €</td></tr>
+          <tr class="mark"><td><strong>Produit brut annuel</strong></td><td class="n"></td><td class="n"></td><td class="n"><b>≈ 99 000 €</b></td></tr>
+        </tbody>
+        <caption>Reconstitution prudente, segment A. Les taux de rendement brut observés sur les actifs balnéaires de rareté se situent entre 3,0 % et 3,5 % — l'acquéreur achète un usage et une rareté, non un rendement.</caption>
+      </table>
+    </div>
+    <div class="callout">
+      <p class="eyebrow">Recoupement</p>
+      <p class="prose">99 000 € ÷ 3,3 % ≈ <strong>3 000 000 €</strong>. Rapportée à une villa de 150 m², cette valeur ressort à <strong>20 000 €/m²</strong> — cohérente avec la table du §3 et obtenue par une voie totalement distincte.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 5</p>
+  <div class="body">
+    <h2>Une rareté qui ne peut pas se résorber</h2>
+    <ol class="prose">
+      <li><strong>Loi Littoral</strong> (art. L.121-16 et s. du code de l'urbanisme) — inconstructibilité de principe dans la bande des 100 mètres hors espaces urbanisés, extension de l'urbanisation limitée dans les espaces proches du rivage. Aucune offre nouvelle de foncier pieds dans l'eau ne peut être créée.</li>
+      <li><strong>Stock physiquement fini</strong> — le linéaire côtier entre la plage de la Nartelle et la Pointe des Sardinaux comporte un nombre fermé de parcelles en première ligne. À chiffrer par comptage cadastral (§10.3)&nbsp;: c'est l'élément factuel le plus fort du dossier.</li>
+      <li><strong>Protection environnementale des Sardinaux</strong> — contrainte supplémentaire sur toute densification.</li>
+    </ol>
+    <p class="prose">Conséquence économique&nbsp;: l'offre est parfaitement inélastique. Toute hausse de la demande se transmet intégralement au prix, sans arbitrage possible par la construction. La prime de rareté est structurelle, pas conjoncturelle.</p>
+    <div class="callout warn">
+      <p class="eyebrow">À vérifier au PLU en vigueur</p>
+      <p class="prose">Les trois points ci-dessus doivent être confirmés au PLU de Sainte-Maxime et au zonage littoral avant citation dans un rapport signé.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 6</p>
+  <div class="body">
+    <h2>Comparables</h2>
+    <h3>6.1 — Offre, secteur Nartelle / Sardinaux <span class="mono" style="color:var(--chart);font-size:12px">N3</span></h3>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Réf.</th><th>Localisation</th><th class="n">SHAB</th><th class="n">Prix affiché</th><th class="n">€/m²</th><th>Caractéristique</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">O1</td><td>Entre plage de la Nartelle et Pointe des Sardinaux</td><td class="n">177,17 m²</td><td class="n">2 950 000 €</td><td class="n"><b>16 651 €</b></td><td>Pieds dans l'eau, rénové contemporain</td></tr>
+          <tr class="mark"><td class="mono">O2</td><td>Secteur Nartelle</td><td class="n">≈ 160 m²</td><td class="n">2 980 000 €</td><td class="n"><b>≈ 18 625 €</b></td><td><strong>Accès privatif direct à la plage</strong></td></tr>
+          <tr><td class="mono">O3</td><td>Proche plage de la Nartelle</td><td class="n">≈ 117 m²</td><td class="n">1 575 000 €</td><td class="n"><b>≈ 13 460 €</b></td><td>Vue mer sur les Sardinaux, sans accès direct</td></tr>
+        </tbody>
+        <caption>Prix affichés, non des prix de vente. O2 est le comparable pivot du dossier : il établit qu'un bien à accès plage privatif se positionne au-delà de 18 000 €/m² sur ce secteur. Il doit être re-sourcé, horodaté et capturé en PDF avant remise du rapport.</caption>
+      </table>
+    </div>
+
+    <h3>6.2 — Comparables élargis, Golfe de Saint-Tropez</h3>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Commune / secteur</th><th>Indicateur</th><th class="n">Valeur</th></tr></thead>
+        <tbody>
+          <tr><td>Saint-Tropez</td><td>prix moyen maisons (mai 2026)</td><td class="n">≈ 21 228 €/m²</td></tr>
+          <tr><td>Saint-Tropez</td><td>prix moyen tous biens</td><td class="n">≈ 15 278 €/m²</td></tr>
+          <tr class="mark"><td>Saint-Tropez — <strong>quartier des Salins</strong></td><td><strong>pieds dans l'eau</strong></td><td class="n"><b>20 000 – 40 000 €/m²</b></td></tr>
+          <tr><td>Saint-Tropez</td><td>biens d'exception</td><td class="n">jusqu'à ≈ 50 000 €/m²</td></tr>
+          <tr><td>Ramatuelle</td><td>prix moyen</td><td class="n">≈ 16 135 €/m²</td></tr>
+          <tr><td>Sainte-Maxime</td><td>neuf haut de gamme</td><td class="n">8 000 – 11 000 €/m²</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <blockquote><p>Sainte-Maxime fait face à Saint-Tropez, à quinze minutes par la mer. Le pieds-dans-l'eau des Salins se traite entre 20&nbsp;000 et 40&nbsp;000&nbsp;€/m². Une valorisation à 18&nbsp;000&nbsp;€/m² sur le front de mer de La Nartelle représente une <em>décote</em> de 10&nbsp;% à 55&nbsp;% par rapport à la rive opposée du même golfe.</p></blockquote>
+    <p class="prose">Contexte 2025-2026&nbsp;: le Golfe enregistre moins de transactions sans baisse des prix — la rareté prime sur toute logique de correction. Sainte-Maxime est identifiée comme marché de report de Saint-Tropez, ce qui soutient structurellement le haut de son marché.</p>
+
+    <h3>6.3 — Transactions <span class="mono" style="color:var(--chart);font-size:12px">N1</span> — à extraire</h3>
+    <div class="callout warn">
+      <p class="prose">C'est la pièce manquante et la seule opposable. Cinq lignes à compléter&nbsp;: date, adresse ou section-parcelle, SHAB, terrain, prix acte, €/m², distance au rivage, source. Le script du §10.2 les produit automatiquement au format du tableau.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 7</p>
+  <div class="body">
+    <h2>Grille de pondération</h2>
+    <p class="prose">Pour passer d'un comparable au bien évalué, les ajustements doivent être explicites et chiffrés — c'est une exigence de tout expert comme de l'administration. Un ajustement non motivé est le premier point attaqué en contradictoire.</p>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Critère</th><th class="n">Ajustement sur la valeur de situation</th></tr></thead>
+        <tbody>
+          <tr><td>Accès direct mer ou plage, sans voie interposée</td><td class="n">+ 60 % à + 120 %</td></tr>
+          <tr><td>Plage ou crique privative</td><td class="n">+ 25 % à + 50 %</td></tr>
+          <tr><td>Ponton ou mouillage</td><td class="n">+ 10 % à + 25 %</td></tr>
+          <tr><td>Vue frontale sur Saint-Tropez</td><td class="n">+ 15 % à + 30 %</td></tr>
+          <tr><td>Exposition plein sud ou sud-ouest</td><td class="n">+ 10 % à + 20 %</td></tr>
+          <tr><td>Absence de servitude de passage sur la parcelle</td><td class="n">+ 5 % à + 15 %</td></tr>
+          <tr><td>Nuisance routière (RD 559 en surplomb)</td><td class="n">− 10 % à − 25 %</td></tr>
+          <tr><td>Servitude de passage des piétons sur le littoral traversant la propriété</td><td class="n">− 10 % à − 20 %</td></tr>
+          <tr><td>Exposition au risque de submersion, PPR</td><td class="n">− 5 % à − 15 %</td></tr>
+          <tr><td>Bien à rénover intégralement</td><td class="n">bâti ramené à 0, moins démolition</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 8</p>
+  <div class="body">
+    <h2>Les sept objections, et leurs réponses</h2>
+    <div>
+      <details open>
+        <summary><span class="q">01</span> « La moyenne à Sainte-Maxime est de 6 100 €/m². »</summary>
+        <div class="ans">La méthode par comparaison impose de retenir des biens <strong>intrinsèquement similaires</strong> en situation, surface et époque — pas de rapporter un bien à une moyenne communale. Une moyenne qui agrège collines, arrière-pays et parc ancien n'est pas un terme de comparaison.</div>
+      </details>
+      <details>
+        <summary><span class="q">02</span> « Les outils d'estimation plafonnent le quartier à 12 852 €/m². »</summary>
+        <div class="ans">Ces bornes sont des sorties algorithmiques calées sur le volume&nbsp;: le front de mer représente moins de 2 % du parc et est structurellement sous-représenté dans l'apprentissage. Le même outil affiche <strong>16 573 €/m²</strong> en borne haute sur le seul chemin de la Nartelle — un écart intra-voie de 1 à 4 qui signale l'existence du micro-marché.</div>
+      </details>
+      <details>
+        <summary><span class="q">03</span> « 18 000 €/m², c'est plus que la moyenne de Saint-Tropez. »</summary>
+        <div class="ans">Comparaison non homogène&nbsp;: une moyenne communale contre un ratio de bien d'exception. Le pieds-dans-l'eau des Salins se traite 20 000 à 40 000 €/m². La référence pertinente n'est pas la moyenne de Saint-Tropez, c'est le front de mer de Saint-Tropez.</div>
+      </details>
+      <details>
+        <summary><span class="q">04</span> « Aucune vente DVF de ce niveau n'est recensée à Sainte-Maxime. »</summary>
+        <div class="ans">Trois raisons cumulatives. <strong>(a)</strong> Le segment produit très peu de mutations par an — l'absence de comparable récent traduit la rareté, pas l'absence de valeur. <strong>(b)</strong> Une part significative de ces biens est détenue en SCI et cédée par <strong>cession de parts sociales</strong>, opération qui n'apparaît pas dans DVF. <strong>(c)</strong> Une part importante des transactions haut de gamme du Golfe se réalise off-market. DVF sous-représente donc structurellement ce segment.</div>
+      </details>
+      <details>
+        <summary><span class="q">05</span> « Le prix affiché n'est pas un prix de vente. »</summary>
+        <div class="ans">Exact — d'où la production de comparables N1 au §6.3 et le recoupement par capitalisation locative au §4. Les prix d'offre ne sont ici qu'un troisième faisceau.</div>
+      </details>
+      <details>
+        <summary><span class="q">06</span> « Le bien est petit, il ne vaut pas ce prix. »</summary>
+        <div class="ans">Argument inversé&nbsp;: sur le front de mer, la compacité <strong>augmente</strong> le €/m² et <strong>diminue</strong> la valeur absolue. Le bien de 155 m² à 18 000 €/m² est moins cher en valeur totale que le bien de 250 m² à 12 900 €/m² sur la même emprise — 2,80 M€ contre 3,23 M€.</div>
+      </details>
+      <details>
+        <summary><span class="q">07</span> « Le marché est en repli. »</summary>
+        <div class="ans">Sur le Golfe de Saint-Tropez, le repli porte sur les <strong>volumes</strong>, pas sur les prix&nbsp;: moins de ventes, valeurs maintenues, la rareté primant sur toute logique de baisse. Le segment de rareté est le moins élastique du marché.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 9</p>
+  <div class="body">
+    <h2>Fourchette de valeur justifiée</h2>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Segment</th><th class="n">Fourchette €/m²</th><th>Condition du dépassement de 18 000 €/m²</th></tr></thead>
+        <tbody>
+          <tr class="mark"><td><strong>A</strong> — pieds dans l'eau, Nartelle / Sardinaux</td><td class="n"><b>15 000 – 22 000 €</b></td><td>en deçà de ≈ 155 m² habitables, ou au-delà avec plage privative, ponton ou exposition sud</td></tr>
+          <tr class="mark"><td><strong>A+</strong> — pieds dans l'eau avec plage privative</td><td class="n"><b>18 000 – 28 000 €</b></td><td>situation exceptionnelle documentée</td></tr>
+          <tr><td><strong>B</strong> — 1<sup>re</sup> ligne vue mer, sans accès direct</td><td class="n"><b>11 000 – 18 000 €</b></td><td>en deçà de ≈ 105 m² habitables</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose">Une valeur supérieure à 18&nbsp;000&nbsp;€/m² est pleinement justifiable sur le secteur de La Nartelle, dès lors que le rapport établit conjointement&nbsp;:</p>
+    <ol class="prose">
+      <li>l'appartenance du bien au micro-marché du front de mer&nbsp;;</li>
+      <li>la valeur de situation par compte à rebours foncier&nbsp;;</li>
+      <li>la surface bâtie et le seuil de franchissement correspondant&nbsp;;</li>
+      <li>au moins trois comparables de niveau N1&nbsp;;</li>
+      <li>le recoupement par capitalisation locative&nbsp;;</li>
+      <li>la rareté foncière quantifiée par comptage cadastral.</li>
+    </ol>
+    <p class="prose"><strong>Sans les points 4 et 6, le dossier reste argumentatif&nbsp;; avec eux, il devient opposable.</strong></p>
+  </div>
+</section>
+
+<section>
+  <p class="num">§ 10</p>
+  <div class="body">
+    <h2>Obtenir les comparables opposables</h2>
+    <h3>10.1 — Sources de niveau N1</h3>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Source</th><th>Accès</th><th>Contenu</th><th>Limite</th></tr></thead>
+        <tbody>
+          <tr><td><strong>DVF open data</strong></td><td><span class="mono" style="font-size:12.5px">files.data.gouv.fr/geo-dvf/</span> — libre</td><td>Mutations depuis 2020, géolocalisées, surfaces bâtie et terrain</td><td>Pas les cessions de parts de SCI</td></tr>
+          <tr><td><strong>Patrim</strong></td><td>impots.gouv.fr, espace particulier</td><td>Même socle, recherche par critères</td><td>Usage encadré</td></tr>
+          <tr><td><strong>Perval</strong></td><td>Base des notaires, accès professionnel</td><td>Mutations enrichies (état, prestations)</td><td>Payant / conventionné</td></tr>
+          <tr><td>Chambre des Notaires du Var</td><td>Publication annuelle</td><td>Indices et prix médians par commune</td><td>Agrégé, sans comparable individuel</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>10.2 — Extraction automatisée</h3>
+    <p class="prose">Un script est fourni dans le dépôt&nbsp;: <span class="mono" style="font-size:13.5px">tools/dvf/extract_dvf_nartelle.py</span>. Il télécharge les mutations de Sainte-Maxime (INSEE 83115), <strong>les reconstitue au niveau de l'acte</strong> — une vente DVF s'étale sur plusieurs lignes et sommer sans déduplication fausse tous les €/m² —, calcule la distance au rivage de chaque bien et sort une grille triée, restreinte à la bande littorale.</p>
+    <p class="mono prose" style="font-size:13px;background:var(--land);padding:13px 15px;border-radius:3px;overflow-x:auto">python3 tools/dvf/extract_dvf_nartelle.py --annees 2021 2022 2023 2024 2025 --distance-max 250</p>
+
+    <h3>10.3 — Comptage cadastral de la rareté</h3>
+    <ol class="prose">
+      <li>Ouvrir cadastre.gouv.fr ou le Géoportail de l'urbanisme sur Sainte-Maxime.</li>
+      <li>Délimiter le linéaire côtier entre la plage de la Nartelle et la Pointe des Sardinaux.</li>
+      <li>Compter les parcelles bâties en contact direct avec le domaine public maritime, sans voie interposée.</li>
+      <li>Croiser avec le zonage du PLU et le tracé de la bande des 100 mètres.</li>
+    </ol>
+    <div class="callout">
+      <p class="prose">Résultat attendu&nbsp;: un nombre fermé, à deux chiffres. Une phrase du type <em>« le secteur compte N parcelles bâties en contact direct avec le rivage, aucune création nouvelle n'étant possible au titre de la loi Littoral »</em> vaut plus, en dossier, que dix pages d'analyse de marché.</p>
+    </div>
+
+    <h3>10.4 — Pièces à joindre au rapport final</h3>
+    <ul class="check">
+      <li>Extraction DVF horodatée — CSV et capture de la requête</li>
+      <li>Trois comparables N1 minimum, avec plan de situation</li>
+      <li>Captures PDF horodatées des comparables d'offre O1 à O3</li>
+      <li>Extrait cadastral du bien et des comparables</li>
+      <li>Extrait du PLU et du zonage littoral</li>
+      <li>Attestation signée des comparables off-market (N2), le cas échéant</li>
+      <li>Historique locatif réel du bien, s'il existe — il substitue des flux constatés aux tarifs affichés du §4</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p class="eyebrow">Sources</p>
+  <p class="srcs">Données agrégées&nbsp;: <a href="https://www.meilleursagents.com/prix-immobilier/sainte-maxime-83120/chemin-de-la-nartelle-1167963135/">MeilleursAgents — chemin de la Nartelle</a> · <a href="https://www.seloger.com/prix-de-l-immo/vente/provence-alpes-cote-d-azur/var/sainte-maxime/nartelle-noyer-bellevue-bd-des-sardinaux/46108.htm">SeLoger — quartier Nartelle-Noyer-Bellevue-Sardinaux</a> · <a href="https://www.netvendeur.com/prix/ville-sainte-maxime-83/">Netvendeur — Sainte-Maxime</a> · <a href="https://www.pap.fr/vendeur/prix-m2/sainte-maxime-83120-g40947">PAP — prix par quartiers</a><br>
+  Comparables d'offre&nbsp;: <a href="https://www.espaces-atypiques.com/ventes/83120-sainte-maxime-villa-les-pieds-dans-l-eau-5791/">Espaces Atypiques — villa pieds dans l'eau 177,17 m²</a> · <a href="https://www.bellesdemeures.com/vente/france/provence-alpes-cote-d-azur/var/sainte-maxime/nartelle-noyer-bellevue-bd-des-sardinaux/maison-luxe/tt-2-tb-2-pl-46108/">Belles Demeures — quartier Nartelle-Sardinaux</a> · <a href="https://proprietes.agenceprovensal.com/fiche-villa+pieds+dans+l+eau+avec+piscine+a+vendre+a+ste+maxime-300V1402M.html">Agence Provensal</a> · <a href="https://www.cotelittoral.fr/vente-maisons-pieds-dans-l-eau-sainte-maxime-56096_31.html">Côte &amp; Littoral</a><br>
+  Marché du Golfe&nbsp;: <a href="https://www.mysweetimmo.com/2026/02/18/immobilier-dans-le-golfe-de-saint-tropez-peu-de-ventes-mais-des-prix-qui-ne-cedent-pas/">MySweetImmo — moins de ventes, prix maintenus (févr. 2026)</a> · <a href="https://www.mysweetimmo.com/2026/03/15/prix-immobilier-saint-tropez-fevrier-2026/">MySweetImmo — les clés du marché tropézien</a> · <a href="https://www.mysweetimmo.com/2026/06/01/immobilier-saint-tropez-ces-communes-voisines-qui-seduisent-les-acheteurs/">MySweetImmo — communes voisines</a> · <a href="https://www.orpi.com/prix-immobilier/saint-tropez">Orpi — prix m² Saint-Tropez</a> · <a href="https://www.ventecommerces.com/prix-au-m2-a-saint-tropez-analyse-detaillee-par-quartier/">Analyse par quartier, Saint-Tropez</a> · <a href="https://actualites.logic-immo.com/pres-de-chez/golfe-de-saint-tropez-vue-mer-reste-principal-critere-de-recherche-oeil-expert-13387">Logic-Immo — la vue mer, premier critère</a><br>
+  Marché locatif&nbsp;: <a href="https://www.magrey.fr/location-sainte-maxime.html">Magrey &amp; Sons</a> · <a href="https://www.agencemontblanc.com/location-vacances/83-var/2-ste-maxime/villa-au-calme-avec-piscine-et-apercu-mer-domaine-de-la-nartelle-sainte-maxime/944-villa">Agence Mont-Blanc — Domaine de la Nartelle</a></p>
+  <p>Toutes les valeurs issues de ces sources doivent être revérifiées et horodatées à la date d'émission du rapport final&nbsp;: les niveaux affichés par les plateformes d'estimation évoluent mensuellement.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var SITUATION = 1900000, EXTERIEURS = 200000, COUT_BATI = 4500, SEUIL = 18000;
+  var prixM2 = function (s) { return (SITUATION + EXTERIEURS) / s + COUT_BATI; };
+  var seuilSHAB = (SITUATION + EXTERIEURS) / (SEUIL - COUT_BATI);
+
+  /* --- Tableau de sensibilité ------------------------------------------- */
+  var fmt = function (v) { return Math.round(v).toLocaleString('fr-FR').replace(/ /g, ' '); };
+  var corps = document.getElementById('tbl-sensi');
+  [100, 120, 140, 155, 177, 200, 250, 300].forEach(function (s) {
+    var bati = s * COUT_BATI, total = bati + EXTERIEURS + SITUATION;
+    var tr = document.createElement('tr');
+    if (s === 155) tr.className = 'mark';
+    tr.innerHTML =
+      '<td class="n">' + s + ' m²</td>' +
+      '<td class="n">' + fmt(bati) + ' €</td>' +
+      '<td class="n">' + fmt(bati + EXTERIEURS) + ' €</td>' +
+      '<td class="n">' + fmt(SITUATION) + ' €</td>' +
+      '<td class="n">' + fmt(total) + ' €</td>' +
+      '<td class="n"><b>' + fmt(total / s) + ' €</b></td>';
+    corps.appendChild(tr);
+  });
+
+  /* --- Courbe ------------------------------------------------------------ */
+  var W = 720, H = 340, ML = 62, MR = 18, MT = 16, MB = 40;
+  var x0 = 80, x1 = 340, y0 = 8000, y1 = 32000;
+  var px = function (s) { return ML + (s - x0) / (x1 - x0) * (W - ML - MR); };
+  var py = function (v) { return MT + (1 - (v - y0) / (y1 - y0)) * (H - MT - MB); };
+  var ns = 'http://www.w3.org/2000/svg';
+  var svg = document.getElementById('courbe');
+  var el = function (nom, attrs, texte) {
+    var n = document.createElementNS(ns, nom);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (texte != null) n.textContent = texte;
+    svg.appendChild(n);
+    return n;
+  };
+  var LABEL = { 'font-family': 'IBM Plex Mono, monospace', 'font-size': '11', fill: 'var(--ink-faint)' };
+  var assign = function (base, extra) {
+    var o = {}; for (var k in base) o[k] = base[k]; for (var j in extra) o[j] = extra[j]; return o;
+  };
+
+  [10000, 15000, 20000, 25000, 30000].forEach(function (v) {
+    el('line', { x1: ML, x2: W - MR, y1: py(v), y2: py(v), stroke: 'var(--rule-soft)', 'stroke-width': 1 });
+    el('text', assign(LABEL, { x: ML - 10, y: py(v) + 4, 'text-anchor': 'end' }), fmt(v));
+  });
+  [100, 150, 200, 250, 300].forEach(function (s) {
+    el('text', assign(LABEL, { x: px(s), y: H - 14, 'text-anchor': 'middle' }), s + ' m²');
+  });
+  el('line', { x1: ML, x2: W - MR, y1: py(y0), y2: py(y0), stroke: 'var(--rule)', 'stroke-width': 1 });
+
+  /* Seuil de 18 000 €/m² */
+  el('line', {
+    x1: ML, x2: W - MR, y1: py(SEUIL), y2: py(SEUIL),
+    stroke: 'var(--chart)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4'
+  });
+  el('text', assign(LABEL, {
+    x: W - MR, y: py(SEUIL) - 9, 'text-anchor': 'end', fill: 'var(--chart)', 'font-size': '11.5'
+  }), '18 000 €/m²');
+
+  /* Zone de dépassement */
+  var zone = ['M ' + px(x0) + ' ' + py(SEUIL)];
+  for (var s = x0; s <= seuilSHAB; s += 1) zone.push('L ' + px(s) + ' ' + py(Math.min(prixM2(s), y1)));
+  zone.push('L ' + px(seuilSHAB) + ' ' + py(SEUIL) + ' Z');
+  el('path', { d: zone.join(' '), fill: 'var(--chart)', 'fill-opacity': '.12' });
+
+  /* Courbe */
+  var trace = [];
+  for (var t = x0; t <= x1; t += 1) {
+    var v = prixM2(t);
+    if (v > y1) continue;
+    trace.push((trace.length ? 'L ' : 'M ') + px(t) + ' ' + py(v));
+  }
+  el('path', { d: trace.join(' '), fill: 'none', stroke: 'var(--deep)', 'stroke-width': 2.4, 'stroke-linecap': 'round' });
+
+  /* Point de franchissement */
+  el('line', {
+    x1: px(seuilSHAB), x2: px(seuilSHAB), y1: py(SEUIL), y2: H - MB,
+    stroke: 'var(--chart)', 'stroke-width': 1, 'stroke-dasharray': '3 3'
+  });
+  el('circle', { cx: px(seuilSHAB), cy: py(SEUIL), r: 4.5, fill: 'var(--chart)' });
+  el('text', assign(LABEL, {
+    x: px(seuilSHAB) + 12, y: py(SEUIL) + 22, fill: 'var(--chart)', 'font-size': '12', 'font-weight': '500'
+  }), '≈ 156 m²');
+})();
+</script>
