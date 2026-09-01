@@ -1,0 +1,650 @@
+<title>Villa Roi de la Camargue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400&family=Archivo:wght@400;500;600&display=swap">
+
+<style>
+/* ─── Tokens : travertin, acier brossé, bronze ────────────────────────────── */
+:root{
+  --ground:   #E7E2D7;
+  --paper:    #F8F6F1;
+  --panel:    #F0EDE5;
+  --ink:      #1E1A14;
+  --ink-soft: #5B5347;
+  --ink-mute: #8B8375;
+  --rule:     #D2CCBE;
+  --rule-fine:#E2DDD2;
+  --bronze:   #8A5A0E;
+  --bronze-wash:#F3E9D6;
+  --steel:    #33302A;
+  --c1: #BE7B12;   /* catégoriel 1 — validé */
+  --c2: #2064C0;   /* catégoriel 2 — validé */
+  --c3: #B03024;   /* catégoriel 3 — validé */
+  --surface-chart:#FCFCFB;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:   #14120D;
+    --paper:    #1D1A14;
+    --panel:    #232019;
+    --ink:      #EDE8DC;
+    --ink-soft: #B3AB9A;
+    --ink-mute: #857D6D;
+    --rule:     #332F26;
+    --rule-fine:#282419;
+    --bronze:   #D9A544;
+    --bronze-wash:#2A2213;
+    --steel:    #C9C2B2;
+    --c1: #BC8420;
+    --c2: #5089DC;
+    --c3: #D25E52;
+    --surface-chart:#17150F;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:   #14120D;
+  --paper:    #1D1A14;
+  --panel:    #232019;
+  --ink:      #EDE8DC;
+  --ink-soft: #B3AB9A;
+  --ink-mute: #857D6D;
+  --rule:     #332F26;
+  --rule-fine:#282419;
+  --bronze:   #D9A544;
+  --bronze-wash:#2A2213;
+  --steel:    #C9C2B2;
+  --c1: #BC8420;
+  --c2: #5089DC;
+  --c3: #D25E52;
+  --surface-chart:#17150F;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);color:var(--ink);
+  font-family:"Archivo",-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;
+}
+.serif{font-family:"Bodoni Moda","Didot",Georgia,serif}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px 110px}
+
+h1,h2,h3{margin:0;font-family:"Bodoni Moda","Didot",Georgia,serif;font-weight:400;text-wrap:balance;line-height:1.14}
+h1{font-size:clamp(2.5rem,6.4vw,4.6rem);letter-spacing:-.012em}
+h2{font-size:clamp(1.75rem,3.4vw,2.6rem);letter-spacing:-.008em}
+h3{font-size:1.16rem;font-weight:500;font-family:"Archivo",sans-serif;letter-spacing:-.004em}
+p{margin:0}
+.prose{max-width:64ch}
+.eyebrow{
+  font-size:11px;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--bronze);
+}
+.lede{font-size:1.2rem;line-height:1.55;color:var(--ink-soft);max-width:56ch}
+strong{font-weight:600}
+em{font-style:italic}
+a{color:var(--bronze);text-decoration:underline;text-underline-offset:.18em;text-decoration-thickness:.06em}
+a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--bronze);outline-offset:3px;border-radius:3px}
+ul,ol{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:.45em;max-width:62ch}
+
+/* ─── Chapitres ───────────────────────────────────────────────────────────── */
+section{padding-block:52px;border-top:1px solid var(--rule-fine);display:flex;flex-direction:column;gap:24px}
+.chapno{
+  font-family:"Bodoni Moda",serif;font-size:13px;letter-spacing:.2em;color:var(--ink-mute);
+}
+.head{display:flex;flex-direction:column;gap:9px}
+
+/* ─── Couverture ──────────────────────────────────────────────────────────── */
+header{padding:clamp(54px,9vw,110px) 0 46px;display:flex;flex-direction:column;gap:26px}
+.addr{font-size:14px;color:var(--ink-soft);letter-spacing:.02em}
+.hero-price{
+  display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 40px;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:24px 0;margin-top:6px;
+}
+.hero-price .big{
+  font-family:"Bodoni Moda",serif;font-size:clamp(3rem,9vw,5.6rem);line-height:.92;
+  font-variant-numeric:tabular-nums;color:var(--ink);
+}
+.hero-price .unit{font-family:"Bodoni Moda",serif;font-size:clamp(1.1rem,2.4vw,1.7rem);color:var(--bronze)}
+.hero-price .side{font-size:13.5px;color:var(--ink-soft);max-width:32ch;line-height:1.5}
+
+/* ─── Relevé de chiffres ──────────────────────────────────────────────────── */
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.figs div{background:var(--paper);padding:15px 17px;display:flex;flex-direction:column;gap:4px}
+.figs dt{font-size:10.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-mute)}
+.figs dd{margin:0;font-family:"Bodoni Moda",serif;font-size:1.5rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.figs dd small{display:block;font-family:"Archivo",sans-serif;font-size:.68rem;color:var(--ink-mute);margin-top:3px}
+
+/* ─── Tableaux ────────────────────────────────────────────────────────────── */
+.scroll{overflow-x:auto;border:1px solid var(--rule);background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--rule-fine);vertical-align:top}
+thead th{
+  font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-mute);
+  background:var(--panel);white-space:nowrap;border-bottom:1px solid var(--rule);
+}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.tot td{background:var(--bronze-wash);font-weight:600}
+tr.tot td.n{color:var(--bronze)}
+tr.sub td{font-weight:600}
+caption{caption-side:bottom;text-align:left;padding:9px 13px;font-size:12px;color:var(--ink-mute);border-top:1px solid var(--rule-fine)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;transform:translateY(0)}
+
+/* ─── Encarts ─────────────────────────────────────────────────────────────── */
+.box{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--bronze);padding:17px 21px;display:flex;flex-direction:column;gap:9px}
+.box.risk{border-left-color:var(--c3)}
+.box .eyebrow{color:var(--bronze)}
+.box.risk .eyebrow{color:var(--c3)}
+.quote{
+  font-family:"Bodoni Moda",serif;font-size:1.3rem;line-height:1.42;font-style:italic;
+  color:var(--ink);max-width:52ch;padding-left:20px;border-left:2px solid var(--bronze);
+}
+
+/* ─── Figures ─────────────────────────────────────────────────────────────── */
+figure{margin:0;background:var(--paper);border:1px solid var(--rule);padding:20px 18px 14px;position:relative}
+figure svg{display:block;width:100%;height:auto;overflow:visible}
+figcaption{font-size:12px;color:var(--ink-mute);margin-top:13px;padding-top:11px;border-top:1px solid var(--rule-fine);max-width:72ch;line-height:1.55}
+.legend{display:flex;flex-wrap:wrap;gap:5px 20px;font-size:12px;color:var(--ink-soft);margin-bottom:15px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.tip{
+  position:absolute;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--ink);color:var(--ground);font-size:12px;line-height:1.4;
+  padding:7px 10px;border-radius:3px;max-width:240px;z-index:5;
+}
+.tip b{font-weight:600}
+@media (prefers-reduced-motion:reduce){.tip{transition:none}}
+
+/* ─── Trois méthodes ──────────────────────────────────────────────────────── */
+.methods{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.method{background:var(--paper);border:1px solid var(--rule);padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.method .res{font-family:"Bodoni Moda",serif;font-size:2rem;color:var(--bronze);font-variant-numeric:tabular-nums;line-height:1}
+.method h3{font-size:1rem}
+.method p{font-size:.87rem;color:var(--ink-soft);line-height:1.5}
+
+/* ─── Objections ──────────────────────────────────────────────────────────── */
+details{background:var(--paper);border:1px solid var(--rule)}
+details + details{margin-top:7px}
+summary{cursor:pointer;padding:13px 17px;list-style:none;font-size:14px;font-weight:500;display:flex;gap:11px;align-items:baseline}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";margin-left:auto;color:var(--c3);font-size:15px}
+details[open] summary::after{content:"−"}
+details[open] summary{border-bottom:1px solid var(--rule-fine)}
+summary .k{font-family:"Bodoni Moda",serif;font-size:12.5px;color:var(--ink-mute)}
+details .ans{padding:14px 17px 16px 42px;font-size:.93rem;color:var(--ink-soft);max-width:70ch;display:flex;flex-direction:column;gap:9px}
+@media (max-width:600px){details .ans{padding-left:17px}}
+
+/* ─── Prestations ─────────────────────────────────────────────────────────── */
+.presta{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.presta div{background:var(--paper);padding:14px 16px;display:flex;flex-direction:column;gap:5px}
+.presta h3{font-size:.88rem;font-weight:600;letter-spacing:.02em}
+.presta p{font-size:.83rem;color:var(--ink-soft);line-height:1.48}
+.presta .sz{font-family:"Bodoni Moda",serif;font-size:1.15rem;color:var(--bronze);font-variant-numeric:tabular-nums}
+
+footer{border-top:1px solid var(--rule);padding-top:28px;font-size:12.5px;color:var(--ink-mute);display:flex;flex-direction:column;gap:11px;line-height:1.7}
+
+@media print{
+  body{background:#fff;font-size:10.5pt}
+  section{break-inside:auto;padding-block:22px}
+  figure,.box,.figs,.scroll,.methods,.presta{break-inside:avoid}
+  details{break-inside:avoid}
+  details .ans{display:flex !important}
+  summary::after{display:none}
+  .tip{display:none}
+}
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">La Crémerie · Cercle Privé — Dossier de défense de prix</p>
+  <h1>Villa Roi de la Camargue</h1>
+  <p class="addr">9, avenue du Roi de la Camargue — La Nartelle, 83120 Sainte-Maxime · Parcelle AF 168</p>
+  <p class="lede">Villa neuve de 421,82 m² intérieurs sur 2 033 m², prestations d'exception, livrée équipée et meublée. Défense d'une valeur de 20 000 €/m².</p>
+  <div class="hero-price">
+    <div>
+      <div class="big">8 436 400 <span class="unit">€</span></div>
+    </div>
+    <div>
+      <div class="big" style="font-size:clamp(2rem,5vw,3rem);color:var(--bronze)">20 000 <span class="unit" style="font-size:1rem">€/m²</span></div>
+    </div>
+    <p class="side">Sur la surface intérieure de 421,82 m². Trois méthodes indépendantes convergent vers cette valeur — le détail suit.</p>
+  </div>
+</header>
+
+<section>
+  <div class="head">
+    <p class="chapno">I</p>
+    <h2>Le bien en chiffres</h2>
+  </div>
+  <dl class="figs">
+    <div><dt>Parcelle AF 168</dt><dd>2 033 m²<small>dont 1 635 m² d'extérieurs</small></dd></div>
+    <div><dt>Surface intérieure</dt><dd>421,82 m²<small>hors garage et local technique</small></dd></div>
+    <div><dt>Emprise au sol</dt><dd>397,68 m²<small>19,6 % de la parcelle</small></dd></div>
+    <div><dt>Terrasses</dt><dd>151,73 m²<small>dont 30,69 m² couverts</small></dd></div>
+    <div><dt>Surface de plancher</dt><dd>502,49 m²<small>garage 74,67 m² inclus</small></dd></div>
+    <div><dt>Chambres</dt><dd>4 × 39,85 m²<small>moyenne, de 36,54 à 41,16 m²</small></dd></div>
+  </dl>
+  <p class="prose">La singularité du programme tient en une ligne : <strong>quatre chambres de 36 à 41 m²</strong>, quand les villas comparables du Golfe en alignent cinq ou six de 15 à 20 m². Ce n'est pas une villa familiale, c'est une villa de réception au standard hôtelier cinq étoiles.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Niveau</th><th>Espaces</th><th class="n">Surface</th></tr></thead>
+      <tbody>
+        <tr><td><strong>R-0</strong></td><td>Hall 34,88 · Chambre 3 40,86 · Chambre 4 41,16 · Salle de musculation 36,52 · Salle de projection 30,22 · Lingerie 24,14 · Chambre froide 10,38 · Sauna 8,59 · Sanitaires 7,52</td><td class="n">234,27 m²</td></tr>
+        <tr><td><strong>R+1</strong></td><td>Séjour 54,75 · Chambre 1 40,85 · Chambre 2 36,54 · Cuisine 18,15 · Bureau 13,48 · Entrée 9,79 · Cave 6,11 · Vestibule 3,62 · WC 3,16 · SAS 1,10</td><td class="n">187,55 m²</td></tr>
+        <tr class="tot"><td colspan="2"><strong>Surface intérieure</strong></td><td class="n">421,82 m²</td></tr>
+        <tr><td>Annexes</td><td>Garage 74,67 · Zone technique 6,00</td><td class="n">80,67 m²</td></tr>
+        <tr><td>Extérieurs</td><td>Terrasse sud 96,49 · Terrasse couverte 30,69 · Terrasse est 24,55 · Piscine 7,70 × 3,50 · Jacuzzi · Cuisine d'été</td><td class="n">151,73 m²</td></tr>
+      </tbody>
+      <caption>Surfaces relevées sur les plans d'esquisse ESQ.2 / ESQ.3 du 30/05/2025, indice 120. Ces plans portent la mention « plans de principe » : les surfaces définitives devront être attestées par un géomètre à la livraison.</caption>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="head">
+    <p class="chapno">II</p>
+    <h2>Le ratio dépend de la convention retenue</h2>
+  </div>
+  <p class="prose">Premier réflexe de défense, avant toute discussion de marché : <strong>20 000 €/m² est un chiffre de convention, pas une donnée physique.</strong> Le même prix, rapporté à une autre base de surface — toutes usuelles en expertise — produit des ratios très différents.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Base de calcul</th><th class="n">Surface</th><th class="n">Ratio</th></tr></thead>
+      <tbody>
+        <tr class="tot"><td>Surface intérieure — <em>base retenue</em></td><td class="n">421,82 m²</td><td class="n"><strong>20 000 €/m²</strong></td></tr>
+        <tr><td>Surface intérieure + terrasses pondérées à 40 %</td><td class="n">482,51 m²</td><td class="n">17 484 €/m²</td></tr>
+        <tr><td>Surface de plancher, garage et local technique inclus</td><td class="n">502,49 m²</td><td class="n">16 789 €/m²</td></tr>
+        <tr><td>Surface bâtie totale + terrasses</td><td class="n">654,22 m²</td><td class="n">12 895 €/m²</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="box">
+    <p class="eyebrow">À dire au premier contradicteur</p>
+    <p class="prose">Nous retenons volontairement la base <em>la plus défavorable</em> — la surface intérieure stricte. Sur la surface de plancher, convention usuelle en évaluation de villa neuve, le ratio ressort à <strong>16 789 €/m²</strong>, soit en dessous de la moyenne du segment contemporain de Sainte-Maxime.</p>
+  </div>
+</section>
+
+<section>
+  <div class="head">
+    <p class="chapno">III</p>
+    <h2>Trois méthodes, une valeur</h2>
+  </div>
+  <div class="methods">
+    <div class="method">
+      <p class="eyebrow">Méthode 1</p>
+      <h3>Bilan de reconstitution</h3>
+      <p class="res">1 185 €/m²</p>
+      <p>Le prix de 8 436 400 € n'implique qu'une valeur foncière de 1 185 €/m² de terrain — cohérente, voire prudente, pour une parcelle vue mer de 2 033 m² à La Nartelle.</p>
+    </div>
+    <div class="method">
+      <p class="eyebrow">Méthode 2</p>
+      <h3>Comparables d'offre actuels</h3>
+      <p class="res">19 854 €/m²</p>
+      <p>Moyenne du segment neuf et contemporain actuellement en vente à Sainte-Maxime. Le prix visé se situe exactement sur cette moyenne.</p>
+    </div>
+    <div class="method">
+      <p class="eyebrow">Méthode 3</p>
+      <h3>Prime du neuf mesurée</h3>
+      <p class="res">+ 22,6 %</p>
+      <p>Écart constaté entre le segment neuf-contemporain et le segment ancien-rénové sur le même marché, à situation comparable.</p>
+    </div>
+  </div>
+  <p class="prose">Ces trois méthodes n'ont aucune donnée en commun : l'une part des coûts, l'autre du marché de l'offre, la troisième d'un différentiel de segment. Leur convergence est l'argument central du dossier.</p>
+</section>
+
+<section>
+  <div class="head">
+    <p class="chapno">IV</p>
+    <h2>Méthode 1 — Ce que le prix contient réellement</h2>
+  </div>
+  <p class="prose">On reconstitue le coût de production d'une villa neuve de ce standard, poste par poste, et l'on observe ce qu'il reste pour le foncier. Si le résidu foncier est plausible, le prix l'est.</p>
+
+  <figure>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--c1)"></i> Coût de production hors foncier</span>
+      <span><i class="dot" style="background:var(--c2)"></i> Foncier implicite</span>
+      <span><i class="dot" style="background:var(--c3)"></i> Marge d'opération et frais financiers</span>
+    </div>
+    <svg id="fig-decomp" viewBox="0 0 720 168" role="img" aria-label="Décomposition des 20 000 €/m² : 11 289 € de coût de production, 5 711 € de foncier implicite, 3 000 € de marge et frais financiers."></svg>
+    <div class="tip" id="tip1"></div>
+    <figcaption>Décomposition du prix au m² de surface intérieure. Le détail chiffré poste par poste figure dans le tableau ci-dessous.</figcaption>
+  </figure>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Poste</th><th>Base retenue</th><th class="n">Montant HT</th></tr></thead>
+      <tbody>
+        <tr class="sub"><td colspan="3">Construction</td></tr>
+        <tr><td>Gros œuvre et second œuvre, surface intérieure</td><td>421,82 m² × 5 200 €/m² — travertin premium grand format, menuiseries alu Technal à rupture de pont thermique, VMC double flux, PAC gainable Daikin, isolation biosourcée fibre de bois, éclairage architectural intégré</td><td class="n">2 193 464 €</td></tr>
+        <tr><td>Garage et local technique</td><td>80,67 m² × 1 800 €/m²</td><td class="n">145 206 €</td></tr>
+        <tr class="sub"><td colspan="2">Équipements d'exception</td><td class="n">550 000 €</td></tr>
+        <tr><td>Salle de projection 30,22 m²</td><td>Epson Pro Cinema, Bowers &amp; Wilkins, fauteuils cuir, acoustique Vicoustic / Ecophon / Armstrong</td><td class="n">150 000 €</td></tr>
+        <tr><td>Cuisine sur mesure</td><td>Îlot monolithique, plan quartzite ou Dekton, électroménager Miele / Gaggenau</td><td class="n">120 000 €</td></tr>
+        <tr><td>Salle de sport 36,52 m²</td><td>Technogym Kinesis, Powertec, ATX Warrior, cardio Precor</td><td class="n">60 000 €</td></tr>
+        <tr><td>Domotique et sûreté</td><td>NIKO connecté, vidéosurveillance, visiophone à reconnaissance faciale</td><td class="n">55 000 €</td></tr>
+        <tr><td>Lingerie 24,14 m²</td><td>Miele Professional, Laurastar, adoucisseur, plans Silestone</td><td class="n">40 000 €</td></tr>
+        <tr><td>Sauna 8,59 m² et chambre froide 10,38 m²</td><td>Cèdre rouge sur mesure, Harvia · Fricon, Isocab, Metro</td><td class="n">70 000 €</td></tr>
+        <tr><td>Jacuzzi extérieur et cave à vin</td><td>Balboa, habillage travertin · régulation Liebherr</td><td class="n">55 000 €</td></tr>
+        <tr class="sub"><td colspan="2">Aménagements extérieurs</td><td class="n">680 000 €</td></tr>
+        <tr><td>Terrassements et soutènements</td><td>Dénivelé d'environ 7 m sur la parcelle (cotes +37,92 à +44,77 NGF)</td><td class="n">180 000 €</td></tr>
+        <tr><td>Paysagisme, arrosage, éclairage scénographique</td><td>1 635 m² d'extérieurs</td><td class="n">130 000 €</td></tr>
+        <tr><td>Terrasses et margelles travertin</td><td>151,73 m² sur plots, antidérapant</td><td class="n">120 000 €</td></tr>
+        <tr><td>Piscine, cuisine d'été, accès et mobilier extérieur</td><td>Piscine maçonnée pierre naturelle, électrolyse au sel · pavé granite · Roda Outdoor</td><td class="n">250 000 €</td></tr>
+        <tr class="sub"><td colspan="2">Mobilier et décoration intérieure</td><td class="n">550 000 €</td></tr>
+        <tr><td>Ameublement complet</td><td>Sélection La Crémerie — Bonaldo, La Chance, De Padova, Red Edition, Hamilton Conte, Luceplan, Saba Italia, Talenti</td><td class="n">—</td></tr>
+        <tr class="sub"><td colspan="2">Honoraires, assurances et taxes</td><td class="n">643 144 €</td></tr>
+        <tr><td>Maîtrise d'œuvre et bureaux d'études</td><td>13 % des travaux — architecte, structure, thermique, acoustique, OPC</td><td class="n">464 128 €</td></tr>
+        <tr><td>Assurances et taxes</td><td>DO, RCD, TRC (2,5 %) · taxes d'aménagement, raccordements, étude de sol</td><td class="n">179 016 €</td></tr>
+        <tr class="tot"><td colspan="2"><strong>Coût de production hors foncier</strong></td><td class="n"><strong>4 761 814 €</strong></td></tr>
+        <tr><td>Marge d'opération</td><td>12 % du prix</td><td class="n">1 012 368 €</td></tr>
+        <tr><td>Frais financiers et portage</td><td>3 % du prix</td><td class="n">253 092 €</td></tr>
+        <tr class="tot"><td colspan="2"><strong>Foncier implicite — résidu</strong></td><td class="n"><strong>2 409 126 €</strong></td></tr>
+      </tbody>
+      <caption>Coûts d'ordre de grandeur, à substituer par les coûts réels de l'opération dès qu'ils sont arrêtés. Le prix d'acquisition effectif de la parcelle AF 168 doit remplacer le foncier implicite : c'est la donnée qui verrouille définitivement ce bilan.</caption>
+    </table>
+  </div>
+
+  <div class="box">
+    <p class="eyebrow">Le résultat qui emporte la décision</p>
+    <p class="prose">Un prix de 8 436 400 € n'implique qu'un foncier de <strong>2 409 126 €, soit 1 185 €/m² de terrain</strong>, pour une parcelle de 2 033 m² avec vue mer à La Nartelle. Ce niveau est cohérent avec le marché du foncier constructible vue mer du Golfe — il en est même plutôt le bas.</p>
+    <p class="quote">Le prix ne se défend pas malgré le coût de production : il est <em>contraint</em> par lui. Descendre sous 8 M€ reviendrait à valoriser le terrain à moins de 900 €/m², ce qu'aucun propriétaire foncier de La Nartelle n'accepterait.</p>
+  </div>
+</section>
+
+<section>
+  <div class="head">
+    <p class="chapno">V</p>
+    <h2>Méthode 2 — Étude complémentaire : les annonces en cours</h2>
+  </div>
+  <p class="prose">Relevé des villas actuellement proposées à la vente à Sainte-Maxime dans le segment haut. Le marché se scinde nettement en trois strates, et c'est cette segmentation qui porte l'argument.</p>
+
+  <figure>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--c1)"></i> Neuf et contemporain</span>
+      <span><i class="dot" style="background:var(--c2)"></i> Ancien et rénové</span>
+      <span><i class="dot" style="background:var(--c3)"></i> Standard vue mer</span>
+      <span><i class="dot" style="background:var(--ink);outline:2px solid var(--bronze);outline-offset:2px"></i> Villa Roi de la Camargue</span>
+    </div>
+    <svg id="fig-comps" viewBox="0 0 720 400" role="img" aria-label="Nuage de points du prix au m² en fonction de la surface pour les villas actuellement en vente à Sainte-Maxime. Le segment neuf et contemporain se situe entre 18 156 et 23 390 €/m², l'ancien rénové entre 14 857 et 17 808 €/m². La Villa Roi de la Camargue se positionne à 20 000 €/m² pour 421,82 m²."></svg>
+    <div class="tip" id="tip2"></div>
+    <figcaption>Prix affichés relevés en septembre 2026 sur les portails et sites d'agences du Golfe. Les données complètes figurent dans le tableau ci-dessous.</figcaption>
+  </figure>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Bien</th><th>Segment</th><th class="n">Surface</th><th class="n">Prix affiché</th><th class="n">€/m²</th></tr></thead>
+      <tbody>
+        <tr><td>Contemporaine vue mer panoramique, 6 ch. — réf. 2025-17</td><td><span class="dot" style="background:var(--c1)"></span>Neuf / contemporain</td><td class="n">295 m²</td><td class="n">6 900 000 €</td><td class="n"><strong>23 390 €</strong></td></tr>
+        <tr><td>Villa neuve, proximité centre-ville</td><td><span class="dot" style="background:var(--c1)"></span>Neuf / contemporain</td><td class="n">320 m²</td><td class="n">6 300 000 €</td><td class="n"><strong>19 688 €</strong></td></tr>
+        <tr><td>Contemporaine neuve, 4 ch.</td><td><span class="dot" style="background:var(--c1)"></span>Neuf / contemporain</td><td class="n">264 m²</td><td class="n">4 800 000 €</td><td class="n"><strong>18 182 €</strong></td></tr>
+        <tr><td>Contemporaine surplombant la mer</td><td><span class="dot" style="background:var(--c1)"></span>Neuf / contemporain</td><td class="n">358 m²</td><td class="n">6 500 000 €</td><td class="n"><strong>18 156 €</strong></td></tr>
+        <tr><td>Méditerranéenne face à la mer, 5 ch. — réf. 2025-16</td><td><span class="dot" style="background:var(--c2)"></span>Ancien / rénové</td><td class="n">365 m²</td><td class="n">6 500 000 €</td><td class="n">17 808 €</td></tr>
+        <tr><td>Vue mer exceptionnelle, 6 ch. — réf. 2026-39</td><td><span class="dot" style="background:var(--c2)"></span>Ancien / rénové</td><td class="n">347 m²</td><td class="n">5 690 000 €</td><td class="n">16 398 €</td></tr>
+        <tr><td>Villa unique en bord de mer, 5 ch. — réf. 2025-12</td><td><span class="dot" style="background:var(--c2)"></span>Ancien / rénové</td><td class="n">340 m²</td><td class="n">5 500 000 €</td><td class="n">16 176 €</td></tr>
+        <tr><td>Inspiration provençale</td><td><span class="dot" style="background:var(--c2)"></span>Ancien / rénové</td><td class="n">350 m²</td><td class="n">5 500 000 €</td><td class="n">15 714 €</td></tr>
+        <tr><td>Villa vue mer</td><td><span class="dot" style="background:var(--c2)"></span>Ancien / rénové</td><td class="n">350 m²</td><td class="n">5 200 000 €</td><td class="n">14 857 €</td></tr>
+        <tr><td>Villa vue mer, 4 ch.</td><td><span class="dot" style="background:var(--c3)"></span>Standard</td><td class="n">400 m²</td><td class="n">4 250 000 €</td><td class="n">10 625 €</td></tr>
+        <tr class="tot"><td><strong>Villa Roi de la Camargue</strong> — neuve, livrée équipée et meublée</td><td>Neuf grand luxe</td><td class="n">421,82 m²</td><td class="n">8 436 400 €</td><td class="n"><strong>20 000 €</strong></td></tr>
+      </tbody>
+      <caption>Prix d'offre, non des prix de vente. Chaque ligne doit être re-sourcée, horodatée et capturée en PDF avant remise du dossier à un tiers.</caption>
+    </table>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Segment</th><th class="n">Nombre</th><th class="n">Minimum</th><th class="n">Médiane</th><th class="n">Moyenne</th><th class="n">Maximum</th></tr></thead>
+      <tbody>
+        <tr class="tot"><td><span class="dot" style="background:var(--c1)"></span><strong>Neuf et contemporain</strong></td><td class="n">4</td><td class="n">18 156 €</td><td class="n">18 935 €</td><td class="n"><strong>19 854 €</strong></td><td class="n">23 390 €</td></tr>
+        <tr><td><span class="dot" style="background:var(--c2)"></span>Ancien et rénové</td><td class="n">5</td><td class="n">14 857 €</td><td class="n">16 176 €</td><td class="n">16 191 €</td><td class="n">17 808 €</td></tr>
+        <tr><td><span class="dot" style="background:var(--c3)"></span>Standard vue mer</td><td class="n">1</td><td class="n">10 625 €</td><td class="n">—</td><td class="n">10 625 €</td><td class="n">10 625 €</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="quote">La moyenne du segment neuf et contemporain de Sainte-Maxime ressort à 19 854 €/m². Nous demandons 20 000 €/m². L'écart est de 0,7 %.</p>
+</section>
+
+<section>
+  <div class="head">
+    <p class="chapno">VI</p>
+    <h2>Méthode 3 — La prime du neuf, mesurée sur ce marché</h2>
+  </div>
+  <p class="prose">Entre les deux strates principales du relevé, à situation et à surface comparables, l'écart moyen est de <strong>+ 22,6 %</strong> — 19 854 €/m² contre 16 191 €/m². Cette prime n'est pas une opinion : elle se lit directement dans les prix pratiqués sur la commune. Elle recouvre six éléments, tous documentés au dossier.</p>
+  <div class="presta">
+    <div><span class="sz">RE2020</span><h3>Garanties et performance</h3><p>Décennale, dommages-ouvrage, parfait achèvement. Isolation biosourcée, VMC double flux, PAC Daikin, double vitrage anti-effraction. Aucun travaux à prévoir avant vingt ans.</p></div>
+    <div><span class="sz">421,82 m²</span><h3>Livrée meublée et décorée</h3><p>Ameublement complet fourni par La Crémerie. L'acquéreur international dispose d'un actif exploitable dès la remise des clés, y compris en location saisonnière à la première saison.</p></div>
+    <div><span class="sz">4 × 39,85 m²</span><h3>Suites de standard hôtelier</h3><p>Quatre chambres de 36,54 à 41,16 m², toutes avec dressings aménagés sur mesure. Aucun comparable du relevé n'offre cette générosité de suites.</p></div>
+    <div><span class="sz">112 m²</span><h3>Espaces de bien-être et loisirs</h3><p>Salle de projection 30,22 m², salle de musculation 36,52 m², sauna 8,59 m², sanitaires dédiés 7,52 m², jacuzzi extérieur. Un programme d'hôtellerie de luxe intégré à la villa.</p></div>
+    <div><span class="sz">34,52 m²</span><h3>Logistique de réception</h3><p>Lingerie 24,14 m² Miele Professional et chambre froide professionnelle 10,38 m². Ces équipements signalent une villa conçue pour recevoir, et les acquéreurs de ce segment les cherchent.</p></div>
+    <div><span class="sz">2 033 m²</span><h3>Parcelle et emprise</h3><p>Emprise limitée à 19,6 %, soit 1 635 m² d'extérieurs. Ratio rare sur un secteur où la contrainte foncière pousse à la densification.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="head">
+    <p class="chapno">VII</p>
+    <h2>Ce qui sera attaqué</h2>
+  </div>
+  <p class="prose">Un dossier de défense de prix ne vaut que s'il anticipe l'attaque. Voici les six points sur lesquels le prix sera contesté, et ce qu'il faut répondre — ou corriger avant de sortir le bien.</p>
+  <div>
+    <details open>
+      <summary><span class="k">01</span> « Ce n'est pas un pieds dans l'eau. »</summary>
+      <div class="ans">
+        <p>Exact, et il ne faut jamais le laisser croire. Les cotes du plan de masse situent la villa entre <strong>+37,92 et +44,77 NGF</strong> : c'est une position perchée avec vue mer, pas un front de mer.</p>
+        <p>La conséquence est méthodologique : le prix ne se défend <em>pas</em> par la valeur du foncier littoral, mais par le neuf, les prestations et le coût de production. C'est précisément ce que font les trois méthodes de ce dossier — aucune ne s'appuie sur le front de mer.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="k">02</span> « La piscine est petite. »</summary>
+      <div class="ans">
+        <p><strong>C'est le point faible réel du dossier.</strong> Une piscine de 7,70 × 3,50 m, soit 27 m², est modeste pour une villa de 421,82 m² sur 2 033 m² de terrain. Les comparables à 6,5-6,9 M€ affichent des bassins de 10 × 5 ou 12 × 5.</p>
+        <p>Deux options, à trancher avant commercialisation : agrandir le bassin — le foncier disponible le permet largement — ou documenter la contrainte qui l'a imposé (pente, reculs du PLU, implantation). En l'état, un acquéreur avisé s'en servira pour demander 300 000 à 500 000 € de remise.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="k">03</span> « Quatre chambres pour 8,4 M€, c'est peu. »</summary>
+      <div class="ans">
+        <p>Les comparables à 5,5-6,9 M€ offrent cinq à six chambres. L'objection est prévisible et se retourne : la surface est dans les chambres, pas dans leur nombre. <strong>159,41 m² de chambres pour quatre pièces</strong>, soit 39,85 m² de moyenne, contre 15 à 20 m² dans les villas comparables.</p>
+        <p>Argument à tenir : un acquéreur de ce segment n'achète pas des lits, il achète des suites. Et le R-0 conserve la réserve de transformation d'une partie des espaces de loisirs en chambres supplémentaires si le besoin apparaît.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="k">04</span> « Les surfaces viennent de plans d'esquisse. »</summary>
+      <div class="ans">
+        <p>Fondé. Les plans ESQ.2 et ESQ.3 du 30/05/2025 portent explicitement la mention <em>« plans de principe, ils ne peuvent en aucun cas servir de plans d'exécution »</em>, et trois variantes du R+1 coexistent au dossier, avec des surfaces de séjour et de cuisine différentes.</p>
+        <p>À faire avant toute remise à un tiers : figer la variante retenue et faire établir une attestation de surface. Tant que la variante n'est pas arrêtée, ne communiquer que la surface totale, qui est stable d'une version à l'autre.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="k">05</span> « Vos comparables sont des prix affichés. »</summary>
+      <div class="ans">
+        <p>Exact, et c'est pourquoi la méthode 1 — le bilan de reconstitution — porte le dossier plutôt que la méthode 2. Un bilan de coûts ne dépend d'aucun prix d'annonce.</p>
+        <p>Pour renforcer : extraire les mutations réellement enregistrées via l'outil DVF livré avec la première étude, et joindre les captures horodatées de chaque annonce citée.</p>
+      </div>
+    </details>
+    <details>
+      <summary><span class="k">06</span> « 20 000 €/m² dépasse la moyenne de Sainte-Maxime. »</summary>
+      <div class="ans">
+        <p>La moyenne communale, autour de 6 100 €/m², agrège collines, arrière-pays et parc ancien : ce n'est pas un terme de comparaison recevable pour une villa neuve d'exception.</p>
+        <p>Le repère pertinent est le segment neuf et contemporain du haut de marché local, à <strong>19 854 €/m² de moyenne</strong>. Et à Saint-Tropez, en face, le prix médian d'une villa avoisine 25 000 €/m².</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="head">
+    <p class="chapno">VIII</p>
+    <h2>Recommandation</h2>
+  </div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Niveau</th><th class="n">Prix</th><th class="n">€/m²</th><th>Positionnement</th></tr></thead>
+      <tbody>
+        <tr class="tot"><td><strong>Prix de présentation</strong></td><td class="n"><strong>8 450 000 €</strong></td><td class="n"><strong>20 032 €</strong></td><td>Sur la moyenne du segment neuf ; laisse une marge de négociation crédible</td></tr>
+        <tr><td>Valeur de référence du dossier</td><td class="n">8 436 400 €</td><td class="n">20 000 €</td><td>Point de convergence des trois méthodes</td></tr>
+        <tr><td>Plancher de négociation</td><td class="n">7 950 000 €</td><td class="n">18 847 €</td><td>Reste au-dessus de la médiane du segment neuf (18 935 €) — ne pas descendre plus bas sans contrepartie</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="box risk">
+    <p class="eyebrow">Trois actions avant commercialisation</p>
+    <ol>
+      <li><strong>Trancher la question de la piscine.</strong> C'est la seule faiblesse matérielle du dossier, et elle est corrigeable.</li>
+      <li><strong>Figer la variante de plan et faire attester les surfaces.</strong> Trois versions du R+1 circulent ; un acquéreur qui les découvre perd confiance dans le reste du dossier.</li>
+      <li><strong>Substituer le prix d'acquisition réel du foncier</strong> au foncier implicite du bilan. C'est la donnée qui transforme une reconstitution en démonstration.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <p class="eyebrow">Sources et réserves</p>
+  <p>Documents de l'opération : notice descriptive Villa La Nartelle du 12 octobre 2025 · dossier de plans ESQ.2 à ESQ.5 du 30 mai 2025, indice 120 · plan cadastral parcelle AF 168 · dossier Fournitures par La Crémerie · <a href="https://twinmotion.unrealengine.com/panorama/Nyobbhy2JzOzFgwX">panorama Twinmotion du projet</a>.</p>
+  <p>Marché : <a href="https://www.collectionprovenceimmobilier.com/fr/proprietes-sainte-maxime">Collection Provence Immobilier — villas de luxe Sainte-Maxime</a> · <a href="https://www.bellesdemeures.com/vente/france/provence-alpes-cote-d-azur/var/sainte-maxime/maison-luxe/tt-2-tb-2-pl-35976/2/">Belles Demeures</a> · <a href="https://www.john-taylor.fr/france/vente/cote-d-azur/saint-tropez-et-ses-environs/sainte-maxime/">John Taylor</a> · <a href="https://www.mysweetimmo.com/2026/02/18/immobilier-dans-le-golfe-de-saint-tropez-peu-de-ventes-mais-des-prix-qui-ne-cedent-pas/">MySweetImmo — Golfe de Saint-Tropez, février 2026</a> · <a href="https://www.actual-immo.fr/immobilier-luxe-cote-azur-2026/">Actual-Immo — marché du luxe Côte d'Azur 2026</a>.</p>
+  <p><strong>Réserves.</strong> Les comparables sont des prix d'offre relevés en septembre 2026, non des prix de vente : ils doivent être re-sourcés et horodatés avant remise à un tiers. Les coûts du bilan de reconstitution sont des ordres de grandeur de marché, à remplacer par les coûts réels de l'opération. Les surfaces proviennent de plans d'esquisse non contractuels et devront être attestées à la livraison.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var nf = function (v, d) { return v.toLocaleString("fr-FR", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); };
+  var css = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); };
+
+  function make(parent, tag, attrs, text) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    parent.appendChild(n);
+    return n;
+  }
+
+  /* Infobulle partagée -------------------------------------------------- */
+  function bindTip(mark, figure, tip, html) {
+    var show = function (evt) {
+      tip.innerHTML = html;
+      tip.style.opacity = "1";
+      var box = figure.getBoundingClientRect();
+      var x = (evt.clientX || 0) - box.left + 14;
+      var y = (evt.clientY || 0) - box.top - 8;
+      tip.style.left = Math.min(x, box.width - 250) + "px";
+      tip.style.top = Math.max(y, 4) + "px";
+    };
+    mark.addEventListener("mousemove", show);
+    mark.addEventListener("mouseenter", show);
+    mark.addEventListener("mouseleave", function () { tip.style.opacity = "0"; });
+    mark.addEventListener("focus", function (e) {
+      tip.innerHTML = html; tip.style.opacity = "1";
+      var b = mark.getBoundingClientRect(), f = figure.getBoundingClientRect();
+      tip.style.left = Math.min(b.left - f.left, f.width - 250) + "px";
+      tip.style.top = Math.max(b.top - f.top - 46, 4) + "px";
+    });
+    mark.addEventListener("blur", function () { tip.style.opacity = "0"; });
+    mark.setAttribute("tabindex", "0");
+  }
+
+  /* ── Figure 1 : décomposition du €/m² ─────────────────────────────────── */
+  (function () {
+    var svg = document.getElementById("fig-decomp");
+    var fig = svg.closest("figure"), tip = document.getElementById("tip1");
+    var parts = [
+      { lab: "Coût de production hors foncier", val: 11289, hue: "--c1",
+        note: "Construction, équipements d'exception, extérieurs, mobilier, honoraires" },
+      { lab: "Foncier implicite", val: 5711, hue: "--c2",
+        note: "2 409 126 € pour 2 033 m², soit 1 185 €/m² de terrain" },
+      { lab: "Marge et frais financiers", val: 3000, hue: "--c3",
+        note: "Marge d'opération 12 % et portage 3 %" }
+    ];
+    var total = 20000, W = 720, ML = 0, MR = 0, BY = 44, BH = 52;
+    var span = W - ML - MR, x = ML;
+
+    make(svg, "text", { x: 0, y: 18, "font-size": 12, "font-family": "Archivo, sans-serif", fill: css("--ink-mute") }, "Prix au m² de surface intérieure");
+    make(svg, "text", { x: W, y: 18, "text-anchor": "end", "font-size": 13, "font-family": "Archivo, sans-serif", "font-weight": 600, fill: css("--ink") }, nf(total) + " €/m²");
+
+    parts.forEach(function (p, i) {
+      var w = span * p.val / total;
+      var gap = i < parts.length - 1 ? 2 : 0;   /* 2px de surface entre segments */
+      var r = make(svg, "rect", {
+        x: x, y: BY, width: Math.max(w - gap, 1), height: BH,
+        fill: css(p.hue), rx: 2
+      });
+      bindTip(r, fig, tip, "<b>" + p.lab + "</b><br>" + nf(p.val) + " €/m² — " + nf(p.val / total * 100, 1) + " %<br>" + p.note);
+
+      var cx = x + (w - gap) / 2;
+      if (w > 96) {
+        make(svg, "text", { x: cx, y: BY + BH / 2 + 5, "text-anchor": "middle", "font-size": 14,
+          "font-family": "Archivo, sans-serif", "font-weight": 600, fill: "#FFFFFF" }, nf(p.val) + " €");
+      }
+      /* la dernière étiquette est calée à droite pour ne pas déborder du cadre */
+      var last = i === parts.length - 1;
+      var lx = last ? x + w : x, anchor = last ? "end" : "start";
+      make(svg, "text", { x: lx, y: BY + BH + 26, "text-anchor": anchor, "font-size": 12, "font-family": "Archivo, sans-serif", fill: css("--ink-soft") }, p.lab);
+      make(svg, "text", { x: lx, y: BY + BH + 44, "text-anchor": anchor, "font-size": 12, "font-family": "Archivo, sans-serif", "font-weight": 600, fill: css(p.hue) }, nf(p.val / total * 100, 1) + " %");
+      x += w;
+    });
+  })();
+
+  /* ── Figure 2 : comparables ───────────────────────────────────────────── */
+  (function () {
+    var svg = document.getElementById("fig-comps");
+    var fig = svg.closest("figure"), tip = document.getElementById("tip2");
+    var data = [
+      { n: "Contemporaine vue mer panoramique, 6 ch.", s: 295, p: 6900000, g: 0 },
+      { n: "Villa neuve, proximité centre-ville",       s: 320, p: 6300000, g: 0 },
+      { n: "Contemporaine neuve, 4 ch.",                s: 264, p: 4800000, g: 0 },
+      { n: "Contemporaine surplombant la mer",          s: 358, p: 6500000, g: 0 },
+      { n: "Méditerranéenne face à la mer, 5 ch.",      s: 365, p: 6500000, g: 1 },
+      { n: "Vue mer exceptionnelle, 6 ch.",             s: 347, p: 5690000, g: 1 },
+      { n: "Villa unique en bord de mer, 5 ch.",        s: 340, p: 5500000, g: 1 },
+      { n: "Inspiration provençale",                    s: 350, p: 5500000, g: 1 },
+      { n: "Villa vue mer",                             s: 350, p: 5200000, g: 1 },
+      { n: "Villa vue mer, 4 ch.",                      s: 400, p: 4250000, g: 2 }
+    ];
+    var hues = ["--c1", "--c2", "--c3"];
+    var noms = ["Neuf et contemporain", "Ancien et rénové", "Standard vue mer"];
+
+    var W = 720, H = 400, ML = 62, MR = 58, MT = 26, MB = 46;
+    var x0 = 240, x1 = 440, y0 = 9000, y1 = 25000;
+    var px = function (s) { return ML + (s - x0) / (x1 - x0) * (W - ML - MR); };
+    var py = function (v) { return MT + (1 - (v - y0) / (y1 - y0)) * (H - MT - MB); };
+
+    /* Grille et axes, volontairement discrets */
+    [10000, 14000, 18000, 22000].forEach(function (v) {
+      make(svg, "line", { x1: ML, x2: W - MR, y1: py(v), y2: py(v), stroke: css("--rule-fine"), "stroke-width": 1 });
+      make(svg, "text", { x: ML - 9, y: py(v) + 4, "text-anchor": "end", "font-size": 11,
+        "font-family": "Archivo, sans-serif", fill: css("--ink-mute") }, nf(v / 1000) + " k€");
+    });
+    [250, 300, 350, 400].forEach(function (s) {
+      make(svg, "text", { x: px(s), y: H - 20, "text-anchor": "middle", "font-size": 11,
+        "font-family": "Archivo, sans-serif", fill: css("--ink-mute") }, s + " m²");
+    });
+    make(svg, "text", { x: ML - 9, y: MT + 4, "text-anchor": "end", "font-size": 10.5,
+      "font-family": "Archivo, sans-serif", fill: css("--ink-mute") }, "€/m²");
+
+    /* Moyenne du segment neuf */
+    make(svg, "line", { x1: ML, x2: W - MR, y1: py(19854), y2: py(19854),
+      stroke: css("--c1"), "stroke-width": 1.5, "stroke-dasharray": "6 4" });
+    make(svg, "text", { x: ML + 6, y: py(19854) - 9, "font-size": 11,
+      "font-family": "Archivo, sans-serif", "font-weight": 600, fill: css("--c1") },
+      "Moyenne du segment neuf — 19 854 €/m²");
+
+    data.forEach(function (d) {
+      var v = d.p / d.s;
+      var c = make(svg, "circle", { cx: px(d.s), cy: py(v), r: 7, fill: css(hues[d.g]),
+        stroke: css("--paper"), "stroke-width": 2 });   /* anneau de 2px sur marques superposées */
+      bindTip(c, fig, tip, "<b>" + d.n + "</b><br>" + noms[d.g] + "<br>" +
+        d.s + " m² — " + nf(d.p) + " €<br><b>" + nf(v) + " €/m²</b>");
+    });
+
+    /* Le bien */
+    var BX = px(421.82), BY = py(20000);
+    make(svg, "circle", { cx: BX, cy: BY, r: 12, fill: "none", stroke: css("--bronze"), "stroke-width": 1.5, opacity: .55 });
+    var b = make(svg, "circle", { cx: BX, cy: BY, r: 7.5, fill: css("--ink"), stroke: css("--paper"), "stroke-width": 2 });
+    bindTip(b, fig, tip, "<b>Villa Roi de la Camargue</b><br>Neuf grand luxe, livrée meublée<br>421,82 m² — 8 436 400 €<br><b>20 000 €/m²</b>");
+    make(svg, "line", { x1: BX, x2: BX, y1: BY - 14, y2: BY - 30, stroke: css("--bronze"), "stroke-width": 1 });
+    make(svg, "text", { x: BX, y: BY - 52, "text-anchor": "middle", "font-size": 12.5,
+      "font-family": "Archivo, sans-serif", "font-weight": 600, fill: css("--ink") }, "Villa Roi de la Camargue");
+    make(svg, "text", { x: BX, y: BY - 37, "text-anchor": "middle", "font-size": 11.5,
+      "font-family": "Archivo, sans-serif", fill: css("--bronze") }, "421,82 m² — 20 000 €/m²");
+  })();
+})();
+</script>
